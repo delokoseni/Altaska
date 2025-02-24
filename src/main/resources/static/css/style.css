@@ -13,6 +13,10 @@ body {
     background-color: var(--background-color);
 }
 
+svg fill {
+
+}
+
 /* Светлая тема */
 :root {
     --header-color: #5680E9; /* Цвет заголовков */
@@ -20,6 +24,7 @@ body {
     --button-color: #8860D0; /* Цвет кнопков */
     --text-color: #FFFFFF; /* Цвет текста */
     --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --hover-button-color: #7449C6;
 }
 
 /* Темная тема */
@@ -29,6 +34,7 @@ body {
     --button-color: #5A5A5A; /* Цвет кнопков в темной теме */
     --text-color: #FFFFFF; /* Цвет текста в темной теме */
     --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --hover-button-color: #7A7A7A;
 }
 
 /* Стили для заголовков */
@@ -39,10 +45,17 @@ h1, h2, h3 {
 
 /* Стили для кнопок */
 button {
+    font-family: 'Nunito', sans-serif;
     background-color: var(--button-color);
     color: var(--text-color);
     border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background-color: var(--hover-button-color);
+    border-color: var(--hover-button-color);
 }

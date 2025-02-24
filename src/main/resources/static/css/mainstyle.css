@@ -9,7 +9,7 @@ header {
 
 /* Стили для названия */
 .site-title {
-    font-size: 48px;
+    font-size: 24px;
     color: var(--header-color); /* Цвет надписи */
 }
 
@@ -41,6 +41,18 @@ header {
     border: 3px solid var(--button-color); /* Цвет границы элемента */
     border-radius: 15px; /* Радиус закругления углов */
     padding: 8px; /* Отступы внутри контейнера */
+}
+
+.language-container {
+    display: flex;
+    align-items: center;
+    margin-left: 8px; /* Отступ между иконкой и меню */
+}
+
+.language-toggle {
+    width: 32px; /* Размер иконки */
+    height: 32px; /* Размер иконки */
+    cursor: pointer; /* Указатель курсора */
 }
 
 /* Стили для кнопок в меню */
@@ -79,9 +91,67 @@ header {
     padding: 24px; /* Отступы */
 }
 
-main {
+main h1 {
+    font-size: 32px;
+    text-align: center;
+}
+
+.content-block {
+    background-color: var(--second-text-color); /* Цвет фона блока */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, [1)](1)); /* Увеличенная тень */
+    border-radius: 32px; /* Радиус углов */
+    padding: 16px 16px 16px; /* Верхний отступ уменьшен до 16px */
+    max-width: fit-content; /* Чтобы ширина подстраивалась под текст */
+    margin-left: 40px; /* Отступ слева */
+    margin-bottom: 16px; /* Межблочный отступ снизу */
+}
+
+.content-block p {
+    font-size: 16px;
+}
+
+.gallery-container {
     display: flex;
-    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-container {
+    width: 60vw; /* Ширина 60% страницы */
+    aspect-ratio: 16/9; /* Соотношение сторон 720:1280 */
+    border-radius: 32px; /* Радиус углов */
+    overflow: hidden;
+    background-color: #f0f0f0; /* Фоновый цвет */
+    margin-bottom: 20px;
+}
+
+.current-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Масштабирование изображения */
+}
+
+.prev-button, .next-button {
+    margin: 0 16px; /* Отступы между кнопками и контейнером */
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+.center-button {
+    display: flex;
+    flex-direction: column; /* Для вертикального выравнивания */
+    align-items: center; /* Центрирование по горизонтали */
+    margin-bottom: 40px;
+}
+
+.content-block ul {
+    font-size: 16px;
 }
 
 footer {
