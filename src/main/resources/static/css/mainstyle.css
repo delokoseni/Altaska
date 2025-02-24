@@ -1,0 +1,90 @@
+/* Стили для шапки */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: var(--background-color); /* Или любой другой цвет фона для шапки */
+}
+
+/* Стили для названия */
+.site-title {
+    font-size: 48px;
+    color: var(--header-color); /* Цвет надписи */
+}
+
+/* Контейнер для меню */
+.menu-container {
+    display: flex;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-grow: 1; /* Позволяем контейнеру занимать оставшееся пространство */
+}
+
+.theme-icon-container {
+    display: flex;
+    align-items: center;
+    margin-right: 8px; /* Отступ между иконкой и меню */
+}
+
+.theme-toggle {
+    width: 32px; /* Размер иконки */
+    height: 32px; /* Размер иконки */
+    cursor: pointer; /* Указатель курсора */
+}
+
+/* Стили для меню */
+.menu {
+    display: flex;
+    background-color: var(--text-color); /* Цвет фона элемента меню */
+    border: 3px solid var(--button-color); /* Цвет границы элемента */
+    border-radius: 15px; /* Радиус закругления углов */
+    padding: 8px; /* Отступы внутри контейнера */
+}
+
+/* Стили для кнопок в меню */
+.menu-button {
+    background-color: transparent; /* Прозрачный фон для кнопок */
+    color: var(--second-text-color); /* Цвет текста */
+    border: none; /* Убираем стандартную обводку */
+    border-radius: 8px; /* Радиус закругления углов */
+    padding: 16px; /* Отступы внутри кнопок */
+    margin: 0 8px; /* Отступ между кнопками */
+    cursor: pointer; /* Указатель курсора */
+    font-size: 16px; /* Размер шрифта кнопки */
+}
+
+/* Стили для кнопок */
+.login-button, .register-button {
+    padding: 24px 48px; /* Отступы по кнопкам */
+    border-radius: 15px; /* Радиус обводки */
+    cursor: pointer; /* Указатель курсора */
+    border: none; /* Убираем стандартную обводку */
+    font-size: 16px; /* Размер шрифта кнопок */
+    margin-left: 8px; /* Менять */
+}
+
+/* Стили для кнопки "Войти" */
+.login-button {
+    background-color: var(--background-color); /* Цвет фона кнопки "Войти" */
+    border: 3px solid var(--button-color); /* Обводка */
+    color: var(--text-color); /* Цвет текста */
+}
+
+/* Стили для кнопки "Зарегистрироваться" */
+.register-button {
+    background-color: var(--button-color); /* Цвет фона кнопки "Зарегистрироваться" */
+    color: var(--text-color); /* Цвет текста */
+    padding: 24px; /* Отступы */
+}
+
+main {
+    display: flex;
+    flex-grow: 1;
+}
+
+footer {
+    padding: 16px;
+    background-color: var(--background-color); /* Или любой другой цвет фона для шапки */
+}
