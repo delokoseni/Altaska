@@ -68,4 +68,16 @@ public class Users {
     public UserType GetUserType() {
         return userType;
     }
+
+    public void SetEmail(String email) {
+        this.email = email;
+    }
+
+    public void SetPassword(String password) {
+        this.password = password;
+    }
+
+    public void SetUserType(UserType userType) {
+        this.userType = userType;
+    }
 }

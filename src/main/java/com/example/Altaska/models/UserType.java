@@ -14,9 +14,14 @@ public class UserType {
     @Column(name = "type", unique = true, nullable = false)
     private String type;
 
-    public UserType() { }
+    public UserType()
+    {
+        type = "user";
+    }
 
     public Long GetId() { return this.id; }
 
     public String GetType() { return this.type; }
+
+    public void SetType(String type) { this.type = type; }
 }

@@ -26,6 +26,7 @@
         </div>
     </#if>
     <form action="/registration" method="post">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <label>Email <span class="required" title="Поле обязательно для заполнения">*</span></label>
         <input type="text" name="email" placeholder="Email" required>
         <label>Пароль <span class="required" title="Поле обязательно для заполнения">*</span></label>
