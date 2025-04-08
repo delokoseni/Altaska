@@ -4,7 +4,6 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    background-color: var(--background-color); /* Или любой другой цвет фона для шапки */
 }
 
 /* Стили для названия */
@@ -156,5 +155,4 @@ h2 {
 
 footer {
     padding: 16px;
-    background-color: var(--background-color); /* Или любой другой цвет фона для шапки */
 }

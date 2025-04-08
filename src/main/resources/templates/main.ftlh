@@ -17,17 +17,17 @@
             <img class="theme-toggle" src="/icons/sun.svg" alt="Сменить тему">
         </div>
         <div class="menu">
-            <button class="menu-button">Продукт</button>
-            <button class="menu-button">Возможности</button>
-            <button class="menu-button">Для кого</button>
+            <a href="#" class="menu-button">Продукт</a>
+            <a href="#" class="menu-button">Возможности</a>
+            <a href="#" class="menu-button">Для кого</a>
         </div>
         <div class="language-container">
             <img class="language-toggle" src="/icons/language.svg" alt="Сменить язык">
         </div>
     </div>
     <div>
-        <button class="login-button">Войти</button>
-        <button class="register-button">Зарегистрироваться</button>
+        <a href="/login" class="login-button">Войти</a>
+        <a href="/registration" class="register-button">Зарегистрироваться</a>
     </div>
 </header>
 <main>
@@ -79,7 +79,7 @@
     </div>
     <div class="center-button">
         <h2>Попробуйте!</h2>
-        <button class="register-button">Зарегистрироваться</button>
+        <a href="/registration" class="register-button">Зарегистрироваться</a>
     </div>
     <div class="content-block">
         <p>

@@ -11,10 +11,7 @@ body {
     padding: 0;
     color: var(--text-color);
     background-color: var(--background-color);
-}
-
-svg fill {
-
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* Светлая тема */
@@ -44,7 +41,9 @@ h1, h2, h3 {
 }
 
 /* Стили для кнопок */
-button {
+a.menu-button,
+a.login-button,
+a.register-button {
     font-family: 'Nunito', sans-serif;
     background-color: var(--button-color);
     color: var(--text-color);
@@ -52,9 +51,13 @@ button {
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
+    text-decoration: none; /* чтобы убрать подчёркивание у ссылок */
+    display: inline-block; /* чтобы вести себя как кнопки */
 }
 
-button:hover {
+a.menu-button:not(.prev-button):not(.next-button):hover,
+a.login-button:hover,
+a.register-button:hover {
     transform: scale(1.05);
     background-color: var(--hover-button-color);
     border-color: var(--hover-button-color);
