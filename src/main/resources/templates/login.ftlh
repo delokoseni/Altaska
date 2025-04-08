@@ -6,27 +6,39 @@
     <link rel="stylesheet" href="/css/mainstyle.css">
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/themeToggle.js" defer></script>
-    <script src="/js/gallery.js" defer></script>
+    <script src="/js/passwordToggle.js"></script>
     <title>Вход</title>
 </head>
 <body>
 <header>
     <div class="site-title">altaska</div>
-    <div class="menu-container">
-        <div class="theme-icon-container">
-            <img class="theme-toggle" src="/icons/sun.svg" alt="Сменить тему">
-        </div>
-        <div class="language-container">
-            <img class="language-toggle" src="/icons/language.svg" alt="Сменить язык">
-        </div>
-    </div>
     <div>
-        <button class="login-button">Войти</button>
-        <button class="register-button">Зарегистрироваться</button>
+        <a href="/" class="login-button">На главную</a>
+        <a href="/registration" class="register-button">Зарегистрироваться</a>
     </div>
 </header>
 <main>
+    <div class="container">
+        <h1>Вход</h1>
+        <#if error??>
+            <div class="error-message" style="color: red;">${error}</div>
+        </#if>
+    <form action="/login" method="post">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        <label>Email</label>
+        <input type="text" name="username" placeholder="Email" style="width: 94%;" required>
 
+        <label>Пароль</label>
+        <div class="password-container">
+            <input type="password" id="password" name="password" placeholder="Пароль" required>
+            <span class="toggle-password" onclick="togglePasswordVisibility('password')" title="Показать/Скрыть пароль">
+                    <img id="eye-icon-password" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
+                </span>
+        </div>
+
+        <button type="submit">Войти</button>
+    </form>
+    </div>
 </main>
 <footer>
     <p>

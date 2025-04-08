@@ -17,9 +17,9 @@
             <img class="theme-toggle" src="/icons/sun.svg" alt="Сменить тему">
         </div>
         <div class="menu">
-            <a href="#" class="menu-button">Продукт</a>
-            <a href="#" class="menu-button">Возможности</a>
-            <a href="#" class="menu-button">Для кого</a>
+            <a href="#product" class="menu-button">Продукт</a>
+            <a href="#opportunities" class="menu-button">Возможности</a>
+            <a href="#forwhom" class="menu-button">Для кого</a>
         </div>
         <div class="language-container">
             <img class="language-toggle" src="/icons/language.svg" alt="Сменить язык">
@@ -32,7 +32,7 @@
 </header>
 <main>
     <h1>Сервис для управления задачами</h1>
-    <div class="content-block">
+    <div class="content-block" id="product">
         <p>
             Представляем вам уникальный бесплатный инструмент<br>
             для управления проектами, который поможет вам организовать<br>
@@ -55,7 +55,7 @@
             <img src="/icons/button_right_light.svg" alt="Вперед" width="64" height="64">
         </button>
     </div>
-    <div class="content-block">
+    <div class="content-block" id="opportunities">
         <p>
             Возможности:
             <ul>
@@ -81,7 +81,7 @@
         <h2>Попробуйте!</h2>
         <a href="/registration" class="register-button">Зарегистрироваться</a>
     </div>
-    <div class="content-block">
+    <div class="content-block" id="forwhom">
         <p>
             Наш продукт идеально подходит для фрилансеров,<br>
             небольших команд и стартапов, которые ищут эффективное<br>

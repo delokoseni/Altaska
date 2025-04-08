@@ -6,27 +6,45 @@
     <link rel="stylesheet" href="/css/mainstyle.css">
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/themeToggle.js" defer></script>
-    <script src="/js/gallery.js" defer></script>
+    <script src="/js/passwordToggle.js"></script>
     <title>Регистрация</title>
 </head>
 <body>
 <header>
     <div class="site-title">altaska</div>
-    <div class="menu-container">
-        <div class="theme-icon-container">
-            <img class="theme-toggle" src="/icons/sun.svg" alt="Сменить тему">
-        </div>
-        <div class="language-container">
-            <img class="language-toggle" src="/icons/language.svg" alt="Сменить язык">
-        </div>
-    </div>
     <div>
-        <button class="login-button">Войти</button>
-        <button class="register-button">Зарегистрироваться</button>
+        <a href="/" class="login-button">На главную</a>
+        <a href="/registration" class="register-button">Зарегистрироваться</a>
     </div>
 </header>
 <main>
-
+    <div class="container">
+        <h1>Вход</h1>
+    <#if error??>
+        <div class="error-message">
+            <p>${error}</p>
+        </div>
+    </#if>
+    <form action="/registration" method="post">
+        <label>Email <span class="required" title="Поле обязательно для заполнения">*</span></label>
+        <input type="text" name="email" placeholder="Email" required>
+        <label>Пароль <span class="required" title="Поле обязательно для заполнения">*</span></label>
+        <div class="password-container">
+            <input type="password" id="password" name="password" placeholder="Пароль" required>
+            <span class="toggle-password" onclick="togglePasswordVisibility('password')" title="Показать/Скрыть пароль">
+                    <img id="eye-icon-password" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
+                </span>
+        </div>
+        <label>Повторите пароль <span class="required" title="Поле обязательно для заполнения">*</span></label>
+        <div class="password-container">
+            <input type="password" id="repeatpassword" name="repeatpassword" placeholder="Повторите пароль" required>
+            <span class="toggle-password" onclick="togglePasswordVisibility('repeatpassword')" title="Показать/Скрыть пароль">
+                    <img id="eye-icon-repeatpassword" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
+                </span>
+        </div>
+        <button type="submit">Войти</button>
+    </form>
+    </div>
 </main>
 <footer>
     <p>
