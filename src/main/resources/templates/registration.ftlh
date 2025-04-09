@@ -13,8 +13,8 @@
 <header>
     <div class="site-title">altaska</div>
     <div>
-        <a href="/" class="login-button">На главную</a>
-        <a href="/registration" class="register-button">Зарегистрироваться</a>
+        <a href="/login" class="login-button">Войти</a>
+        <a href="/" class="register-button">На главную</a>
     </div>
 </header>
 <main>
