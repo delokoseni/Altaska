@@ -1,0 +1,91 @@
+/* Контейнер формы */
+form {
+    max-width: 400px;
+    margin: 0 auto; /* Центрирует форму по горизонтали */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Метки для полей */
+form label {
+    font-weight: 700;
+    color: var(--header-color);
+    margin-bottom: 4px;
+}
+
+/* Поля ввода */
+form input[type="text"],
+form input[type="password"],
+form input[type="email"] {
+    font-family: 'Nunito', sans-serif;
+    padding: 12px;
+    border: 2px solid var(--button-color);
+    border-radius: 10px;
+    background-color: var(--text-color);
+    color: var(--background-color);
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Эффект при фокусе */
+form input:focus {
+    outline: none;
+    border-color: var(--hover-button-color);
+    box-shadow: 0 0 5px var(--hover-button-color);
+}
+
+/* Кнопка отправки */
+form button[type="submit"] {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    padding: 14px 0;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Ховер по кнопке */
+form button[type="submit"]:hover {
+    background-color: var(--hover-button-color);
+    transform: scale(1.03);
+}
+
+/* Сообщение об ошибке */
+.error-message {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: darkred;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+/* Контейнер с паролями (глаз) */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Глазик */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* Иконка */
+.eye-icon {
+    width: 20px;
+    height: 20px;
+    /*filter: invert(1); /* подстраивает под темную тему */
+}

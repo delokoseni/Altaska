@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/mainstyle.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/registrationlogin.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/passwordToggle.js"></script>
     <title>Вход</title>
@@ -26,7 +27,7 @@
     <form action="/login" method="post">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <label>Email</label>
-        <input type="text" name="username" placeholder="Email" style="width: 94%;" required>
+        <input type="text" name="username" placeholder="Email" required>
 
         <label>Пароль</label>
         <div class="password-container">

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/mainstyle.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/registrationlogin.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/passwordToggle.js"></script>
     <title>Регистрация</title>
@@ -19,7 +20,7 @@
 </header>
 <main>
     <div class="container">
-        <h1>Вход</h1>
+        <h1>Регистрация</h1>
     <#if error??>
         <div class="error-message">
             <p>${error}</p>
@@ -43,7 +44,7 @@
                     <img id="eye-icon-repeatpassword" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
                 </span>
         </div>
-        <button type="submit">Войти</button>
+        <button type="submit">Зарегистрироваться</button>
     </form>
     </div>
 </main>
