@@ -12,8 +12,9 @@ public class Tags {
     @Column(name = "name", length = 20, nullable = false)
     private String name;
 
-    @Column(name = "id_project", nullable = false)
-    private Integer idProject; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_project", referencedColumnName = "id")
+    private Projects idProject;
 
     public Long GetId() {
         return id;
@@ -23,15 +24,15 @@ public class Tags {
         return name;
     }
 
-    public Integer GetIdProject() {
-        return idProject; //todo Возможно переделать
+    public Projects GetIdProject() {
+        return idProject;
     }
 
     public void SetName(String name) {
         this.name = name;
     }
 
-    public void SetIdProject(Integer idProject) {
-        this.idProject = idProject; //todo Возможно переделать
+    public void SetIdProject(Projects idProject) {
+        this.idProject = idProject;
     }
 }

@@ -12,11 +12,13 @@ public class TasksDependencies {
     @Column(name = "type", length = 50, nullable = false)
     private String type;
 
-    @Column(name = "id_from_task", nullable = false)
-    private Integer idFromTask; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_from_task", referencedColumnName = "id")
+    private Tasks idFromTask;
 
-    @Column(name = "id_to_task", nullable = false)
-    private Integer idToTask; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_to_task", referencedColumnName = "id")
+    private Tasks idToTask;
 
     @Column(name = "sort_order")
     private Integer sortOrder;
@@ -29,12 +31,12 @@ public class TasksDependencies {
         return type;
     }
 
-    public Integer GetIdFromTask() {
-        return idFromTask; //todo Возможно переделать
+    public Tasks GetIdFromTask() {
+        return idFromTask;
     }
 
-    public Integer GetIdToTask() {
-        return idToTask; //todo Возможно переделать
+    public Tasks GetIdToTask() {
+        return idToTask;
     }
 
     public Integer GetSortOrder() {
@@ -45,12 +47,12 @@ public class TasksDependencies {
         this.type = type;
     }
 
-    public void SetIdFromTask(Integer idFromTask) {
-        this.idFromTask = idFromTask; //todo Возможно переделать
+    public void SetIdFromTask(Tasks idFromTask) {
+        this.idFromTask = idFromTask;
     }
 
-    public void SetIdToTask(Integer idToTask) {
-        this.idToTask = idToTask; //todo Возможно переделать
+    public void SetIdToTask(Tasks idToTask) {
+        this.idToTask = idToTask;
     }
 
     public void SetSortOrder(Integer sortOrder) {

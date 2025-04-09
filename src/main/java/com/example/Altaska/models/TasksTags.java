@@ -11,11 +11,13 @@ public class TasksTags {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_tag", nullable = false)
-    private Integer idTag; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_tag", referencedColumnName = "id")
+    private Tags idTag;
 
-    @Column(name = "id_task", nullable = false)
-    private Integer idTask; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_task", referencedColumnName = "id")
+    private Tasks idTask;
 
     @Column(name = "added_at_server", nullable = false)
     private LocalDateTime addedAtServer;
@@ -24,24 +26,24 @@ public class TasksTags {
         return id;
     }
 
-    public Integer GetIdTag() {
-        return idTag; //todo Возможно переделать
+    public Tags GetIdTag() {
+        return idTag;
     }
 
-    public Integer GetIdTask() {
-        return idTask; //todo Возможно переделать
+    public Tasks GetIdTask() {
+        return idTask;
     }
 
     public LocalDateTime GetAddedAtServer() {
         return addedAtServer;
     }
 
-    public void SetIdTag(Integer idTag) {
-        this.idTag = idTag; //todo Возможно переделать
+    public void SetIdTag(Tags idTag) {
+        this.idTag = idTag;
     }
 
-    public void SetIdTask(Integer idTask) {
-        this.idTask = idTask; //todo Возможно переделать
+    public void SetIdTask(Tasks idTask) {
+        this.idTask = idTask;
     }
 
     public void SetAddedAtServer(LocalDateTime addedAtServer) {

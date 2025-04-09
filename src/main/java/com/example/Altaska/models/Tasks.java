@@ -26,20 +26,24 @@ public class Tasks {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @Column(name = "id_status", nullable = false)
-    private Integer idStatus; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_status", referencedColumnName = "id")
+    private Statuses idStatus;
 
-    @Column(name = "id_priority")
-    private Integer idPriority; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_priority")
+    private Priorities idPriority;
 
-    @Column(name = "id_creator", nullable = false)
-    private Integer idCreator; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_creator", referencedColumnName = "id")
+    private Users idCreator;
 
     @Column(name = "time_spent")
     private Duration timeSpent;
 
-    @Column(name = "id_project", nullable = false)
-    private Integer idProject; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_project", referencedColumnName = "id")
+    private Projects idProject;
 
     @Column(name = "created_at_server", nullable = false)
     private LocalDate createdAtServer;
@@ -76,24 +80,24 @@ public class Tasks {
         return updatedAt;
     }
 
-    public Integer GetIdStatus() {
-        return idStatus; //todo Возможность переделать
+    public Statuses GetIdStatus() {
+        return idStatus;
     }
 
-    public Integer GetIdPriority() {
-        return idPriority; //todo Возможность переделать
+    public Priorities GetIdPriority() {
+        return idPriority;
     }
 
-    public Integer GetIdCreator() {
-        return idCreator; //todo Возможность переделать
+    public Users GetIdCreator() {
+        return idCreator;
     }
 
     public Duration GetTimeSpent() {
         return timeSpent;
     }
 
-    public Integer GetIdProject() {
-        return idProject; //todo Возможность переделать
+    public Projects GetIdProject() {
+        return idProject;
     }
 
     public LocalDate GetCreatedAtServer() {
@@ -132,24 +136,24 @@ public class Tasks {
         this.updatedAt = updatedAt;
     }
 
-    public void SetIdStatus(Integer idStatus) {
-        this.idStatus = idStatus; //todo Возможность переделать
+    public void SetIdStatus(Statuses idStatus) {
+        this.idStatus = idStatus;
     }
 
-    public void SetIdPriority(Integer idPriority) {
-        this.idPriority = idPriority; //todo Возможность переделать
+    public void SetIdPriority(Priorities idPriority) {
+        this.idPriority = idPriority;
     }
 
-    public void SetIdCreator(Integer idCreator) {
-        this.idCreator = idCreator; //todo Возможность переделать
+    public void SetIdCreator(Users idCreator) {
+        this.idCreator = idCreator;
     }
 
     public void SetTimeSpent(Duration timeSpent) {
         this.timeSpent = timeSpent;
     }
 
-    public void SetIdProject(Integer idProject) {
-        this.idProject = idProject; //todo Возможность переделать
+    public void SetIdProject(Projects idProject) {
+        this.idProject = idProject;
     }
 
     public void SetCreatedAtServer(LocalDate createdAtServer) {

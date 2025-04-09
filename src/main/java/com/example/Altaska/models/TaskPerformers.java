@@ -11,11 +11,13 @@ public class TaskPerformers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_task", nullable = false)
-    private Integer idTask; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_task", referencedColumnName = "id")
+    private Tasks idTask;
 
-    @Column(name = "id_user", nullable = false)
-    private Integer idUser; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    private Users idUser;
 
     @Column(name = "added_at_server", nullable = false)
     private OffsetDateTime addedAtServer;
@@ -24,24 +26,24 @@ public class TaskPerformers {
         return id;
     }
 
-    public Integer GetIdTask() {
-        return idTask; //todo Возможно переделать
+    public Tasks GetIdTask() {
+        return idTask;
     }
 
-    public Integer GetIdUser() {
-        return idUser; //todo Возможно переделать
+    public Users GetIdUser() {
+        return idUser;
     }
 
     public OffsetDateTime GetAddedAtServer() {
         return addedAtServer;
     }
 
-    public void SetIdTask(Integer idTask) {
-        this.idTask = idTask; //todo Возможно переделать
+    public void SetIdTask(Tasks idTask) {
+        this.idTask = idTask;
     }
 
-    public void SetIdUser(Integer idUser) {
-        this.idUser = idUser; //todo Возможно переделать
+    public void SetIdUser(Users idUser) {
+        this.idUser = idUser;
     }
 
     public void SetAddedAtServer(OffsetDateTime addedAtServer) {

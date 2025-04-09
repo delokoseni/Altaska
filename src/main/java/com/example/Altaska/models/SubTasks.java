@@ -12,8 +12,9 @@ public class SubTasks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_task", nullable = false)
-    private Integer idTask; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_task", referencedColumnName = "id")
+    private Tasks idTask;
 
     @Column(name = "name", length = 100, nullable = false)
     private String name;
@@ -33,15 +34,16 @@ public class SubTasks {
     @Column(name = "completed_at_server", nullable = false)
     private LocalDateTime completedAtServer;
 
-    @Column(name = "id_user", nullable = false)
-    private Integer idUser; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    private Users idUser;
 
     public Long GetId() {
         return id;
     }
 
-    public Integer GetIdTask() {
-        return idTask; //todo Возможно переделать
+    public Tasks GetIdTask() {
+        return idTask;
     }
 
     public String GetName() {
@@ -68,12 +70,12 @@ public class SubTasks {
         return completedAtServer;
     }
 
-    public Integer GetIdUser() {
-        return idUser; //todo Возможно переделать
+    public Users GetIdUser() {
+        return idUser;
     }
 
-    public void SetIdTask(Integer idTask) {
-        this.idTask = idTask; //todo Возможно переделать
+    public void SetIdTask(Tasks idTask) {
+        this.idTask = idTask;
     }
 
     public void SetName(String name) {
@@ -100,7 +102,7 @@ public class SubTasks {
         this.completedAtServer = completedAtServer;
     }
 
-    public void SetIdUser(Integer idUser) {
-        this.idUser = idUser; //todo Возможно переделать
+    public void SetIdUser(Users idUser) {
+        this.idUser = idUser;
     }
 }
