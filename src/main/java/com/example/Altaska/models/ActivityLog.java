@@ -1,8 +1,10 @@
 package com.example.Altaska.models;
 
+import com.example.Altaska.converters.JsonConverter;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "activity_log")
@@ -11,20 +13,20 @@ public class ActivityLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //todo Переделать
-    /*
     @Column(name = "details", columnDefinition = "json", nullable = false)
-    private String details;
-     */
+    @Convert(converter = JsonConverter.class)
+    private Map<String, Object> details;
 
     @Column(name = "activity_date", nullable = false)
     private OffsetDateTime activityDate;
 
-    @Column(name = "id_user", nullable = false)
-    private Integer idUser; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    private Users idUser;
 
-    @Column(name = "id_project", nullable = false)
-    private Integer idProject; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_project", referencedColumnName = "id")
+    private Projects idProject;
 
     @Column(name = "activity_date_server", nullable = false)
     private OffsetDateTime activityDateServer;
@@ -33,46 +35,40 @@ public class ActivityLog {
         return id;
     }
 
-    //todo Переделать
-    /*
-    public String GetDetails() {
+    public Map<String, Object> GetDetails() {
         return details;
     }
-    */
 
     public OffsetDateTime GetActivityDate() {
         return activityDate;
     }
 
-    public Integer GetIdUser() {
-        return idUser; //todo Возможно переделать
+    public Users GetIdUser() {
+        return idUser;
     }
 
-    public Integer GetIdProject() {
-        return idProject; //todo Возможно переделать
+    public Projects GetIdProject() {
+        return idProject;
     }
 
     public OffsetDateTime GetActivityDateServer() {
         return activityDateServer;
     }
 
-    //todo Переделать
-    /*
-    public void SetDetails(String details) {
+    public void SetDetails(Map<String, Object> details) {
         this.details = details;
     }
-    */
 
     public void SetActivityDate(OffsetDateTime activityDate) {
         this.activityDate = activityDate;
     }
 
-    public void SetIdUser(Integer idUser) {
-        this.idUser = idUser; //todo Переделать
+    public void SetIdUser(Users idUser) {
+        this.idUser = idUser;
     }
 
-    public void SetIdProject(Integer idProject) {
-        this.idProject = idProject; //todo Переделать
+    public void SetIdProject(Projects idProject) {
+        this.idProject = idProject;
     }
 
     public void SetActivityDateServer(OffsetDateTime activityDateServer) {

@@ -17,11 +17,13 @@ public class Comments {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
-    @Column(name = "id_task", nullable = false)
-    private Integer idTask; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_task", referencedColumnName = "id")
+    private Tasks idTask;
 
-    @Column(name = "id_user", nullable = false)
-    private Integer idUser; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    private Users idUser;
 
     @Column(name = "created_at_server", nullable = false)
     private OffsetDateTime createdAtServer;
@@ -38,12 +40,12 @@ public class Comments {
         return createdAt;
     }
 
-    public Integer GetIdTask() {
-        return idTask; //todo Возможно переделать
+    public Tasks GetIdTask() {
+        return idTask;
     }
 
-    public Integer GetIdUser() {
-        return idUser; //todo Возможно переделать
+    public Users GetIdUser() {
+        return idUser;
     }
 
     public OffsetDateTime GetCreatedAtServer() {
@@ -58,12 +60,12 @@ public class Comments {
         this.createdAt = createdAt;
     }
 
-    public void SetIdTask(Integer idTask) {
-        this.idTask = idTask; //todo Возможно переделать
+    public void SetIdTask(Tasks idTask) {
+        this.idTask = idTask;
     }
 
-    public void SetIdUser(Integer idUser) {
-        this.idUser = idUser; //todo Возможно переделать
+    public void SetIdUser(Users idUser) {
+        this.idUser = idUser;
     }
 
     public void SetCreatedAtServer(OffsetDateTime createdAtServer) {

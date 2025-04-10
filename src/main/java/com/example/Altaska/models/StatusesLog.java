@@ -14,11 +14,13 @@ public class StatusesLog {
     @Column(name = "change_at", nullable = false)
     private OffsetDateTime changeAt;
 
-    @Column(name = "id_user", nullable = false)
-    private Integer idUser; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    private Users idUser;
 
-    @Column(name = "id_task", nullable = false)
-    private Integer idTask; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_task", referencedColumnName = "id")
+    private Tasks idTask;
 
     public Long GetId() {
         return id;
@@ -28,23 +30,23 @@ public class StatusesLog {
         return changeAt;
     }
 
-    public Integer GetIdUser() {
-        return idUser; //todo Возможно переделать
+    public Users GetIdUser() {
+        return idUser;
     }
 
-    public Integer GetIdTask() {
-        return idTask; //todo Возможно переделать
+    public Tasks GetIdTask() {
+        return idTask;
     }
 
     public void SetChangeAt(OffsetDateTime changeAt) {
         this.changeAt = changeAt;
     }
 
-    public void SetIdUser(Integer idUser) {
-        this.idUser = idUser; //todo Возможно переделать
+    public void SetIdUser(Users idUser) {
+        this.idUser = idUser;
     }
 
-    public void SetIdTask(Integer idTask) {
-        this.idTask = idTask; //todo Возможно переделать
+    public void SetIdTask(Tasks idTask) {
+        this.idTask = idTask;
     }
 }

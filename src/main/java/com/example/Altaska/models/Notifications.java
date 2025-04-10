@@ -26,8 +26,9 @@ public class Notifications {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
-    @Column(name = "id_user", nullable = false)
-    private Integer idUser; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    private Users idUser;
 
     @Column(name = "created_at_server", nullable = false)
     private OffsetDateTime createdAtServer;
@@ -56,8 +57,8 @@ public class Notifications {
         return createdAt;
     }
 
-    public Integer GetIdUser() {
-        return idUser; //todo Возможно переделать
+    public Users GetIdUser() {
+        return idUser;
     }
 
     public OffsetDateTime GetCreatedAtServer() {
@@ -84,8 +85,8 @@ public class Notifications {
         this.createdAt = createdAt;
     }
 
-    public void SetIdUser(Integer idUser) {
-        this.idUser = idUser; //todo Возможно переделать
+    public void SetIdUser(Users idUser) {
+        this.idUser = idUser;
     }
 
     public void SetCreatedAtServer(OffsetDateTime createdAtServer) {

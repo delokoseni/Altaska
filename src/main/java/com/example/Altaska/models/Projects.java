@@ -36,8 +36,9 @@ public class Projects {
     @Column(name = "updated_by", length = 254, nullable = false)
     private String updatedBy;
 
-    @Column(name = "id_owner", nullable = false)
-    private Integer idOwner; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_owner", referencedColumnName = "id")
+    private Users idOwner;
 
     public Long GetId() {
         return id;
@@ -75,8 +76,8 @@ public class Projects {
         return updatedBy;
     }
 
-    public Integer GetIdOwner() {
-        return idOwner; //todo Возможно переделать
+    public Users GetIdOwner() {
+        return idOwner;
     }
 
     public void SetName(String name) {
@@ -111,7 +112,7 @@ public class Projects {
         this.updatedBy = updatedBy;
     }
 
-    public void SetIdOwner(Integer idOwner) {
-        this.idOwner = idOwner; //todo Возможно переделать
+    public void SetIdOwner(Users idOwner) {
+        this.idOwner = idOwner;
     }
 }

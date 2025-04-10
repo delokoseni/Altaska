@@ -2,6 +2,7 @@ package com.example.Altaska.models;
 
 import jakarta.persistence.*;
 import java.util.Map;
+import com.example.Altaska.converters.JsonConverter;
 
 @Entity
 @Table(name = "roles")
@@ -17,12 +18,13 @@ public class Roles {
     private String name;
 
     //todo Добавить конвертер для JSON и сделать
-    /*@Column(name = "permissions", nullable = false, columnDefinition = "json")
+    @Column(name = "permissions", nullable = false, columnDefinition = "json")
     @Convert(converter = JsonConverter.class)
-    private Map<String, Object> permissions;*/
+    private Map<String, Object> permissions;
 
-    @Column(name = "id_project")
-    private Integer idProject; //todo Переделать
+    @ManyToOne
+    @JoinColumn(name = "id_project", referencedColumnName = "id")
+    private Projects idProject;
 
     public Long GetId() {
         return id;
@@ -36,15 +38,13 @@ public class Roles {
         return name;
     }
 
-    //todo Сделать
-    /*
     public Map<String, Object> GetPermissions() {
         return permissions;
     }
-    */
 
-    public Integer GetIdProject() {
-        return idProject; //todo Возможно переделать
+
+    public Projects GetIdProject() {
+        return idProject;
     }
 
     public void SetIsCustom(boolean isCustom) {
@@ -54,14 +54,12 @@ public class Roles {
     public void SetName(String name) {
         this.name = name;
     }
-    //todo Сделать
-    /*
+
     public void SetPermissions(Map<String, Object> permissions) {
         this.permissions = permissions;
     }
-     */
 
-    public void SetIdProject(Integer idProject) {
-        this.idProject = idProject; //todo Возможно переделать
+    public void SetIdProject(Projects idProject) {
+        this.idProject = idProject;
     }
 }
