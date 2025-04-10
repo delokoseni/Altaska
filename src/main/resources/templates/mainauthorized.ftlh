@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/sidebar.css">
     <script src="/js/themeToggle.js" defer></script>
+    <script src="/js/mainAuthorized.js" defer></script>
     <title>Главная</title>
 </head>
 <body>
@@ -26,7 +27,7 @@
         <div class="sidebar-header">
             <h2>Проекты</h2>
             <div class="add-button-container">
-                <button class="add-project-button" title="Добавить">
+                <button class="add-project-button" title="Добавить" id="show-create-form">
                     +
                     <span class="add-label">Добавить</span>
                 </button>
@@ -44,6 +45,18 @@
 </aside>
     <section class="main-content">
         <h1>Добро пожаловать!</h1>
+        <div id="create-project-form" style="display: none;">
+            <form method="post" action="/create-project">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                <label>Название проекта:</label><br>
+                <input type="text" name="name" required><br><br>
+
+                <label>Описание:</label><br>
+                <textarea name="description" rows="4" cols="50" required></textarea><br><br>
+
+                <button type="submit">Создать</button>
+            </form>
+        </div>
     </section>
 </main>
 <footer>

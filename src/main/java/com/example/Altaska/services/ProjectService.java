@@ -8,6 +8,9 @@ import com.example.Altaska.repositories.ProjectsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,5 +36,21 @@ public class ProjectService {
 
         return new ArrayList<>(allProjects);
     }
+
+    public void createProject(String name, String description, Users owner) {
+        Projects project = new Projects();
+        project.SetName(name);
+        project.SetDescription(description);
+        project.SetIdOwner(owner);
+
+        project.SetCreatedAt(LocalDate.now());  //todo Заменить на время клиента
+        project.SetUpdatedAt(OffsetDateTime.now());  //todo Заменить на время клиента
+        project.SetCreatedAtServer(LocalDate.now());
+        project.SetUpdatedAtServer(OffsetTime.now());
+        project.SetUpdatedBy(owner.GetEmail());
+
+        projectsRepo.save(project);
+    }
+
 }
 
