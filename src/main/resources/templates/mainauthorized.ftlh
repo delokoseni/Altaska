@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/sidebar.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>
+    <script src="/js/projectSelection.js"></script>
     <title>Главная</title>
 </head>
 <body>
@@ -37,7 +38,9 @@
         <#if projects?? && (projects?size > 0)>
             <#list projects as project>
                 <div class="project-entry">
-                    ${project.GetName()}
+                    <button class="project-button" onclick="selectProject('${project.GetId()}', '${project.GetName()}')">
+                        ${project.GetName()}
+                    </button>
                 </div>
             </#list>
         <#else>
