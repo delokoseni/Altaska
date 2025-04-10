@@ -1,14 +1,26 @@
-/* sidebar.css */
 .sidebar {
     width: 20%;
     min-width: 200px;
-    background-color: rgba(0, 0, 0, 0.05); /* можно заменить на var(--second-text-color) */
+    background-color: var(--second-text-color);
+    color: var(--text-color);
     padding: 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: calc(100vh - 60px);
 }
+
+.main-content {
+    width: 80%;
+    padding: 30px;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+    height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 .sidebar-header {
     display: flex;
@@ -29,8 +41,8 @@
     background-color: var(--button-color);
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -95,13 +107,14 @@
     background-color: var(--hover-button-color);
 }
 
-.main-content {
-    flex-grow: 1;
-    padding: 20px;
-}
-
 .no-projects-message {
     text-align: center;
     margin-top: 20px;
     color: var(--second-text-color);
 }
+
+.layout {
+    display: flex;
+    height: 100%;
+}
+

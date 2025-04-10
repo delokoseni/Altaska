@@ -23,6 +23,7 @@
     </div>
 </header>
 <main>
+    <div class="layout">
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2>Проекты</h2>
@@ -42,9 +43,8 @@
         <#else>
             <div class="no-projects-message">Нет проектов</div>
         </#if>
-</aside>
+    </aside>
     <section class="main-content">
-        <h1>Добро пожаловать!</h1>
         <div id="create-project-form" style="display: none;">
             <form method="post" action="/create-project">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -59,6 +59,7 @@
             </form>
         </div>
     </section>
+    </div>
 </main>
 <footer>
 

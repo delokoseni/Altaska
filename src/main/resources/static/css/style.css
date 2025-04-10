@@ -18,7 +18,7 @@ body {
 :root {
     --header-color: #5680E9; /* Цвет заголовков */
     --background-color: #C1C8E4; /* Цвет фона */
-    --button-color: #8860D0; /* Цвет кнопков */
+    --button-color: #8860D0; /* Цвет кнопок */
     --text-color: #FFFFFF; /* Цвет текста */
     --second-text-color: #ACB3CE; /* Второй цвет текста */
     --hover-button-color: #7449C6;
