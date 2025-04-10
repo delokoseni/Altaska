@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,14 +44,18 @@ public class MainAuthorizedController {
     @PostMapping("/create-project")
     public String createProject(@RequestParam String name,
                                 @RequestParam String description,
+                                @RequestParam String createdAt,
+                                @RequestParam String updatedAt,
                                 Principal principal,
                                 RedirectAttributes redirectAttributes) {
         if (principal != null) {
             String email = principal.getName();
             Optional<Users> currentUserOpt = userRepository.findByEmail(email);
+            LocalDate clientCreatedAt = LocalDate.parse(createdAt);
+            OffsetDateTime clientUpdatedAt = OffsetDateTime.parse(updatedAt);
             if (currentUserOpt.isPresent()) {
                 Users user = currentUserOpt.get();
-                projectService.createProject(name, description, user);
+                projectService.createProject(name, description, user, clientCreatedAt, clientUpdatedAt);
                 redirectAttributes.addFlashAttribute("message", "Проект создан!");
             }
         }

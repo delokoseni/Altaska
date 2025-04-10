@@ -53,7 +53,8 @@
 
                 <label>Описание:</label><br>
                 <textarea name="description" rows="4" cols="50" required></textarea><br><br>
-
+                <input type="hidden" id="createdAt" name="createdAt">
+                <input type="hidden" id="updatedAt" name="updatedAt">
                 <button type="submit">Создать</button>
             </form>
         </div>
