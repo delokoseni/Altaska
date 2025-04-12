@@ -26,7 +26,7 @@ function selectProject(projectId, projectName) {
 
 function loadView(view, projectId) {
     const viewContent = document.querySelector('.view-content');
-    viewContent.innerHTML = ''; // очищаем только контент, не трогаем меню
+    viewContent.innerHTML = '';
 
     if (view === 'список') {
         fetch(`/api/tasks/project/${projectId}`)
@@ -35,9 +35,20 @@ function loadView(view, projectId) {
                 const taskListContainer = document.createElement('div');
                 taskListContainer.className = 'task-list';
 
-                if (tasks.length === 0) {
-                    taskListContainer.textContent = 'Нет задач';
-                } else {
+                const header = document.createElement('div');
+                header.className = 'task-header';
+                const title = document.createElement('span');
+                title.textContent = tasks.length === 0 ? 'Нет задач' : 'Задачи';
+                header.appendChild(title);
+
+                const addBtn = document.createElement('button');
+                addBtn.textContent = '+ Добавить';
+                addBtn.className = 'add-task-button';
+                addBtn.onclick = () => showTaskForm(projectId, taskListContainer);
+                header.appendChild(addBtn);
+                taskListContainer.appendChild(header);
+
+                if (tasks.length > 0) {
                     tasks.forEach(task => {
                         const taskDiv = document.createElement('div');
                         taskDiv.className = 'task-item';
@@ -56,5 +67,68 @@ function loadView(view, projectId) {
             });
     }
 }
+
+function showTaskForm(projectId, container) {
+    const existingForm = container.querySelector('.task-form');
+    if (existingForm) return;
+
+    const form = document.createElement('form');
+    form.className = 'task-form';
+
+    // Добавление CSRF токена в скрытое поле
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = csrfParam;  // имя параметра CSRF токена
+    csrfInput.value = csrfToken; // значение токена
+    form.appendChild(csrfInput);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.placeholder = 'Название задачи';
+    nameInput.name = 'name';  // имя параметра
+    nameInput.required = true;
+
+    const descriptionInput = document.createElement('textarea');
+    descriptionInput.placeholder = 'Описание задачи';
+    descriptionInput.name = 'description';  // имя параметра
+    descriptionInput.required = true;
+
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.textContent = 'Создать';
+
+    form.appendChild(nameInput);
+    form.appendChild(descriptionInput);
+    form.appendChild(submitBtn);
+
+    form.onsubmit = function (e) {
+        e.preventDefault();
+
+        // Создаем FormData для отправки данных формы
+        const formData = new FormData();
+        formData.append('name', nameInput.value);  // Параметр name
+        formData.append('description', descriptionInput.value);  // Параметр description
+        formData.append(csrfParam, csrfToken); // Добавляем CSRF токен
+
+        fetch(`/api/tasks/create/${projectId}`, {
+            method: 'POST',
+            body: formData  // Отправляем форму как данные формы
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Ошибка при создании задачи");
+            return response.json();
+        })
+        .then(data => {
+            loadView('список', projectId);  // Обновление списка задач
+        })
+        .catch(error => {
+            console.error('Ошибка создания задачи:', error);
+        });
+    };
+
+    container.appendChild(form);
+}
+
+
 
 

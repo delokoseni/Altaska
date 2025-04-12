@@ -39,7 +39,7 @@ public class Tasks {
     private Users idCreator;
 
     @Column(name = "time_spent")
-    private Duration timeSpent;
+    private Long timeSpent;
 
     @ManyToOne
     @JoinColumn(name = "id_project", referencedColumnName = "id")
@@ -92,7 +92,7 @@ public class Tasks {
         return idCreator;
     }
 
-    public Duration GetTimeSpent() {
+    public Long GetTimeSpent() {
         return timeSpent;
     }
 
@@ -148,7 +148,7 @@ public class Tasks {
         this.idCreator = idCreator;
     }
 
-    public void SetTimeSpent(Duration timeSpent) {
+    public void SetTimeSpent(Long timeSpent) {
         this.timeSpent = timeSpent;
     }
 
