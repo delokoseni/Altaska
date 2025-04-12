@@ -48,24 +48,15 @@
         </#if>
     </aside>
     <section class="main-content">
-        <div id="create-project-form" style="display: none;">
-            <form method="post" action="/create-project">
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                <label>Название проекта:</label><br>
-                <input type="text" name="name" required><br><br>
-
-                <label>Описание:</label><br>
-                <textarea name="description" rows="4" cols="50" required></textarea><br><br>
-                <input type="hidden" id="createdAt" name="createdAt">
-                <input type="hidden" id="updatedAt" name="updatedAt">
-                <button type="submit">Создать</button>
-            </form>
-        </div>
     </section>
     </div>
 </main>
 <footer>
 
 </footer>
+<script>
+    const csrfParam = '${_csrf.parameterName}';
+    const csrfToken = '${_csrf.token}';
+</script>
 </body>
 </html>
