@@ -34,63 +34,63 @@ public class Attachments {
     @Column(name = "uploaded_at_server", nullable = false)
     private OffsetDateTime uploadedAtServer;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public OffsetDateTime GetUploadedAt() {
+    public OffsetDateTime getUploadedAt() {
         return uploadedAt;
     }
 
-    public byte[] GetUploadedFile() {
+    public byte[] getUploadedFile() {
         return uploadedFile;
     }
 
-    public String GetFileName() {
+    public String getFileName() {
         return fileName;
     }
 
-    public String GetFileType() {
+    public String getFileType() {
         return fileType;
     }
 
-    public Tasks GetIdTask() {
+    public Tasks getIdTask() {
         return idTask;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public OffsetDateTime GetUploadedAtServer() {
+    public OffsetDateTime getUploadedAtServer() {
         return uploadedAtServer;
     }
 
-    public void SetUploadedAt(OffsetDateTime uploadedAt) {
+    public void setUploadedAt(OffsetDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
     }
 
-    public void SetUploadedFile(byte[] uploadedFile) {
+    public void setUploadedFile(byte[] uploadedFile) {
         this.uploadedFile = uploadedFile;
     }
 
-    public void SetFileName(String fileName) {
+    public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
-    public void SetFileType(String fileType) {
+    public void setFileType(String fileType) {
         this.fileType = fileType;
     }
 
-    public void SetIdTask(Tasks idTask) {
+    public void setIdTask(Tasks idTask) {
         this.idTask = idTask;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 
-    public void SetUploadedAtServer(OffsetDateTime uploadedAtServer) {
+    public void setUploadedAtServer(OffsetDateTime uploadedAtServer) {
         this.uploadedAtServer = uploadedAtServer;
     }
 }

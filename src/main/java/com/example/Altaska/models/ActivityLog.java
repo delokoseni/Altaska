@@ -35,43 +35,43 @@ public class ActivityLog {
         return id;
     }
 
-    public Map<String, Object> GetDetails() {
+    public Map<String, Object> getDetails() {
         return details;
     }
 
-    public OffsetDateTime GetActivityDate() {
+    public OffsetDateTime getActivityDate() {
         return activityDate;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public Projects GetIdProject() {
+    public Projects getIdProject() {
         return idProject;
     }
 
-    public OffsetDateTime GetActivityDateServer() {
+    public OffsetDateTime getActivityDateServer() {
         return activityDateServer;
     }
 
-    public void SetDetails(Map<String, Object> details) {
+    public void setDetails(Map<String, Object> details) {
         this.details = details;
     }
 
-    public void SetActivityDate(OffsetDateTime activityDate) {
+    public void setActivityDate(OffsetDateTime activityDate) {
         this.activityDate = activityDate;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 
-    public void SetIdProject(Projects idProject) {
+    public void setIdProject(Projects idProject) {
         this.idProject = idProject;
     }
 
-    public void SetActivityDateServer(OffsetDateTime activityDateServer) {
+    public void setActivityDateServer(OffsetDateTime activityDateServer) {
         this.activityDateServer = activityDateServer;
     }
 }

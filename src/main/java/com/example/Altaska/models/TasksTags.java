@@ -22,31 +22,31 @@ public class TasksTags {
     @Column(name = "added_at_server", nullable = false)
     private LocalDateTime addedAtServer;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public Tags GetIdTag() {
+    public Tags getIdTag() {
         return idTag;
     }
 
-    public Tasks GetIdTask() {
+    public Tasks getIdTask() {
         return idTask;
     }
 
-    public LocalDateTime GetAddedAtServer() {
+    public LocalDateTime getAddedAtServer() {
         return addedAtServer;
     }
 
-    public void SetIdTag(Tags idTag) {
+    public void setIdTag(Tags idTag) {
         this.idTag = idTag;
     }
 
-    public void SetIdTask(Tasks idTask) {
+    public void setIdTask(Tasks idTask) {
         this.idTask = idTask;
     }
 
-    public void SetAddedAtServer(LocalDateTime addedAtServer) {
+    public void setAddedAtServer(LocalDateTime addedAtServer) {
         this.addedAtServer = addedAtServer;
     }
 }

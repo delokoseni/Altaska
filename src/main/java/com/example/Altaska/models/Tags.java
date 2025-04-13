@@ -16,23 +16,23 @@ public class Tags {
     @JoinColumn(name = "id_project", referencedColumnName = "id")
     private Projects idProject;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public Projects GetIdProject() {
+    public Projects getIdProject() {
         return idProject;
     }
 
-    public void SetName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void SetIdProject(Projects idProject) {
+    public void setIdProject(Projects idProject) {
         this.idProject = idProject;
     }
 }

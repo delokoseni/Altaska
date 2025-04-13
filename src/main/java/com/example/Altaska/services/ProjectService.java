@@ -6,7 +6,6 @@ import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,7 +31,7 @@ public class ProjectService {
 
         List<ProjectMembers> memberships = membersRepo.findByIdUser(user);
         for (ProjectMembers member : memberships) {
-            allProjects.add(member.GetIdProject());
+            allProjects.add(member.getIdProject());
         }
 
         return new ArrayList<>(allProjects);
@@ -41,15 +40,15 @@ public class ProjectService {
     public void createProject(String name, String description, Users owner, LocalDate createdAt,
                               OffsetDateTime updatedAt) {
         Projects project = new Projects();
-        project.SetName(name);
-        project.SetDescription(description);
-        project.SetIdOwner(owner);
+        project.setName(name);
+        project.setDescription(description);
+        project.setIdOwner(owner);
 
-        project.SetCreatedAt(createdAt);
-        project.SetUpdatedAt(updatedAt);
-        project.SetCreatedAtServer(LocalDate.now());
-        project.SetUpdatedAtServer(OffsetTime.now());
-        project.SetUpdatedBy(owner.GetEmail());
+        project.setCreatedAt(createdAt);
+        project.setUpdatedAt(updatedAt);
+        project.setCreatedAtServer(LocalDate.now());
+        project.setUpdatedAtServer(OffsetTime.now());
+        project.setUpdatedBy(owner.getEmail());
 
         projectsRepo.save(project);
     }

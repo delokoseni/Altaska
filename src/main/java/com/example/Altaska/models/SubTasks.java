@@ -38,71 +38,71 @@ public class SubTasks {
     @JoinColumn(name = "id_user", referencedColumnName = "id")
     private Users idUser;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public Tasks GetIdTask() {
+    public Tasks getIdTask() {
         return idTask;
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public String GetDescription() {
+    public String getDescription() {
         return description;
     }
 
-    public LocalDate GetCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public boolean GetIsCompleted() {
+    public boolean getIsCompleted() {
         return isCompleted;
     }
 
-    public LocalDate GetCreatedAtServer() {
+    public LocalDate getCreatedAtServer() {
         return createdAtServer;
     }
 
-    public LocalDateTime GetCompletedAtServer() {
+    public LocalDateTime getCompletedAtServer() {
         return completedAtServer;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public void SetIdTask(Tasks idTask) {
+    public void setIdTask(Tasks idTask) {
         this.idTask = idTask;
     }
 
-    public void SetName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void SetDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public void SetCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void SetIsCompleted(boolean isCompleted) {
+    public void setIsCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
 
-    public void SetCreatedAtServer(LocalDate createdAtServer) {
+    public void setCreatedAtServer(LocalDate createdAtServer) {
         this.createdAtServer = createdAtServer;
     }
 
-    public void SetCompletedAtServer(LocalDateTime completedAtServer) {
+    public void setCompletedAtServer(LocalDateTime completedAtServer) {
         this.completedAtServer = completedAtServer;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 }

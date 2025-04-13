@@ -26,40 +26,40 @@ public class Roles {
     @JoinColumn(name = "id_project", referencedColumnName = "id")
     private Projects idProject;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public boolean GetIsCustom() {
+    public boolean getIsCustom() {
         return isCustom;
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public Map<String, Object> GetPermissions() {
+    public Map<String, Object> getPermissions() {
         return permissions;
     }
 
 
-    public Projects GetIdProject() {
+    public Projects getIdProject() {
         return idProject;
     }
 
-    public void SetIsCustom(boolean isCustom) {
+    public void setIsCustom(boolean isCustom) {
         this.isCustom = isCustom;
     }
 
-    public void SetName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void SetPermissions(Map<String, Object> permissions) {
+    public void setPermissions(Map<String, Object> permissions) {
         this.permissions = permissions;
     }
 
-    public void SetIdProject(Projects idProject) {
+    public void setIdProject(Projects idProject) {
         this.idProject = idProject;
     }
 }

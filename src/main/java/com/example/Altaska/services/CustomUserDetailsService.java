@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         } else {
-            CustomUserDetails userDetails = new CustomUserDetails(((Users)user.get()).GetEmail(), ((Users)user.get()).GetPassword(), new ArrayList(), ((Users)user.get()).GetId());
+            CustomUserDetails userDetails = new CustomUserDetails(((Users)user.get()).getEmail(), ((Users)user.get()).getPassword(), new ArrayList(), ((Users)user.get()).getId());
             return userDetails;
         }
     }

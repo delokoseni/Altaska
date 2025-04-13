@@ -12,15 +12,15 @@ public class Statuses {
     @Column(name = "name", length = 20, nullable = false)
     private String name;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public void SetName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 }

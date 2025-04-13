@@ -40,79 +40,79 @@ public class Projects {
     @JoinColumn(name = "id_owner", referencedColumnName = "id")
     private Users idOwner;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public String GetDescription() {
+    public String getDescription() {
         return description;
     }
 
-    public LocalDate GetCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public OffsetDateTime GetUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public boolean GetIsArchived() {
+    public boolean getIsArchived() {
         return isArchived;
     }
 
-    public LocalDate GetCreatedAtServer() {
+    public LocalDate getCreatedAtServer() {
         return createdAtServer;
     }
 
-    public OffsetTime GetUpdatedAtServer() {
+    public OffsetTime getUpdatedAtServer() {
         return updatedAtServer;
     }
 
-    public String GetUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
-    public Users GetIdOwner() {
+    public Users getIdOwner() {
         return idOwner;
     }
 
-    public void SetName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void SetDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public void SetCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void SetUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public void SetIsArchived(boolean isArchived) {
+    public void setIsArchived(boolean isArchived) {
         this.isArchived = isArchived;
     }
 
-    public void SetCreatedAtServer(LocalDate createdAtServer) {
+    public void setCreatedAtServer(LocalDate createdAtServer) {
         this.createdAtServer = createdAtServer;
     }
 
-    public void SetUpdatedAtServer(OffsetTime updatedAtServer) {
+    public void setUpdatedAtServer(OffsetTime updatedAtServer) {
         this.updatedAtServer = updatedAtServer;
     }
 
-    public void SetUpdatedBy(String updatedBy) {
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public void SetIdOwner(Users idOwner) {
+    public void setIdOwner(Users idOwner) {
         this.idOwner = idOwner;
     }
 }

@@ -23,39 +23,39 @@ public class TasksDependencies {
     @Column(name = "sort_order")
     private Integer sortOrder;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetType() {
+    public String getType() {
         return type;
     }
 
-    public Tasks GetIdFromTask() {
+    public Tasks getIdFromTask() {
         return idFromTask;
     }
 
-    public Tasks GetIdToTask() {
+    public Tasks getIdToTask() {
         return idToTask;
     }
 
-    public Integer GetSortOrder() {
+    public Integer getSortOrder() {
         return sortOrder;
     }
 
-    public void SetType(String type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public void SetIdFromTask(Tasks idFromTask) {
+    public void setIdFromTask(Tasks idFromTask) {
         this.idFromTask = idFromTask;
     }
 
-    public void SetIdToTask(Tasks idToTask) {
+    public void setIdToTask(Tasks idToTask) {
         this.idToTask = idToTask;
     }
 
-    public void SetSortOrder(Integer sortOrder) {
+    public void setSortOrder(Integer sortOrder) {
         this.sortOrder = sortOrder;
     }
 }

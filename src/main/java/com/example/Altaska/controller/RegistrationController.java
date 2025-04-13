@@ -79,14 +79,14 @@ public class RegistrationController {
 
         String hashedPassword = passwordEncoder.encode(password);
         Users newUser = new Users();
-        newUser.SetEmail(email);
-        newUser.SetPassword(hashedPassword);
+        newUser.setEmail(email);
+        newUser.setPassword(hashedPassword);
         Optional<UserType> userTypeOptional = userTypeRepository.findByType("user");
         if (userTypeOptional.isEmpty()) {
             model.addAttribute("error", "Тип пользователя 'user' не найден в базе данных!");
             return "registration";
         }
-        newUser.SetUserType(userTypeOptional.get());
+        newUser.setUserType(userTypeOptional.get());
 
         try {
             usersRepository.save(newUser);

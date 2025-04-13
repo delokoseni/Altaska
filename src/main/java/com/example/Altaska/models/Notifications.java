@@ -33,63 +33,63 @@ public class Notifications {
     @Column(name = "created_at_server", nullable = false)
     private OffsetDateTime createdAtServer;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetType() {
+    public String getType() {
         return type;
     }
 
-    public String GetRelatedEntityType() {
+    public String getRelatedEntityType() {
         return relatedEntityType;
     }
 
-    public Long GetRelatedEntityId() {
+    public Long getRelatedEntityId() {
         return relatedEntityId;
     }
 
-    public boolean GetIsRead() {
+    public boolean getIsRead() {
         return isRead;
     }
 
-    public OffsetDateTime GetCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public OffsetDateTime GetCreatedAtServer() {
+    public OffsetDateTime getCreatedAtServer() {
         return createdAtServer;
     }
 
-    public void SetType(String type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public void SetRelatedEntityType(String relatedEntityType) {
+    public void setRelatedEntityType(String relatedEntityType) {
         this.relatedEntityType = relatedEntityType;
     }
 
-    public void SetRelatedEntityId(Long relatedEntityId) {
+    public void setRelatedEntityId(Long relatedEntityId) {
         this.relatedEntityId = relatedEntityId;
     }
 
-    public void SetIsRead(boolean isRead) {
+    public void setIsRead(boolean isRead) {
         this.isRead = isRead;
     }
 
-    public void SetCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 
-    public void SetCreatedAtServer(OffsetDateTime createdAtServer) {
+    public void setCreatedAtServer(OffsetDateTime createdAtServer) {
         this.createdAtServer = createdAtServer;
     }
 }

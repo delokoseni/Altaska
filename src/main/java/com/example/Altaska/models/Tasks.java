@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -60,119 +59,119 @@ public class Tasks {
     @Column(name = "status_change_at_server", nullable = false)
     private LocalDateTime statusChangeAtServer;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public String GetDescription() {
+    public String getDescription() {
         return description;
     }
 
-    public LocalDate GetCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public OffsetDateTime GetUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public Statuses GetIdStatus() {
+    public Statuses getIdStatus() {
         return idStatus;
     }
 
-    public Priorities GetIdPriority() {
+    public Priorities getIdPriority() {
         return idPriority;
     }
 
-    public Users GetIdCreator() {
+    public Users getIdCreator() {
         return idCreator;
     }
 
-    public Long GetTimeSpent() {
+    public Long getTimeSpent() {
         return timeSpent;
     }
 
-    public Projects GetIdProject() {
+    public Projects getIdProject() {
         return idProject;
     }
 
-    public LocalDate GetCreatedAtServer() {
+    public LocalDate getCreatedAtServer() {
         return createdAtServer;
     }
 
-    public LocalDateTime GetUpdatedAtServer() {
+    public LocalDateTime getUpdatedAtServer() {
         return updatedAtServer;
     }
 
-    public LocalDateTime GetDeadlineServer() {
+    public LocalDateTime getDeadlineServer() {
         return deadlineServer;
     }
 
-    public String GetUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
-    public LocalDateTime GetStatusChangeAtServer() {
+    public LocalDateTime getStatusChangeAtServer() {
         return statusChangeAtServer;
     }
 
-    public void SetName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void SetDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public void SetCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void SetUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public void SetIdStatus(Statuses idStatus) {
+    public void setIdStatus(Statuses idStatus) {
         this.idStatus = idStatus;
     }
 
-    public void SetIdPriority(Priorities idPriority) {
+    public void setIdPriority(Priorities idPriority) {
         this.idPriority = idPriority;
     }
 
-    public void SetIdCreator(Users idCreator) {
+    public void setIdCreator(Users idCreator) {
         this.idCreator = idCreator;
     }
 
-    public void SetTimeSpent(Long timeSpent) {
+    public void setTimeSpent(Long timeSpent) {
         this.timeSpent = timeSpent;
     }
 
-    public void SetIdProject(Projects idProject) {
+    public void setIdProject(Projects idProject) {
         this.idProject = idProject;
     }
 
-    public void SetCreatedAtServer(LocalDate createdAtServer) {
+    public void setCreatedAtServer(LocalDate createdAtServer) {
         this.createdAtServer = createdAtServer;
     }
 
-    public void SetUpdatedAtServer(LocalDateTime updatedAtServer) {
+    public void setUpdatedAtServer(LocalDateTime updatedAtServer) {
         this.updatedAtServer = updatedAtServer;
     }
 
-    public void SetDeadlineServer(LocalDateTime deadlineServer) {
+    public void setDeadlineServer(LocalDateTime deadlineServer) {
         this.deadlineServer = deadlineServer;
     }
 
-    public void SetUpdatedBy(String updatedBy) {
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public void SetStatusChangeAtServer(LocalDateTime statusChangeAtServer) {
+    public void setStatusChangeAtServer(LocalDateTime statusChangeAtServer) {
         this.statusChangeAtServer = statusChangeAtServer;
     }
 }

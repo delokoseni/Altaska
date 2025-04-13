@@ -28,47 +28,47 @@ public class Comments {
     @Column(name = "created_at_server", nullable = false)
     private OffsetDateTime createdAtServer;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetContent() {
+    public String getContent() {
         return content;
     }
 
-    public OffsetDateTime GetCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Tasks GetIdTask() {
+    public Tasks getIdTask() {
         return idTask;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public OffsetDateTime GetCreatedAtServer() {
+    public OffsetDateTime getCreatedAtServer() {
         return createdAtServer;
     }
 
-    public void SetContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
-    public void SetCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void SetIdTask(Tasks idTask) {
+    public void setIdTask(Tasks idTask) {
         this.idTask = idTask;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 
-    public void SetCreatedAtServer(OffsetDateTime createdAtServer) {
+    public void setCreatedAtServer(OffsetDateTime createdAtServer) {
         this.createdAtServer = createdAtServer;
     }
 }

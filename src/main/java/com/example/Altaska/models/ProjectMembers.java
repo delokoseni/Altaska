@@ -37,47 +37,47 @@ public class ProjectMembers {
     @Column(name = "invited_by", length = 254, nullable = false)
     private String invitedBy;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public Projects GetIdProject() {
+    public Projects getIdProject() {
         return idProject;
     }
 
-    public LocalDate GetAddedAt() {
+    public LocalDate getAddedAt() {
         return addedAt;
     }
 
-    public Roles GetIdRole() {
+    public Roles getIdRole() {
         return idRole;
     }
 
-    public boolean GetConfirmed() {
+    public boolean getConfirmed() {
         return confirmed;
     }
 
-    public String GetConfirmationToken() {
+    public String getConfirmationToken() {
         return confirmationToken;
     }
 
-    public LocalDate GetAddedAtServer() {
+    public LocalDate getAddedAtServer() {
         return addedAtServer;
     }
 
-    public String GetInvitedBy() {
+    public String getInvitedBy() {
         return invitedBy;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 
-    public void SetIdProject(Projects idProject) {
+    public void setIdProject(Projects idProject) {
         this.idProject = idProject;
     }
 

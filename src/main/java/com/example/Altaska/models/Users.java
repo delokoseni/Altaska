@@ -53,31 +53,31 @@ public class Users {
     @Column(name = "email_change_status")
     private boolean emailChangeStatus;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetEmail() {
+    public String getEmail() {
         return email;
     }
 
-    public String GetPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public UserType GetUserType() {
+    public UserType getUserType() {
         return userType;
     }
 
-    public void SetEmail(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public void SetPassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
-    public void SetUserType(UserType userType) {
+    public void setUserType(UserType userType) {
         this.userType = userType;
     }
 }

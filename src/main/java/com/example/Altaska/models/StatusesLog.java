@@ -22,31 +22,31 @@ public class StatusesLog {
     @JoinColumn(name = "id_task", referencedColumnName = "id")
     private Tasks idTask;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public OffsetDateTime GetChangeAt() {
+    public OffsetDateTime getChangeAt() {
         return changeAt;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public Tasks GetIdTask() {
+    public Tasks getIdTask() {
         return idTask;
     }
 
-    public void SetChangeAt(OffsetDateTime changeAt) {
+    public void setChangeAt(OffsetDateTime changeAt) {
         this.changeAt = changeAt;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 
-    public void SetIdTask(Tasks idTask) {
+    public void setIdTask(Tasks idTask) {
         this.idTask = idTask;
     }
 }

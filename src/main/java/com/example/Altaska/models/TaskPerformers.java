@@ -22,31 +22,31 @@ public class TaskPerformers {
     @Column(name = "added_at_server", nullable = false)
     private OffsetDateTime addedAtServer;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public Tasks GetIdTask() {
+    public Tasks getIdTask() {
         return idTask;
     }
 
-    public Users GetIdUser() {
+    public Users getIdUser() {
         return idUser;
     }
 
-    public OffsetDateTime GetAddedAtServer() {
+    public OffsetDateTime getAddedAtServer() {
         return addedAtServer;
     }
 
-    public void SetIdTask(Tasks idTask) {
+    public void setIdTask(Tasks idTask) {
         this.idTask = idTask;
     }
 
-    public void SetIdUser(Users idUser) {
+    public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
 
-    public void SetAddedAtServer(OffsetDateTime addedAtServer) {
+    public void setAddedAtServer(OffsetDateTime addedAtServer) {
         this.addedAtServer = addedAtServer;
     }
 }

@@ -15,23 +15,23 @@ public class Priorities {
     @Column(name = "level", nullable = false)
     private Long level;
 
-    public Long GetId() {
+    public Long getId() {
         return id;
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public Long GetLevel() {
+    public Long getLevel() {
         return level;
     }
 
-    public void SetName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void SetLevel(Long level) {
+    public void setLevel(Long level) {
         this.level = level;
     }
 }

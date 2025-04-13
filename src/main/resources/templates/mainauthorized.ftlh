@@ -38,8 +38,8 @@
         <#if projects?? && (projects?size > 0)>
             <#list projects as project>
                 <div class="project-entry">
-                    <button class="project-button" onclick="selectProject('${project.GetId()}', '${project.GetName()}')">
-                        ${project.GetName()}
+                    <button class="project-button" onclick="selectProject('${project.getId()}', '${project.getName()}')">
+                        ${project.getName()}
                     </button>
                 </div>
             </#list>

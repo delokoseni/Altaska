@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -50,24 +49,24 @@ public class TaskApiController {
 
         if (projectOpt.isPresent() && userOpt.isPresent()) {
             Tasks task = new Tasks();
-            task.SetName(name);
-            task.SetDescription(description);
-            task.SetIdProject(projectOpt.get());
-            task.SetIdCreator(userOpt.get());
+            task.setName(name);
+            task.setDescription(description);
+            task.setIdProject(projectOpt.get());
+            task.setIdCreator(userOpt.get());
 
             LocalDate nowDate = LocalDate.now();
             LocalDateTime nowDateTime = LocalDateTime.now();
             OffsetDateTime nowOffset = OffsetDateTime.now();
 
-            task.SetCreatedAt(nowDate); //todo Переделать
-            task.SetUpdatedAt(nowOffset); //todo Переделать
-            task.SetCreatedAtServer(nowDate);
-            task.SetUpdatedAtServer(nowDateTime);
-            task.SetStatusChangeAtServer(nowDateTime);
-            task.SetUpdatedBy(principal.getName());
-            task.SetTimeSpent(0L);
+            task.setCreatedAt(nowDate); //todo Переделать
+            task.setUpdatedAt(nowOffset); //todo Переделать
+            task.setCreatedAtServer(nowDate);
+            task.setUpdatedAtServer(nowDateTime);
+            task.setStatusChangeAtServer(nowDateTime);
+            task.setUpdatedBy(principal.getName());
+            task.setTimeSpent(0L);
             Statuses status = statusesRepository.findById(1L).orElseThrow(() -> new RuntimeException("Статус не найден"));
-            task.SetIdStatus(status);
+            task.setIdStatus(status);
             return tasksRepository.save(task);
         } else {
             throw new RuntimeException("Проект или пользователь не найден");

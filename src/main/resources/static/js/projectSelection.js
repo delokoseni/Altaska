@@ -128,7 +128,3 @@ function showTaskForm(projectId, container) {
 
     container.appendChild(form);
 }
-
-
-
-

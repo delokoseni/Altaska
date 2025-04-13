@@ -19,9 +19,9 @@ public class UserType {
         type = "user";
     }
 
-    public Long GetId() { return this.id; }
+    public Long getId() { return this.id; }
 
-    public String GetType() { return this.type; }
+    public String getType() { return this.type; }
 
-    public void SetType(String type) { this.type = type; }
+    public void setType(String type) { this.type = type; }
 }
