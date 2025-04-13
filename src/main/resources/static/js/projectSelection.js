@@ -54,7 +54,7 @@ function loadView(view, projectId) {
                         taskDiv.className = 'task-item';
                         taskDiv.innerHTML = `
                             <h3>${task.name}</h3>
-                            <p>${task.description}</p>
+                            <p>${task.idStatus.name} ${task.idPriority.name}</p>
                         `;
                         taskListContainer.appendChild(taskDiv);
                     });
