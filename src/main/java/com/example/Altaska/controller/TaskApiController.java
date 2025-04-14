@@ -39,7 +39,7 @@ public class TaskApiController {
     @PostMapping("/create/{projectId}")
     public Tasks createTask(@PathVariable Long projectId,
                             @RequestParam String name,
-                            @RequestParam String description,
+                            @RequestParam(required = false) String description,
                             @RequestParam String createdAt,
                             @RequestParam String updatedAt,
                             @RequestParam(required = false) Long priorityId,
@@ -50,7 +50,9 @@ public class TaskApiController {
         if (projectOpt.isPresent() && userOpt.isPresent()) {
             Tasks task = new Tasks();
             task.setName(name);
-            task.setDescription(description);
+            if (description != null) {
+                task.setDescription(description);
+            }
             task.setIdProject(projectOpt.get());
             task.setIdCreator(userOpt.get());
             if (priorityId != null) {

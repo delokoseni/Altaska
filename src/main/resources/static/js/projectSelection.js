@@ -104,7 +104,6 @@ function showTaskForm(projectId, container) {
             const descriptionInput = document.createElement('textarea');
             descriptionInput.placeholder = 'Описание задачи';
             descriptionInput.name = 'description';
-            descriptionInput.required = true;
 
             // Выпадающий список приоритета
             const prioritySelect = document.createElement('select');
