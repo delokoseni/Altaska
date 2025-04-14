@@ -30,7 +30,7 @@ public class MainAuthorizedController {
     @GetMapping("/mainauthorized")
     public String ShowLogin(Model model, Principal principal) {
         if (principal != null) {
-            String email = principal.getName(); // имя текущего пользователя (у тебя это email)
+            String email = principal.getName();
             Optional<Users> currentUserOpt = userRepository.findByEmail(email);
             if (currentUserOpt.isPresent()) {
                 Users currentUser = currentUserOpt.get();

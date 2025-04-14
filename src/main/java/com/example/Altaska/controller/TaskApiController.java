@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -43,6 +43,7 @@ public class TaskApiController {
                             @RequestParam String createdAt,
                             @RequestParam String updatedAt,
                             @RequestParam(required = false) Long priorityId,
+                            @RequestParam(required = false) String deadline,
                             Principal principal) {
         Optional<Projects> projectOpt = projectsRepository.findById(projectId);
         Optional<Users> userOpt = usersRepository.findByEmail(principal.getName());
@@ -63,7 +64,6 @@ public class TaskApiController {
 
             LocalDate nowDate = LocalDate.now();
             LocalDateTime nowDateTime = LocalDateTime.now();
-            OffsetDateTime nowOffset = OffsetDateTime.now();
             LocalDate createdAtDate = LocalDate.parse(createdAt);
             OffsetDateTime updatedAtOffset = OffsetDateTime.parse(updatedAt);
             task.setCreatedAt(createdAtDate);
@@ -75,11 +75,18 @@ public class TaskApiController {
             task.setTimeSpent(0L);
             Statuses status = statusesRepository.findById(1L).orElseThrow(() -> new RuntimeException("Статус не найден"));
             task.setIdStatus(status);
+            LocalDateTime deadlineDateTime = null;
+            if (deadline != null && !deadline.isEmpty()) {
+                LocalDateTime localDateTime = LocalDateTime.parse(deadline, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                ZoneId serverZoneId = ZoneId.of(TimeZone.getDefault().getID());
+                ZonedDateTime zonedDateTime = localDateTime.atZone(serverZoneId);
+                deadlineDateTime = zonedDateTime.toLocalDateTime();
+            }
+            task.setDeadlineServer(deadlineDateTime);
             return tasksRepository.save(task);
         } else {
             throw new RuntimeException("Проект или пользователь не найден");
         }
     }
-
 }
 

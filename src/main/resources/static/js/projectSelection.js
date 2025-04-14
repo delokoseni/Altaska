@@ -105,6 +105,12 @@ function showTaskForm(projectId, container) {
             descriptionInput.placeholder = 'Описание задачи';
             descriptionInput.name = 'description';
 
+            // Поле для дедлайна
+            const deadlineInput = document.createElement('input');
+            deadlineInput.type = 'datetime-local'; // Дата и время
+            deadlineInput.name = 'deadline'; // Новая строка
+            deadlineInput.placeholder = 'Срок выполнения';
+
             // Выпадающий список приоритета
             const prioritySelect = document.createElement('select');
             prioritySelect.name = 'priorityId';
@@ -127,6 +133,7 @@ function showTaskForm(projectId, container) {
 
             form.appendChild(nameInput);
             form.appendChild(descriptionInput);
+            form.appendChild(deadlineInput); // Добавление поля deadline
             form.appendChild(prioritySelect);
             form.appendChild(submitBtn);
 
@@ -141,7 +148,10 @@ function showTaskForm(projectId, container) {
                 formData.append('updatedAt', updatedAtInput.value);
                 formData.append('name', nameInput.value);
                 formData.append('description', descriptionInput.value);
-                formData.append('priorityId', prioritySelect.value); // новая строка
+                formData.append('priorityId', prioritySelect.value);
+                if (deadlineInput.value) {
+                    formData.append('deadline', deadlineInput.value);
+                }
                 formData.append(csrfParam, csrfToken);
 
                 fetch(`/api/tasks/create/${projectId}`, {
