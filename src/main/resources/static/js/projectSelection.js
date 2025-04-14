@@ -72,74 +72,96 @@ function showTaskForm(projectId, container) {
     const existingForm = container.querySelector('.task-form');
     if (existingForm) return;
 
-    const form = document.createElement('form');
-    form.className = 'task-form';
+    fetch('/api/priorities')
+        .then(response => response.json())
+        .then(priorities => {
+            const form = document.createElement('form');
+            form.className = 'task-form';
 
-    const createdAtInput = document.createElement('input');
-    createdAtInput.type = 'hidden';
-    createdAtInput.name = 'createdAt';
+            const createdAtInput = document.createElement('input');
+            createdAtInput.type = 'hidden';
+            createdAtInput.name = 'createdAt';
 
-    const updatedAtInput = document.createElement('input');
-    updatedAtInput.type = 'hidden';
-    updatedAtInput.name = 'updatedAt';
+            const updatedAtInput = document.createElement('input');
+            updatedAtInput.type = 'hidden';
+            updatedAtInput.name = 'updatedAt';
 
-    form.appendChild(createdAtInput);
-    form.appendChild(updatedAtInput);
+            form.appendChild(createdAtInput);
+            form.appendChild(updatedAtInput);
 
-    // Добавление CSRF токена в скрытое поле
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = csrfParam;  // имя параметра CSRF токена
-    csrfInput.value = csrfToken; // значение токена
-    form.appendChild(csrfInput);
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = csrfParam;
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
 
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.placeholder = 'Название задачи';
-    nameInput.name = 'name';  // имя параметра
-    nameInput.required = true;
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.placeholder = 'Название задачи';
+            nameInput.name = 'name';
+            nameInput.required = true;
 
-    const descriptionInput = document.createElement('textarea');
-    descriptionInput.placeholder = 'Описание задачи';
-    descriptionInput.name = 'description';  // имя параметра
-    descriptionInput.required = true;
+            const descriptionInput = document.createElement('textarea');
+            descriptionInput.placeholder = 'Описание задачи';
+            descriptionInput.name = 'description';
+            descriptionInput.required = true;
 
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.textContent = 'Создать';
+            // Выпадающий список приоритета
+            const prioritySelect = document.createElement('select');
+            prioritySelect.name = 'priorityId';
 
-    form.appendChild(nameInput);
-    form.appendChild(descriptionInput);
-    form.appendChild(submitBtn);
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Без приоритета';
+            prioritySelect.appendChild(defaultOption);
 
-    form.onsubmit = function (e) {
-        e.preventDefault();
-        const now = new Date();
-        createdAtInput.value = now.toISOString().split('T')[0];
-        updatedAtInput.value = now.toISOString();
-        // Создаем FormData для отправки данных формы
-        const formData = new FormData();
-        formData.append('createdAt', createdAtInput.value);
-        formData.append('updatedAt', updatedAtInput.value);
-        formData.append('name', nameInput.value);  // Параметр name
-        formData.append('description', descriptionInput.value);  // Параметр description
-        formData.append(csrfParam, csrfToken); // Добавляем CSRF токен
+            priorities.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = p.name;
+                prioritySelect.appendChild(option);
+            });
 
-        fetch(`/api/tasks/create/${projectId}`, {
-            method: 'POST',
-            body: formData  // Отправляем форму как данные формы
-        })
-        .then(response => {
-            if (!response.ok) throw new Error("Ошибка при создании задачи");
-            return response.json();
-        })
-        .then(data => {
-            loadView('список', projectId);  // Обновление списка задач
-        })
-        .catch(error => {
-            console.error('Ошибка создания задачи:', error);
+            const submitBtn = document.createElement('button');
+            submitBtn.type = 'submit';
+            submitBtn.textContent = 'Создать';
+
+            form.appendChild(nameInput);
+            form.appendChild(descriptionInput);
+            form.appendChild(prioritySelect);
+            form.appendChild(submitBtn);
+
+            form.onsubmit = function (e) {
+                e.preventDefault();
+                const now = new Date();
+                createdAtInput.value = now.toISOString().split('T')[0];
+                updatedAtInput.value = now.toISOString();
+
+                const formData = new FormData();
+                formData.append('createdAt', createdAtInput.value);
+                formData.append('updatedAt', updatedAtInput.value);
+                formData.append('name', nameInput.value);
+                formData.append('description', descriptionInput.value);
+                formData.append('priorityId', prioritySelect.value); // новая строка
+                formData.append(csrfParam, csrfToken);
+
+                fetch(`/api/tasks/create/${projectId}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error("Ошибка при создании задачи");
+                    return response.json();
+                })
+                .then(data => {
+                    loadView('список', projectId);
+                })
+                .catch(error => {
+                    console.error('Ошибка создания задачи:', error);
+                });
+            };
+
+            container.appendChild(form);
         });
-    };
-
-    container.appendChild(form);
 }
+

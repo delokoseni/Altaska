@@ -1,13 +1,7 @@
 package com.example.Altaska.controller;
 
-import com.example.Altaska.models.Projects;
-import com.example.Altaska.models.Statuses;
-import com.example.Altaska.models.Tasks;
-import com.example.Altaska.models.Users;
-import com.example.Altaska.repositories.ProjectsRepository;
-import com.example.Altaska.repositories.StatusesRepository;
-import com.example.Altaska.repositories.TasksRepository;
-import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.models.*;
+import com.example.Altaska.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +28,9 @@ public class TaskApiController {
     @Autowired
     private StatusesRepository statusesRepository;
 
+    @Autowired
+    private PrioritiesRepository prioritiesRepository;
+
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
         return tasksRepository.findByIdProject_Id(projectId);
@@ -45,6 +42,7 @@ public class TaskApiController {
                             @RequestParam String description,
                             @RequestParam String createdAt,
                             @RequestParam String updatedAt,
+                            @RequestParam(required = false) Long priorityId,
                             Principal principal) {
         Optional<Projects> projectOpt = projectsRepository.findById(projectId);
         Optional<Users> userOpt = usersRepository.findByEmail(principal.getName());
@@ -55,6 +53,11 @@ public class TaskApiController {
             task.setDescription(description);
             task.setIdProject(projectOpt.get());
             task.setIdCreator(userOpt.get());
+            if (priorityId != null) {
+                Priorities priority = prioritiesRepository.findById(priorityId)
+                        .orElseThrow(() -> new RuntimeException("Приоритет не найден"));
+                task.setIdPriority(priority);
+            }
 
             LocalDate nowDate = LocalDate.now();
             LocalDateTime nowDateTime = LocalDateTime.now();
