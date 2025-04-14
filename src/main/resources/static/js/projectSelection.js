@@ -54,7 +54,7 @@ function loadView(view, projectId) {
                         taskDiv.className = 'task-item';
                         taskDiv.innerHTML = `
                             <h3>${task.name}</h3>
-                            <p>${task.idStatus.name} ${task.idPriority.name}</p>
+                            <p>${task.idStatus.name} ${task.idPriority ? task.idPriority.name : ''}</p>
                         `;
                         taskListContainer.appendChild(taskDiv);
                     });
@@ -74,6 +74,17 @@ function showTaskForm(projectId, container) {
 
     const form = document.createElement('form');
     form.className = 'task-form';
+
+    const createdAtInput = document.createElement('input');
+    createdAtInput.type = 'hidden';
+    createdAtInput.name = 'createdAt';
+
+    const updatedAtInput = document.createElement('input');
+    updatedAtInput.type = 'hidden';
+    updatedAtInput.name = 'updatedAt';
+
+    form.appendChild(createdAtInput);
+    form.appendChild(updatedAtInput);
 
     // Добавление CSRF токена в скрытое поле
     const csrfInput = document.createElement('input');
@@ -103,9 +114,13 @@ function showTaskForm(projectId, container) {
 
     form.onsubmit = function (e) {
         e.preventDefault();
-
+        const now = new Date();
+        createdAtInput.value = now.toISOString().split('T')[0];
+        updatedAtInput.value = now.toISOString();
         // Создаем FormData для отправки данных формы
         const formData = new FormData();
+        formData.append('createdAt', createdAtInput.value);
+        formData.append('updatedAt', updatedAtInput.value);
         formData.append('name', nameInput.value);  // Параметр name
         formData.append('description', descriptionInput.value);  // Параметр description
         formData.append(csrfParam, csrfToken); // Добавляем CSRF токен

@@ -43,6 +43,8 @@ public class TaskApiController {
     public Tasks createTask(@PathVariable Long projectId,
                             @RequestParam String name,
                             @RequestParam String description,
+                            @RequestParam String createdAt,
+                            @RequestParam String updatedAt,
                             Principal principal) {
         Optional<Projects> projectOpt = projectsRepository.findById(projectId);
         Optional<Users> userOpt = usersRepository.findByEmail(principal.getName());
@@ -57,9 +59,10 @@ public class TaskApiController {
             LocalDate nowDate = LocalDate.now();
             LocalDateTime nowDateTime = LocalDateTime.now();
             OffsetDateTime nowOffset = OffsetDateTime.now();
-
-            task.setCreatedAt(nowDate); //todo Переделать
-            task.setUpdatedAt(nowOffset); //todo Переделать
+            LocalDate createdAtDate = LocalDate.parse(createdAt);
+            OffsetDateTime updatedAtOffset = OffsetDateTime.parse(updatedAt);
+            task.setCreatedAt(createdAtDate);
+            task.setUpdatedAt(updatedAtOffset);
             task.setCreatedAtServer(nowDate);
             task.setUpdatedAtServer(nowDateTime);
             task.setStatusChangeAtServer(nowDateTime);
