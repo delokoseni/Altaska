@@ -156,3 +156,11 @@
     background-color: var(--background-color);
     color: var(--text-color);
 }
+
+.task-header {
+    display: flex;
+    align-items: center; /* Выравнивание по вертикали */
+    justify-content: flex-start; /* Или flex-start, если не нужно разносить по краям */
+    gap: 10px; /* Расстояние между элементами, по желанию */
+    margin-bottom: 10px;
+}

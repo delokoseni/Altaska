@@ -34,7 +34,6 @@ function loadView(view, projectId) {
             .then(tasks => {
                 const taskListContainer = document.createElement('div');
                 taskListContainer.className = 'task-list';
-
                 const header = document.createElement('div');
                 header.className = 'task-header';
                 const title = document.createElement('span');
@@ -42,8 +41,16 @@ function loadView(view, projectId) {
                 header.appendChild(title);
 
                 const addBtn = document.createElement('button');
-                addBtn.textContent = '+ Добавить';
-                addBtn.className = 'add-task-button';
+                addBtn.className = 'add-project-button';
+                addBtn.title = 'Добавить';
+
+                const plusText = document.createTextNode('+');
+                addBtn.appendChild(plusText);
+                const addLabel = document.createElement('span');
+                addLabel.className = 'add-label';
+                addLabel.textContent = 'Добавить';
+                addBtn.appendChild(addLabel);
+
                 addBtn.onclick = () => showTaskForm(projectId, taskListContainer);
                 header.appendChild(addBtn);
                 taskListContainer.appendChild(header);
@@ -71,7 +78,7 @@ function loadView(view, projectId) {
 function showTaskForm(projectId, container) {
     const existingForm = container.querySelector('.task-form');
     if (existingForm) return;
-
+    container.innerHTML = '';
     fetch('/api/priorities')
         .then(response => response.json())
         .then(priorities => {
@@ -105,7 +112,6 @@ function showTaskForm(projectId, container) {
             descriptionInput.placeholder = 'Описание задачи';
             descriptionInput.name = 'description';
 
-            // Поле для дедлайна
             const deadlineInput = document.createElement('input');
             deadlineInput.type = 'datetime-local'; // Дата и время
             deadlineInput.name = 'deadline'; // Новая строка
@@ -133,7 +139,7 @@ function showTaskForm(projectId, container) {
 
             form.appendChild(nameInput);
             form.appendChild(descriptionInput);
-            form.appendChild(deadlineInput); // Добавление поля deadline
+            form.appendChild(deadlineInput);
             form.appendChild(prioritySelect);
             form.appendChild(submitBtn);
 
