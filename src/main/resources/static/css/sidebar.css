@@ -159,7 +159,7 @@
 
 .task-item {
     border: 1px solid var(--second-text-color);
-    padding: 8px 12px; /* уменьшен отступ */
+    padding: 8px 12px;
     border-radius: 8px;
     background-color: var(--background-color);
     color: var(--text-color);

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const showButton = document.getElementById('show-create-form');
     const mainContent = document.querySelector('.main-content');
-
+    const previousContent = mainContent.innerHTML;
     if (showButton && mainContent) {
         showButton.addEventListener('click', () => {
             mainContent.innerHTML = '';
@@ -39,6 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.type = 'submit';
             submitBtn.textContent = 'Создать';
 
+            const backButton = document.createElement('button');
+            backButton.textContent = 'Назад';
+            backButton.type = 'button';
+            backButton.className = 'back-button';
+            backButton.onclick = () => {
+                mainContent.innerHTML = previousContent;
+            };
+
+            formWrapper.appendChild(backButton);
             form.appendChild(csrfInput);
             form.appendChild(createdAtInput);
             form.appendChild(updatedAtInput);

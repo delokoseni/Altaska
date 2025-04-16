@@ -77,6 +77,7 @@ function loadView(view, projectId) {
 
 function showTaskForm(projectId, container) {
     const existingForm = container.querySelector('.task-form');
+    const previousContent = container.innerHTML;
     if (existingForm) return;
     container.innerHTML = '';
     fetch('/api/priorities')
@@ -137,6 +138,15 @@ function showTaskForm(projectId, container) {
             submitBtn.type = 'submit';
             submitBtn.textContent = 'Создать';
 
+            const backButton = document.createElement('button');
+            backButton.textContent = 'Назад';
+            backButton.type = 'button';
+            backButton.className = 'back-button';
+            backButton.onclick = () => {
+                container.innerHTML = previousContent;
+            };
+
+            form.appendChild(backButton);
             form.appendChild(nameInput);
             form.appendChild(descriptionInput);
             form.appendChild(deadlineInput);
