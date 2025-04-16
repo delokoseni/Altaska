@@ -39,3 +39,51 @@
 .close-button:hover {
     transform: scale(1.2);
 }
+/*Все что ниже изменить*/
+.task-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.editable-field {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: none;
+    background-color: #fff;
+    color: #000;
+}
+
+.editable-field:disabled {
+    background-color: #e0e0e0;
+    color: #555;
+}
+
+.field-label {
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.field-value {
+    font-size: 16px;
+    padding: 6px 0;
+}
+
+.edit-button {
+    align-self: flex-end;
+    margin-bottom: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.edit-button:hover {
+    background-color: #45a049;
+}

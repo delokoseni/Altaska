@@ -21,6 +21,7 @@ function selectProject(projectId, projectName) {
 
     mainContent.appendChild(menu);
     mainContent.appendChild(viewContent);
+    loadView('список', projectId)
 }
 
 
@@ -118,10 +119,9 @@ function showTaskForm(projectId, container) {
 
             const deadlineInput = document.createElement('input');
             deadlineInput.type = 'datetime-local'; // Дата и время
-            deadlineInput.name = 'deadline'; // Новая строка
+            deadlineInput.name = 'deadline';
             deadlineInput.placeholder = 'Срок выполнения';
 
-            // Выпадающий список приоритета
             const prioritySelect = document.createElement('select');
             prioritySelect.name = 'priorityId';
 
