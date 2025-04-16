@@ -1,0 +1,66 @@
+/* Контейнер формы */
+form {
+    width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-family: 'Nunito', sans-serif;
+}
+
+/* Поля ввода и textarea */
+form input[type="text"],
+form input[type="datetime-local"],
+form textarea,
+form select {
+    padding: 10px;
+    border: 2px solid var(--button-color);
+    border-radius: 6px;
+    background-color: var(--text-color);
+    color: var(--button-color);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: var(--hover-button-color);
+}
+
+/* Кнопка отправки */
+form button[type="submit"] {
+    padding: 10px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-family: 'Nunito', sans-serif;
+    font-weight: bold;
+}
+
+form button[type="submit"]:hover {
+    background-color: var(--hover-button-color);
+    transform: scale(1.03);
+}
+
+/* Цвет плейсхолдеров */
+form input::placeholder,
+form textarea::placeholder {
+    color: var(--button-color);
+    opacity: 1; /* Убираем полупрозрачность */
+}
+
+/* Цвет текста в select */
+form select {
+    color: var(--button-color);
+}
+
+/* Цвет "плейсхолдера" в select, если стоит пустой option */
+form select:invalid {
+    color: var(--button-color);
+}

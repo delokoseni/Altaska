@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/mainstyle.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/sidebar.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>

@@ -19,11 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
             csrfInput.value = csrfToken;
 
             form.innerHTML += `
-                <label>Название проекта:</label><br>
-                <input type="text" name="name" required><br><br>
-
-                <label>Описание:</label><br>
-                <textarea name="description" rows="4" cols="50" required></textarea><br><br>
+                <label>Название проекта:</label>
+                <input type="text" name="name" required>
+                <label>Описание:</label>
+                <textarea name="description" rows="4" cols="50" required></textarea>
             `;
 
             const createdAtInput = document.createElement('input');
