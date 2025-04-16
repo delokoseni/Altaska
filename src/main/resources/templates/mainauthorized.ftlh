@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/taskdetailssidebar.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>
     <script src="/js/projectSelection.js"></script>
+    <script src="/js/taskDetails.js"></script>
     <title>Главная</title>
 </head>
 <body>

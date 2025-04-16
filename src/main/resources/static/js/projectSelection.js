@@ -63,6 +63,9 @@ function loadView(view, projectId) {
                             <h3>${task.name}</h3>
                             <p>${task.idStatus.name} ${task.idPriority ? task.idPriority.name : ''}</p>
                         `;
+                        taskDiv.addEventListener('click', () => {
+                            showTaskDetails(task);
+                        });
                         taskListContainer.appendChild(taskDiv);
                     });
                 }
