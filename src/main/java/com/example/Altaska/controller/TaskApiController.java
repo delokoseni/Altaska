@@ -2,8 +2,11 @@ package com.example.Altaska.controller;
 
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
+import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.*;
@@ -30,6 +33,9 @@ public class TaskApiController {
 
     @Autowired
     private PrioritiesRepository prioritiesRepository;
+
+    @Autowired
+    private PermissionService permissionService;
 
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
@@ -88,5 +94,130 @@ public class TaskApiController {
             throw new RuntimeException("Проект или пользователь не найден");
         }
     }
+
+    @PutMapping("/{taskId}/name")
+    public Tasks updateTaskName(@PathVariable Long taskId,
+                                @RequestParam String name,
+                                Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new RuntimeException("Нет доступа");
+        }
+
+        task.setName(name);
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
+    @PutMapping("/{taskId}/description")
+    public Tasks updateTaskDescription(@PathVariable Long taskId,
+                                       @RequestParam String description,
+                                       Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        task.setDescription(description);
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
+    @PutMapping("/{taskId}/priority")
+    public Tasks updateTaskPriority(@PathVariable Long taskId,
+                                    @RequestParam(required = false) Long priorityId,
+                                    Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        if (priorityId != null) {
+            Priorities priority = prioritiesRepository.findById(priorityId)
+                    .orElseThrow(() -> new RuntimeException("Приоритет не найден"));
+            task.setIdPriority(priority);
+        } else {
+            task.setIdPriority(null);
+        }
+
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
+    @PutMapping("/{taskId}/status")
+    public Tasks updateTaskStatus(@PathVariable Long taskId,
+                                  @RequestParam Long statusId,
+                                  Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        Statuses status = statusesRepository.findById(statusId)
+                .orElseThrow(() -> new RuntimeException("Статус не найден"));
+
+        task.setIdStatus(status);
+        task.setStatusChangeAtServer(LocalDateTime.now());
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
+    @PutMapping("/{taskId}/deadline")
+    public Tasks updateTaskDeadline(@PathVariable Long taskId,
+                                    @RequestParam(required = false) String deadline,
+                                    Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        if (deadline != null && !deadline.isEmpty()) {
+            LocalDateTime localDateTime = LocalDateTime.parse(deadline, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            ZoneId serverZoneId = ZoneId.of(TimeZone.getDefault().getID());
+            ZonedDateTime zonedDateTime = localDateTime.atZone(serverZoneId);
+            task.setDeadlineServer(zonedDateTime.toLocalDateTime());
+        } else {
+            task.setDeadlineServer(null);
+        }
+
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
 }
 
