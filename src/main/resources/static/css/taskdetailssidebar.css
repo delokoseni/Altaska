@@ -39,11 +39,12 @@
 .close-button:hover {
     transform: scale(1.2);
 }
-/*Все что ниже изменить*/
+
 .task-details-content {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding-right: 16px;
 }
 
 .editable-field {
@@ -75,7 +76,7 @@
 .edit-button {
     align-self: flex-end;
     margin-bottom: 12px;
-    background-color: #4CAF50;
+    background-color: var(--button-color);
     color: white;
     border: none;
     padding: 6px 12px;
@@ -85,5 +86,5 @@
 }
 
 .edit-button:hover {
-    background-color: #45a049;
+    background-color: var(--hover-button-color);
 }

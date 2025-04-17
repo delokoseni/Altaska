@@ -24,7 +24,6 @@ function selectProject(projectId, projectName) {
     loadView('список', projectId)
 }
 
-
 function loadView(view, projectId) {
     const viewContent = document.querySelector('.view-content');
     viewContent.innerHTML = '';
