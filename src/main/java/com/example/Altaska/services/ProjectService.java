@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProjectService {
@@ -25,7 +22,7 @@ public class ProjectService {
     private ProjectMembersRepository membersRepo;
 
     public List<Projects> getAllUserProjects(Users user) {
-        Set<Projects> allProjects = new HashSet<>();
+        Set<Projects> allProjects = new LinkedHashSet<>();
 
         allProjects.addAll(projectsRepo.findByIdOwner(user));
 
@@ -34,8 +31,13 @@ public class ProjectService {
             allProjects.add(member.getIdProject());
         }
 
-        return new ArrayList<>(allProjects);
+        List<Projects> sortedProjects = new ArrayList<>(allProjects);
+        sortedProjects.sort(Comparator.comparing(Projects::getCreatedAt).reversed());
+
+        return sortedProjects;
     }
+
+
 
     public void createProject(String name, String description, Users owner, LocalDate createdAt,
                               OffsetDateTime updatedAt) {

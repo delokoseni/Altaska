@@ -8,7 +8,7 @@ function selectProject(projectId, projectName) {
     const menu = document.createElement('div');
     menu.className = 'project-menu';
 
-    const views = ['Список', 'Канбан', 'Гант', 'Участники'];
+    const views = ['Список', 'Канбан', 'Гант', 'Участники', 'Настройки'];
     views.forEach(view => {
         const button = document.createElement('button');
         button.textContent = view;
