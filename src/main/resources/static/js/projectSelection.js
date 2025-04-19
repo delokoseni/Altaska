@@ -21,7 +21,7 @@ function selectProject(projectId, projectName) {
 
     mainContent.appendChild(menu);
     mainContent.appendChild(viewContent);
-    loadView('список', projectId)
+    loadView('список', projectId);
 }
 
 function loadView(view, projectId) {

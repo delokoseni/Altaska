@@ -145,6 +145,7 @@ function showTaskDetails(task) {
                         })
                         .then(updatedTask => {
                             console.log(`Поле "${target}" обновлено успешно`, updatedTask);
+                            loadView('список', task.idProject.id);
                         })
                         .catch(err => {
                             alert(`Не удалось обновить ${target}: ${err.message}`);
