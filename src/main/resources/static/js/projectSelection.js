@@ -32,6 +32,7 @@ function loadView(view, projectId) {
         fetch(`/api/tasks/project/${projectId}`)
             .then(response => response.json())
             .then(tasks => {
+                tasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 const taskListContainer = document.createElement('div');
                 taskListContainer.className = 'task-list';
                 const header = document.createElement('div');
