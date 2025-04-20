@@ -1,15 +1,19 @@
-package com.example.Altaska.controllers.api;
+package com.example.Altaska.controller;
 
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.Tags;
 import com.example.Altaska.models.TasksTags;
+import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.TagsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.TasksTagsRepository;
+import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,6 +30,12 @@ public class TasksTagsApiController {
     @Autowired
     private TagsRepository tagsRepository;
 
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
     @GetMapping("/task/{taskId}")
     public List<Tags> getTagsByTask(@PathVariable Long taskId) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow();
@@ -34,9 +44,16 @@ public class TasksTagsApiController {
     }
 
     @PostMapping("/{taskId}/add")
-    public void addTagToTask(@PathVariable Long taskId, @RequestParam Long tagId) {
+    public void addTagToTask(@PathVariable Long taskId, @RequestParam Long tagId, Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow();
         Tags tag = tagsRepository.findById(tagId).orElseThrow();
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new RuntimeException("Нет доступа");
+        }
 
         TasksTags tasksTags = new TasksTags();
         tasksTags.setIdTask(task);
@@ -45,11 +62,21 @@ public class TasksTagsApiController {
         tasksTagsRepository.save(tasksTags);
     }
 
+
     @DeleteMapping("/{taskId}/{tagId}")
     @Transactional
-    public void removeTagFromTask(@PathVariable Long taskId, @PathVariable Long tagId) {
+    public void removeTagFromTask(@PathVariable Long taskId,
+                                  @PathVariable Long tagId,
+                                  Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow();
         Tags tag = tagsRepository.findById(tagId).orElseThrow();
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new RuntimeException("Нет доступа");
+        }
+
         tasksTagsRepository.deleteByIdTaskAndIdTag(task, tag);
     }
+
 }
