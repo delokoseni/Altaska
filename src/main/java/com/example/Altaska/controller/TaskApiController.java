@@ -37,6 +37,12 @@ public class TaskApiController {
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private  TasksTagsRepository tasksTagsRepository;
+
+    @Autowired
+    private TagsRepository tagsRepository;
+
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
         return tasksRepository.findByIdProject_Id(projectId);
@@ -50,6 +56,7 @@ public class TaskApiController {
                             @RequestParam String updatedAt,
                             @RequestParam(required = false) Long priorityId,
                             @RequestParam(required = false) String deadline,
+                            @RequestParam(required = false) List<Long> tagIds,
                             Principal principal) {
         Optional<Projects> projectOpt = projectsRepository.findById(projectId);
         Optional<Users> userOpt = usersRepository.findByEmail(principal.getName());
@@ -89,7 +96,21 @@ public class TaskApiController {
                 deadlineDateTime = zonedDateTime.toLocalDateTime();
             }
             task.setDeadlineServer(deadlineDateTime);
-            return tasksRepository.save(task);
+            Tasks savedTask = tasksRepository.save(task);
+
+            if (tagIds != null) {
+                for (Long tagId : tagIds) {
+                    Tags tag = tagsRepository.findById(tagId)
+                            .orElseThrow(() -> new RuntimeException("Тег не найден"));
+                    TasksTags tasksTags = new TasksTags();
+                    tasksTags.setIdTask(savedTask);
+                    tasksTags.setIdTag(tag);
+                    tasksTags.setAddedAtServer(LocalDateTime.now());
+                    tasksTagsRepository.save(tasksTags);
+                }
+            }
+
+            return savedTask;
         } else {
             throw new RuntimeException("Проект или пользователь не найден");
         }

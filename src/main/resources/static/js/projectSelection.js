@@ -136,6 +136,9 @@ function showTaskForm(projectId, container) {
             defaultOption.textContent = 'Без приоритета';
             prioritySelect.appendChild(defaultOption);
 
+            const selectedTagIds = [];
+            const tagSelector = createTagSelector(projectId, selectedTagIds);
+
             priorities.forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.id;
@@ -160,6 +163,7 @@ function showTaskForm(projectId, container) {
             form.appendChild(descriptionInput);
             form.appendChild(deadlineInput);
             form.appendChild(prioritySelect);
+            form.appendChild(tagSelector);
             form.appendChild(submitBtn);
 
             form.onsubmit = function (e) {
@@ -178,6 +182,10 @@ function showTaskForm(projectId, container) {
                     formData.append('deadline', deadlineInput.value);
                 }
                 formData.append(csrfParam, csrfToken);
+
+                selectedTagIds.forEach(tagId => {
+                        formData.append('tagIds', tagId);
+                });
 
                 fetch(`/api/tasks/create/${projectId}`, {
                     method: 'POST',
@@ -397,3 +405,70 @@ function editTag(tagId, currentName, projectId) {
     }
 }
 
+function createTagSelector(projectId, selectedTags) {
+    const container = document.createElement('div');
+    container.className = 'tag-selector-container';
+
+    const tagSelect = document.createElement('select');
+    tagSelect.className = 'tag-select';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = 'Добавить тег';
+
+    const tagsList = document.createElement('div');
+    tagsList.className = 'selected-tags';
+
+    // Храним id выбранных тегов, чтобы не дублировались
+    const selectedTagIds = new Set();
+
+    fetch(`/api/tags/project/${projectId}`)
+        .then(response => response.json())
+        .then(tags => {
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Выберите тег';
+            tagSelect.appendChild(defaultOption);
+
+            tags.forEach(tag => {
+                const option = document.createElement('option');
+                option.value = tag.id;
+                option.textContent = tag.name;
+                tagSelect.appendChild(option);
+            });
+        });
+
+    addBtn.onclick = () => {
+        const selectedId = tagSelect.value;
+        const selectedText = tagSelect.options[tagSelect.selectedIndex]?.textContent;
+
+        if (selectedId && !selectedTagIds.has(selectedId)) {
+            selectedTagIds.add(selectedId);
+            selectedTags.push(selectedId); // Добавляем в общий массив
+
+            const tagItem = document.createElement('span');
+            tagItem.className = 'tag-item';
+            tagItem.textContent = selectedText;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = '×';
+            removeBtn.className = 'remove-tag-btn';
+            removeBtn.onclick = () => {
+                tagsList.removeChild(tagItem);
+                selectedTagIds.delete(selectedId);
+                const index = selectedTags.indexOf(selectedId);
+                if (index !== -1) selectedTags.splice(index, 1);
+            };
+
+            tagItem.appendChild(removeBtn);
+            tagsList.appendChild(tagItem);
+        }
+    };
+
+    container.appendChild(tagSelect);
+    container.appendChild(addBtn);
+    container.appendChild(tagsList);
+
+    return container;
+}
