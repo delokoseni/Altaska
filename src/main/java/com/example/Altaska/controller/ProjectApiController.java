@@ -1,7 +1,9 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.models.ProjectMembers;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Users;
+import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.PermissionService;
@@ -11,6 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -24,6 +30,9 @@ public class ProjectApiController {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ProjectMembersRepository projectMembersRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
@@ -52,6 +61,20 @@ public class ProjectApiController {
         return ResponseEntity.ok(project);
     }
 
+    @GetMapping("/{id}/members")
+    public ResponseEntity<?> getProjectMembers(@PathVariable Long id) {
+        List<ProjectMembers> members = projectMembersRepository.findByIdProjectId(id);
+
+        List<Map<String, Object>> result = members.stream().map(member -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("userId", member.getIdUser().getId());
+            map.put("email", member.getIdUser().getEmail());
+            map.put("role", member.getIdRole().getName());
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
+    }
 
 }
 

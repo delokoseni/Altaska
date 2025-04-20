@@ -251,7 +251,7 @@ function loadProjectInfoView(projectId) {
                 } else {
                     nameInput.disabled = true;
                     nameEditButton.textContent = 'Изменить';
-                    updateProjectField(projectId, 'name', nameInput.value); // отправка
+                    updateProjectField(projectId, 'name', nameInput.value);
                 }
             };
 
@@ -262,7 +262,7 @@ function loadProjectInfoView(projectId) {
                 } else {
                     descInput.disabled = true;
                     descEditButton.textContent = 'Изменить';
-                    updateProjectField(projectId, 'description', descInput.value); // отправка
+                    updateProjectField(projectId, 'description', descInput.value);
                 }
             };
 
@@ -273,7 +273,66 @@ function loadProjectInfoView(projectId) {
             container.appendChild(nameGroup);
             container.appendChild(descGroup);
             viewContent.appendChild(container);
+
+            // --- Теги ---
             renderTagsSection(container, projectId);
+
+            // --- Участники проекта ---
+            fetch(`/api/projects/${projectId}/members`)
+                .then(response => response.json())
+                .then(members => {
+                    const membersSection = document.createElement('div');
+                    membersSection.className = 'project-members-section';
+
+                    const membersTitle = document.createElement('h3');
+                    membersTitle.textContent = 'Участники проекта:';
+                    membersSection.appendChild(membersTitle);
+
+                    if (members.length === 0) {
+                        const noMembers = document.createElement('p');
+                        noMembers.textContent = 'Нет участников';
+                        membersSection.appendChild(noMembers);
+                    } else {
+                        const membersList = document.createElement('ul');
+                        members.forEach(member => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = member.email;
+
+                            const editBtn = document.createElement('button');
+                            editBtn.textContent = 'Редактировать права';
+                            editBtn.onclick = () => {
+                                // сюда вставишь логику изменения прав
+                                alert(`Редактирование прав участника ${member.email}`);
+                            };
+
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.textContent = 'Удалить';
+                            deleteBtn.onclick = () => {
+                                // сюда вставишь логику удаления
+                                alert(`Удаление участника ${member.email}`);
+                            };
+
+                            listItem.appendChild(editBtn);
+                            listItem.appendChild(deleteBtn);
+                            membersList.appendChild(listItem);
+                        });
+                        membersSection.appendChild(membersList);
+                    }
+
+                    const addMemberBtn = document.createElement('button');
+                    addMemberBtn.textContent = 'Добавить участника';
+                    addMemberBtn.onclick = () => {
+                        // сюда вставишь форму/модалку
+                        alert('Открыть форму добавления участника');
+                    };
+                    membersSection.appendChild(addMemberBtn);
+
+                    container.appendChild(membersSection);
+                })
+                .catch(err => {
+                    console.error('Ошибка загрузки участников:', err);
+                });
+
         })
         .catch(error => {
             console.error('Ошибка загрузки проекта:', error);
