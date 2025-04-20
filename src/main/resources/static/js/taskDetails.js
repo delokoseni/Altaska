@@ -98,6 +98,7 @@ function showTaskDetails(task) {
             sidebar.appendChild(closeButton);
             sidebar.appendChild(content);
             document.body.appendChild(sidebar);
+            initTaskTagsSection(task, csrfParam, csrfToken, content);
 
             sidebar.querySelectorAll('.edit-button').forEach(button => {
                 button.addEventListener('click', () => {
@@ -170,4 +171,125 @@ function showTaskDetails(task) {
         .catch(error => {
             console.error('Ошибка загрузки приоритетов или статусов:', error);
         });
+}
+
+function createTagsSection() {
+    const tagsSection = document.createElement('div');
+    tagsSection.className = 'task-tags-section';
+
+    const tagsTitle = document.createElement('h3');
+    tagsTitle.textContent = 'Тэги';
+    tagsSection.appendChild(tagsTitle);
+
+    const tagList = document.createElement('div');
+    tagList.className = 'task-tag-list';
+    tagsSection.appendChild(tagList);
+
+    const addTagContainer = document.createElement('div');
+    addTagContainer.className = 'add-task-tag';
+
+    const tagSelect = document.createElement('select');
+    tagSelect.className = 'tag-select';
+
+    const addTagButton = document.createElement('button');
+    addTagButton.textContent = 'Добавить тэг';
+
+    addTagContainer.appendChild(tagSelect);
+    addTagContainer.appendChild(addTagButton);
+    tagsSection.appendChild(addTagContainer);
+
+    return { tagsSection, tagList, tagSelect, addTagButton };
+}
+
+function loadTaskTags(task, tagList, csrfToken, callback) {
+    fetch(`/api/taskstags/task/${task.id}`)
+        .then(res => res.json())
+        .then(taskTags => {
+            tagList.innerHTML = '';
+            if (taskTags.length === 0) {
+                tagList.textContent = 'Нет тэгов';
+                callback?.([]);
+                return;
+            }
+
+            const ids = [];
+
+            taskTags.forEach(t => {
+                ids.push(t.id); // id тэга
+
+                const tagItem = document.createElement('div');
+                tagItem.className = 'task-tag-item';
+                tagItem.textContent = t.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = '✖';
+                removeBtn.onclick = () => {
+                    fetch(`/api/taskstags/${task.id}/${t.id}`, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': csrfToken }
+                    }).then(() => showTaskDetails(task));
+                };
+
+                tagItem.appendChild(removeBtn);
+                tagList.appendChild(tagItem);
+            });
+
+            callback?.(ids);
+        });
+}
+
+function loadProjectTags(task, tagSelect) {
+    fetch(`/api/tags/project/${task.idProject.id}`)
+        .then(res => res.json())
+        .then(projectTags => {
+            tagSelect.innerHTML = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.textContent = 'Выберите тэг...';
+            defaultOption.value = '';
+            tagSelect.appendChild(defaultOption);
+
+            projectTags.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
+                tagSelect.appendChild(opt);
+            });
+        });
+}
+
+function setupAddTagButton(task, tagSelect, addTagButton, csrfParam, csrfToken, getCurrentTagIds) {
+    addTagButton.onclick = () => {
+        const tagId = tagSelect.value;
+        if (!tagId) return;
+
+        const currentTags = getCurrentTagIds();
+        if (currentTags.includes(Number(tagId))) {
+            alert('Этот тэг уже прикреплён к задаче.');
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append('tagId', tagId);
+        formData.append(csrfParam, csrfToken);
+
+        fetch(`/api/taskstags/${task.id}/add`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        }).then(() => showTaskDetails(task));
+    };
+}
+
+function initTaskTagsSection(task, csrfParam, csrfToken, content) {
+    const { tagsSection, tagList, tagSelect, addTagButton } = createTagsSection();
+    content.appendChild(tagsSection);
+
+    let currentTaskTagIds = [];
+
+    loadTaskTags(task, tagList, csrfToken, (tagIds) => {
+        currentTaskTagIds = tagIds;
+    });
+    loadProjectTags(task, tagSelect);
+    setupAddTagButton(task, tagSelect, addTagButton, csrfParam, csrfToken, () => currentTaskTagIds);
+
 }
