@@ -221,17 +221,6 @@ function loadProjectInfoView(projectId) {
             const nameEditButton = document.createElement('button');
             nameEditButton.textContent = 'Изменить';
 
-            nameEditButton.onclick = () => {
-                if (nameInput.disabled) {
-                    nameInput.disabled = false;
-                    nameEditButton.textContent = 'Сохранить';
-                } else {
-                    nameInput.disabled = true;
-                    nameEditButton.textContent = 'Изменить';
-
-                }
-            };
-
             nameGroup.appendChild(nameLabel);
             nameGroup.appendChild(nameInput);
             nameGroup.appendChild(nameEditButton);
@@ -247,6 +236,17 @@ function loadProjectInfoView(projectId) {
             const descEditButton = document.createElement('button');
             descEditButton.textContent = 'Изменить';
 
+            nameEditButton.onclick = () => {
+                if (nameInput.disabled) {
+                    nameInput.disabled = false;
+                    nameEditButton.textContent = 'Сохранить';
+                } else {
+                    nameInput.disabled = true;
+                    nameEditButton.textContent = 'Изменить';
+                    updateProjectField(projectId, 'name', nameInput.value); // отправка
+                }
+            };
+
             descEditButton.onclick = () => {
                 if (descInput.disabled) {
                     descInput.disabled = false;
@@ -254,7 +254,7 @@ function loadProjectInfoView(projectId) {
                 } else {
                     descInput.disabled = true;
                     descEditButton.textContent = 'Изменить';
-
+                    updateProjectField(projectId, 'description', descInput.value); // отправка
                 }
             };
 
@@ -262,7 +262,6 @@ function loadProjectInfoView(projectId) {
             descGroup.appendChild(descInput);
             descGroup.appendChild(descEditButton);
 
-            // Добавим всё в контейнер
             container.appendChild(nameGroup);
             container.appendChild(descGroup);
             viewContent.appendChild(container);
@@ -270,4 +269,25 @@ function loadProjectInfoView(projectId) {
         .catch(error => {
             console.error('Ошибка загрузки проекта:', error);
         });
+}
+
+function updateProjectField(projectId, field, value) {
+    const formData = new FormData();
+    formData.append(field, value);
+    formData.append(csrfParam, csrfToken);
+
+    fetch(`/api/projects/update/${projectId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Ошибка при обновлении проекта");
+        return response.json();
+    })
+    .then(updated => {
+        console.log(`Поле ${field} обновлено`, updated);
+    })
+    .catch(error => {
+        console.error('Ошибка при обновлении поля проекта:', error);
+    });
 }
