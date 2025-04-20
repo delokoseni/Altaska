@@ -8,7 +8,7 @@ function selectProject(projectId, projectName) {
     const menu = document.createElement('div');
     menu.className = 'project-menu';
 
-    const views = ['Список', 'Канбан', 'Гант', 'Участники', 'Настройки'];
+    const views = ['Список', 'Канбан', 'Гант', 'О проекте'];
     views.forEach(view => {
         const button = document.createElement('button');
         button.textContent = view;
@@ -76,6 +76,12 @@ function loadView(view, projectId) {
             .catch(error => {
                 console.error('Ошибка загрузки задач:', error);
             });
+    }
+    if (view === 'канбан') { }
+    if (view === 'гант') { }
+    if (view === 'о проекте')
+    {
+        loadProjectInfoView(projectId);
     }
 }
 
@@ -193,3 +199,75 @@ function showTaskForm(projectId, container) {
         });
 }
 
+function loadProjectInfoView(projectId) {
+    const viewContent = document.querySelector('.view-content');
+    viewContent.innerHTML = '';
+
+    fetch(`/api/projects/${projectId}`)
+        .then(response => response.json())
+        .then(project => {
+            const container = document.createElement('div');
+            container.className = 'project-info-container';
+
+            // --- Название ---
+            const nameGroup = document.createElement('div');
+            const nameLabel = document.createElement('label');
+            nameLabel.textContent = 'Название проекта:';
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.value = project.name;
+            nameInput.disabled = true;
+
+            const nameEditButton = document.createElement('button');
+            nameEditButton.textContent = 'Изменить';
+
+            nameEditButton.onclick = () => {
+                if (nameInput.disabled) {
+                    nameInput.disabled = false;
+                    nameEditButton.textContent = 'Сохранить';
+                } else {
+                    nameInput.disabled = true;
+                    nameEditButton.textContent = 'Изменить';
+
+                }
+            };
+
+            nameGroup.appendChild(nameLabel);
+            nameGroup.appendChild(nameInput);
+            nameGroup.appendChild(nameEditButton);
+
+            // --- Описание ---
+            const descGroup = document.createElement('div');
+            const descLabel = document.createElement('label');
+            descLabel.textContent = 'Описание проекта:';
+            const descInput = document.createElement('textarea');
+            descInput.value = project.description || '';
+            descInput.disabled = true;
+
+            const descEditButton = document.createElement('button');
+            descEditButton.textContent = 'Изменить';
+
+            descEditButton.onclick = () => {
+                if (descInput.disabled) {
+                    descInput.disabled = false;
+                    descEditButton.textContent = 'Сохранить';
+                } else {
+                    descInput.disabled = true;
+                    descEditButton.textContent = 'Изменить';
+
+                }
+            };
+
+            descGroup.appendChild(descLabel);
+            descGroup.appendChild(descInput);
+            descGroup.appendChild(descEditButton);
+
+            // Добавим всё в контейнер
+            container.appendChild(nameGroup);
+            container.appendChild(descGroup);
+            viewContent.appendChild(container);
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки проекта:', error);
+        });
+}

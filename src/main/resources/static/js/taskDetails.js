@@ -68,7 +68,7 @@ function showTaskDetails(task) {
             content.className = 'task-details-content';
 
             content.innerHTML = `
-                <h2>${task.name}</h2>
+                <h2>Задача</h2>
 
                 <label class="field-label">Название:</label>
                 <input class="editable-field task-name" value="${task.name}" disabled />
