@@ -265,6 +265,7 @@ function loadProjectInfoView(projectId) {
             container.appendChild(nameGroup);
             container.appendChild(descGroup);
             viewContent.appendChild(container);
+            renderTagsSection(container, projectId);
         })
         .catch(error => {
             console.error('Ошибка загрузки проекта:', error);
@@ -291,3 +292,108 @@ function updateProjectField(projectId, field, value) {
         console.error('Ошибка при обновлении поля проекта:', error);
     });
 }
+
+function renderTagsSection(container, projectId) {
+    const tagsGroup = document.createElement('div');
+    tagsGroup.className = 'tags-group';
+
+    const tagsHeader = document.createElement('div');
+    tagsHeader.className = 'tags-header';
+
+    const tagsTitle = document.createElement('span');
+    tagsTitle.textContent = 'Список тэгов';
+
+    const addTagButton = document.createElement('button');
+    addTagButton.textContent = '+ Добавить тэг';
+    addTagButton.onclick = () => showAddTagForm(tagsGroup, projectId);
+
+    tagsHeader.appendChild(tagsTitle);
+    tagsHeader.appendChild(addTagButton);
+    tagsGroup.appendChild(tagsHeader);
+
+    const tagList = document.createElement('div');
+    tagList.className = 'tag-list';
+    tagsGroup.appendChild(tagList);
+
+    container.appendChild(tagsGroup);
+
+    loadTags(tagList, projectId);
+}
+
+function loadTags(tagListElement, projectId) {
+    fetch(`/api/tags/project/${projectId}`)
+        .then(response => response.json())
+        .then(tags => {
+            tagListElement.innerHTML = '';
+            tags.forEach(tag => {
+                tagListElement.appendChild(createTagElement(tag, projectId));
+            });
+        });
+}
+
+function createTagElement(tag, projectId) {
+    const tagItem = document.createElement('div');
+    tagItem.className = 'tag-item';
+
+    const tagName = document.createElement('span');
+    tagName.textContent = tag.name;
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = '✎';
+    editBtn.onclick = () => editTag(tag.id, tag.name, projectId);
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '✖';
+    delBtn.onclick = () => {
+        fetch(`/api/tags/${tag.id}`, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        }).then(() => loadProjectInfoView(projectId));
+    };
+
+    tagItem.appendChild(tagName);
+    tagItem.appendChild(editBtn);
+    tagItem.appendChild(delBtn);
+
+    return tagItem;
+}
+
+function showAddTagForm(container, projectId) {
+    const form = document.createElement('div');
+
+    const input = document.createElement('input');
+    input.placeholder = 'Введите тэг';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Сохранить';
+
+    saveBtn.onclick = () => {
+        const formData = new FormData();
+        formData.append('name', input.value);
+        formData.append(csrfParam, csrfToken);
+
+        fetch(`/api/tags/create/${projectId}`, {
+            method: 'POST',
+            body: formData
+        }).then(() => loadProjectInfoView(projectId));
+    };
+
+    form.appendChild(input);
+    form.appendChild(saveBtn);
+    container.appendChild(form);
+}
+
+function editTag(tagId, currentName, projectId) {
+    const newName = prompt('Новое имя тега:', currentName);
+    if (newName && newName !== currentName) {
+        const formData = new FormData();
+        formData.append('name', newName);
+        formData.append(csrfParam, csrfToken);
+
+        fetch(`/api/tags/update/${tagId}`, {
+            method: 'POST',
+            body: formData
+        }).then(() => loadProjectInfoView(projectId));
+    }
+}
+
