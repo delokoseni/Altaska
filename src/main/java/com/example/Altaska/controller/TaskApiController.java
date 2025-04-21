@@ -3,6 +3,9 @@ package com.example.Altaska.controller;
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.PermissionService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +45,9 @@ public class TaskApiController {
 
     @Autowired
     private TagsRepository tagsRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
@@ -188,6 +194,7 @@ public class TaskApiController {
     }
 
     @PutMapping("/{taskId}/status")
+    @Transactional
     public Tasks updateTaskStatus(@PathVariable Long taskId,
                                   @RequestParam Long statusId,
                                   Principal principal) {
@@ -201,6 +208,11 @@ public class TaskApiController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
+
+        entityManager.createNativeQuery("SET LOCAL myapp.user_id = " + user.getId())
+                .executeUpdate();
+
+
         Statuses status = statusesRepository.findById(statusId)
                 .orElseThrow(() -> new RuntimeException("Статус не найден"));
 
