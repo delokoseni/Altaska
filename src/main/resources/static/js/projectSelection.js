@@ -332,7 +332,8 @@ function loadProjectInfoView(projectId) {
                 .catch(err => {
                     console.error('Ошибка загрузки участников:', err);
                 });
-
+            const archiveButton = createArchiveToggleButton(project, projectId);
+            container.appendChild(archiveButton);
         })
         .catch(error => {
             console.error('Ошибка загрузки проекта:', error);
@@ -531,3 +532,34 @@ function createTagSelector(projectId, selectedTags) {
 
     return container;
 }
+
+function createArchiveToggleButton(project, projectId) {
+    const button = document.createElement('button');
+    button.textContent = project.isArchived ? 'Разархивировать проект' : 'Архивировать проект';
+
+    button.onclick = () => {
+        fetch(`/api/projects/archive/${projectId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                archived: !project.isArchived
+            })
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка архивации проекта');
+                return response.json();
+            })
+            .then(() => {
+                loadProjectInfoView(projectId);
+            })
+            .catch(error => {
+                console.error('Ошибка при архивации проекта:', error);
+            });
+    };
+
+    return button;
+}
+

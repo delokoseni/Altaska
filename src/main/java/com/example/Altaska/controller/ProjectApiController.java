@@ -55,6 +55,8 @@ public class ProjectApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет доступа");
         }
 
+        permissionService.checkIfProjectArchived(project);
+
         if (name != null) project.setName(name);
         if (description != null) project.setDescription(description);
         projectsRepository.save(project);
@@ -74,6 +76,26 @@ public class ProjectApiController {
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/archive/{id}")
+    public ResponseEntity<?> toggleArchiveStatus(@PathVariable Long id,
+                                                 @RequestBody Map<String, Boolean> payload,
+                                                 Principal principal) {
+        Projects project = projectsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "edit")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет доступа");
+        }
+
+        boolean newStatus = payload.getOrDefault("archived", false);
+        project.setIsArchived(newStatus);
+        projectsRepository.save(project);
+        return ResponseEntity.ok(project);
     }
 
 }
