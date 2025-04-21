@@ -54,7 +54,7 @@ public class TasksTagsApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
             throw new RuntimeException("Нет доступа");
         }
-
+        permissionService.checkIfProjectArchived(task.getIdProject());
         TasksTags tasksTags = new TasksTags();
         tasksTags.setIdTask(task);
         tasksTags.setIdTag(tag);
@@ -75,7 +75,7 @@ public class TasksTagsApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
             throw new RuntimeException("Нет доступа");
         }
-
+        permissionService.checkIfProjectArchived(task.getIdProject());
         tasksTagsRepository.deleteByIdTaskAndIdTag(task, tag);
     }
 

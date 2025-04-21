@@ -68,6 +68,7 @@ public class TaskApiController {
                 task.setDescription(description);
             }
             task.setIdProject(projectOpt.get());
+            permissionService.checkIfProjectArchived(task.getIdProject());
             task.setIdCreator(userOpt.get());
             if (priorityId != null) {
                 Priorities priority = prioritiesRepository.findById(priorityId)
@@ -125,7 +126,7 @@ public class TaskApiController {
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
             throw new RuntimeException("Нет доступа");
         }
@@ -146,7 +147,7 @@ public class TaskApiController {
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
         }
@@ -171,7 +172,7 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
         }
-
+        permissionService.checkIfProjectArchived(task.getIdProject());
         if (priorityId != null) {
             Priorities priority = prioritiesRepository.findById(priorityId)
                     .orElseThrow(() -> new RuntimeException("Приоритет не найден"));
@@ -199,7 +200,7 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
         }
-
+        permissionService.checkIfProjectArchived(task.getIdProject());
         Statuses status = statusesRepository.findById(statusId)
                 .orElseThrow(() -> new RuntimeException("Статус не найден"));
 
@@ -220,7 +221,7 @@ public class TaskApiController {
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
+        permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
         }
