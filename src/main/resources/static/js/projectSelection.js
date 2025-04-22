@@ -565,7 +565,7 @@ function createArchiveToggleButton(project, projectId) {
 }
 
 function renderRolesSection(container, projectId) {
-    fetch(`/api/projects/${projectId}/roles`) // Получаем роли проекта и общие (где id_project = null)
+    fetch(`/api/projects/${projectId}/roles`)
         .then(response => response.json())
         .then(roles => {
             const rolesSection = document.createElement('div');
@@ -583,7 +583,22 @@ function renderRolesSection(container, projectId) {
                 const list = document.createElement('ul');
                 roles.forEach(role => {
                     const li = document.createElement('li');
-                    li.textContent = role.name + (role.idProject === null ? ' (глобальная)' : '');
+
+                    const text = document.createElement('span');
+                    text.textContent = role.name + (role.idProject === null ? ' (глобальная)' : '');
+                    li.appendChild(text);
+
+                    // Только для проектных ролей
+                    if (role.idProject !== null) {
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = '🗑️';
+                        deleteButton.style.marginLeft = '10px';
+                        deleteButton.onclick = () => {
+                            deleteRole(role.id, projectId, rolesSection);
+                        };
+                        li.appendChild(deleteButton);
+                    }
+
                     list.appendChild(li);
                 });
                 rolesSection.appendChild(list);
@@ -729,3 +744,25 @@ function renderCreateRoleView(container, projectId, previousSection) {
     container.appendChild(createSection);
 }
 
+function deleteRole(roleId, projectId, container) {
+    if (!confirm('Удалить эту роль?')) return;
+
+    fetch(`/api/projects/${projectId}/roles/${roleId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Перерисовываем блок с ролями
+            container.innerHTML = '';
+            renderRolesSection(container, projectId);
+        } else {
+            console.error('Ошибка при удалении роли:', response.statusText);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка при удалении роли:', error);
+    });
+}

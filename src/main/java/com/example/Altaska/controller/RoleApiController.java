@@ -2,13 +2,20 @@ package com.example.Altaska.controller;
 
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Roles;
+import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.RolesRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
+import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.PermissionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +29,12 @@ public class RoleApiController {
     @Autowired
     private ProjectsRepository projectsRepository;
 
-    // DTO-шка для возврата ролей
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
     public record RoleDto(
             Long id,
             String name,
@@ -31,7 +43,6 @@ public class RoleApiController {
             Long idProject
     ) {}
 
-    // DTO-шка для приёма запроса создания роли
     public static class RoleRequest {
         public String name;
         public JsonNode permissions;
@@ -78,4 +89,35 @@ public class RoleApiController {
                 savedRole.getIdProject() != null ? savedRole.getIdProject().getId() : null
         );
     }
+
+    @DeleteMapping("/{roleId}")
+    public ResponseEntity<Void> deleteRole(@PathVariable Long projectId, @PathVariable Long roleId, Principal principal) {
+        Optional<Roles> roleOpt = rolesRepository.findById(roleId);
+        if (roleOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Roles role = roleOpt.get();
+
+        if (role.getIdProject() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Глобальные роли не могут быть удалены");
+        }
+
+        Projects project = projectsRepository.findById(role.getIdProject().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
+
+        permissionService.checkIfProjectArchived(project);
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        boolean hasPermission = permissionService.hasPermission(user.getId(), project.getId(), "EDIT_ROLE");
+        if (!hasPermission) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав для удаления роли");
+        }
+
+        rolesRepository.delete(role);
+        return ResponseEntity.noContent().build();
+    }
+
 }
