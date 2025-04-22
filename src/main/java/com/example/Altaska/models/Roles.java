@@ -1,9 +1,11 @@
 package com.example.Altaska.models;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import java.util.Map;
 import com.example.Altaska.converters.JsonConverter;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "roles")
@@ -18,7 +20,7 @@ public class Roles {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Convert(converter = JsonConverter.class)
+    @Type(JsonType.class)
     @Column(name = "permissions", columnDefinition = "json", nullable = false)
     private JsonNode permissions;
 

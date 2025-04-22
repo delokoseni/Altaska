@@ -22,14 +22,38 @@ public class RoleApiController {
     @Autowired
     private ProjectsRepository projectsRepository;
 
+    // DTO-шка для возврата ролей
+    public record RoleDto(
+            Long id,
+            String name,
+            boolean isCustom,
+            JsonNode permissions,
+            Long idProject
+    ) {}
+
+    // DTO-шка для приёма запроса создания роли
+    public static class RoleRequest {
+        public String name;
+        public JsonNode permissions;
+    }
+
     @GetMapping
-    public List<Roles> getProjectRoles(@PathVariable Long projectId) {
-        return rolesRepository.findByIdProject_IdOrIdProjectIsNull(projectId);
+    public List<RoleDto> getProjectRoles(@PathVariable Long projectId) {
+        return rolesRepository.findByIdProject_IdOrIdProjectIsNull(projectId)
+                .stream()
+                .map(role -> new RoleDto(
+                        role.getId(),
+                        role.getName(),
+                        role.getIsCustom(),
+                        role.getPermissions(),
+                        role.getIdProject() != null ? role.getIdProject().getId() : null
+                ))
+                .toList();
     }
 
     @PostMapping
     @Transactional
-    public Roles createCustomRole(
+    public RoleDto createCustomRole(
             @PathVariable Long projectId,
             @RequestBody RoleRequest request
     ) {
@@ -44,11 +68,14 @@ public class RoleApiController {
         newRole.setIsCustom(true);
         newRole.setIdProject(projectOpt.get());
 
-        return rolesRepository.save(newRole);
-    }
+        Roles savedRole = rolesRepository.save(newRole);
 
-    public static class RoleRequest {
-        public String name;
-        public JsonNode permissions;
+        return new RoleDto(
+                savedRole.getId(),
+                savedRole.getName(),
+                savedRole.getIsCustom(),
+                savedRole.getPermissions(),
+                savedRole.getIdProject() != null ? savedRole.getIdProject().getId() : null
+        );
     }
 }
