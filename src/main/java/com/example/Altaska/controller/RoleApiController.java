@@ -120,4 +120,45 @@ public class RoleApiController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{roleId}")
+    @Transactional
+    public RoleDto updateRole(
+            @PathVariable Long projectId,
+            @PathVariable Long roleId,
+            @RequestBody RoleRequest request,
+            Principal principal
+    ) {
+        Roles role = rolesRepository.findById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Роль не найдена"));
+
+        if (role.getIdProject() == null || !role.getIdProject().getId().equals(projectId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Глобальные роли нельзя редактировать");
+        }
+
+        Projects project = projectsRepository.findById(projectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
+
+        permissionService.checkIfProjectArchived(project);
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        if (!permissionService.hasPermission(user.getId(), projectId, "EDIT_ROLE")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав");
+        }
+
+        role.setName(request.name);
+        role.setPermissions(request.permissions);
+
+        Roles updatedRole = rolesRepository.save(role);
+
+        return new RoleDto(
+                updatedRole.getId(),
+                updatedRole.getName(),
+                updatedRole.getIsCustom(),
+                updatedRole.getPermissions(),
+                updatedRole.getIdProject() != null ? updatedRole.getIdProject().getId() : null
+        );
+    }
+
 }

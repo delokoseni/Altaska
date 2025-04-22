@@ -590,14 +590,25 @@ function renderRolesSection(container, projectId) {
 
                     // Только для проектных ролей
                     if (role.idProject !== null) {
+                        // Кнопка "Редактировать"
+                        const editButton = document.createElement('button');
+                        editButton.textContent = '✏️';
+                        editButton.style.marginLeft = '10px';
+                        editButton.onclick = () => {
+                            renderEditRoleView(container, projectId, role, rolesSection);
+                        };
+                        li.appendChild(editButton);
+
+                        // Кнопка "Удалить"
                         const deleteButton = document.createElement('button');
                         deleteButton.textContent = '🗑️';
-                        deleteButton.style.marginLeft = '10px';
+                        deleteButton.style.marginLeft = '5px';
                         deleteButton.onclick = () => {
                             deleteRole(role.id, projectId, rolesSection);
                         };
                         li.appendChild(deleteButton);
                     }
+
 
                     list.appendChild(li);
                 });
@@ -724,7 +735,7 @@ function renderCreateRoleView(container, projectId, previousSection) {
             if (response.ok) {
                 alert('Роль создана!');
                 container.removeChild(createSection);
-                previousSection.style.display = '';  // Показываем предыдущую секцию
+                previousSection.remove(); // Показываем предыдущую секцию
                 renderRolesSection(container, projectId); // Перерисовываем список ролей
             } else {
                 // Обработка ошибок, если статус не OK
@@ -765,4 +776,127 @@ function deleteRole(roleId, projectId, container) {
     .catch(error => {
         console.error('Ошибка при удалении роли:', error);
     });
+}
+
+function renderEditRoleView(container, projectId, role, previousSection) {
+    previousSection.style.display = 'none';
+
+    const editSection = document.createElement('div');
+    editSection.className = 'edit-role-section';
+
+    const title = document.createElement('h3');
+    title.textContent = `Редактирование роли "${role.name}"`;
+    editSection.appendChild(title);
+
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Новое имя роли:';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = role.name;
+    editSection.appendChild(nameLabel);
+    editSection.appendChild(nameInput);
+
+    const permissionsList = document.createElement('div');
+    permissionsList.className = 'permissions-list';
+
+    const allPermissions = [
+        "add_roles", "edit_roles", "delete_roles",
+        "add_project_members", "delete_project_members",
+        "rename_project", "edit_project_description",
+        "add_task_lists", "rename_task_lists", "edit_task_lists_description", "delete_task_lists",
+        "add_tasks_yourself", "add_tasks_another",
+        "rename_tasks_yourself", "rename_tasks_another",
+        "edit_tasks_description_yourself", "edit_tasks_description_another",
+        "delete_tasks_yourself", "delete_tasks_another",
+        "add_attachments_yourself", "add_attachments_another",
+        "delete_attachments_yourself", "delete_attachments_another",
+        "change_task_priority_yourself", "change_task_priority_another",
+        "add_priorities", "edit_priorities", "delete_priorities",
+        "add_statuses", "edit_statuses", "delete_statuses",
+        "add_comments_yourself", "add_comments_another",
+        "edit_comments", "delete_comments", "delete_other_comments",
+        "add_tags", "edit_tags", "delete_tags",
+        "set_tags_yourself", "set_tags_another",
+        "delete_tags_yourself", "delete_tags_another",
+        "add_subtasks_yourself", "add_subtasks_another",
+        "rename_subtasks_yourself", "rename_subtasks_another",
+        "edit_subtasks_description_yourself", "edit_subtasks_description_another",
+        "make_edit_gantt", "take_tasks", "change_task_assignee", "cancel_tasks",
+        "change_roles_another"
+    ];
+
+    allPermissions.forEach(permission => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'edit_' + permission;
+        checkbox.name = permission;
+        checkbox.checked = role.permissions?.[permission] || false;
+
+        const label = document.createElement('label');
+        label.htmlFor = 'edit_' + permission;
+        label.textContent = permission;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'permission-item';
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(label);
+
+        permissionsList.appendChild(wrapper);
+    });
+
+    editSection.appendChild(permissionsList);
+
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Сохранить';
+    saveButton.onclick = async () => {
+        const newName = nameInput.value.trim();
+        if (!newName) {
+            alert('Имя роли не может быть пустым');
+            return;
+        }
+
+        const updatedPermissions = {};
+        allPermissions.forEach(p => {
+            updatedPermissions[p] = document.getElementById('edit_' + p).checked;
+        });
+
+        const updatedRole = await updateRole(projectId, role.id, {
+            name: newName,
+            permissions: updatedPermissions
+        }, csrfToken);
+
+        if (updatedRole) {
+            alert('Роль обновлена!');
+            container.removeChild(editSection);
+            previousSection.remove();
+            renderRolesSection(container, projectId);
+        }
+    };
+
+    editSection.appendChild(saveButton);
+    container.appendChild(editSection);
+}
+
+async function updateRole(projectId, roleId, updatedData, csrfToken) {
+    try {
+        const response = await fetch(`/api/projects/${projectId}/roles/${roleId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify(updatedData)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Ошибка при обновлении роли: ${errorText}`);
+        }
+
+        const updatedRole = await response.json();
+        console.log("Роль обновлена:", updatedRole);
+        return updatedRole;
+    } catch (error) {
+        console.error(error.message);
+    }
 }
