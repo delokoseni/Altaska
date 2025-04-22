@@ -4,12 +4,12 @@ import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Roles;
 import com.example.Altaska.repositories.RolesRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -22,13 +22,11 @@ public class RoleApiController {
     @Autowired
     private ProjectsRepository projectsRepository;
 
-    // GET: получить все роли для проекта (и общие, где projectId = null)
     @GetMapping
     public List<Roles> getProjectRoles(@PathVariable Long projectId) {
         return rolesRepository.findByIdProject_IdOrIdProjectIsNull(projectId);
     }
 
-    // POST: создать кастомную роль в проекте
     @PostMapping
     @Transactional
     public Roles createCustomRole(
@@ -49,9 +47,8 @@ public class RoleApiController {
         return rolesRepository.save(newRole);
     }
 
-    // DTO класс для парсинга JSON
     public static class RoleRequest {
         public String name;
-        public Map<String, Object> permissions;  // Убедитесь, что тип данных "boolean"
+        public JsonNode permissions;
     }
 }

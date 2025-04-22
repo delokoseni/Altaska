@@ -3,6 +3,7 @@ package com.example.Altaska.models;
 import jakarta.persistence.*;
 import java.util.Map;
 import com.example.Altaska.converters.JsonConverter;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
 @Table(name = "roles")
@@ -19,7 +20,7 @@ public class Roles {
 
     @Convert(converter = JsonConverter.class)
     @Column(name = "permissions", columnDefinition = "json", nullable = false)
-    private Map<String, Object> permissions;
+    private JsonNode permissions;
 
     @ManyToOne
     @JoinColumn(name = "id_project", referencedColumnName = "id")
@@ -37,7 +38,7 @@ public class Roles {
         return name;
     }
 
-    public Map<String, Object> getPermissions() {
+    public JsonNode getPermissions() {
         return permissions;
     }
 
@@ -54,7 +55,7 @@ public class Roles {
         this.name = name;
     }
 
-    public void setPermissions(Map<String, Object> permissions) {
+    public void setPermissions(JsonNode permissions) {
         this.permissions = permissions;
     }
 
