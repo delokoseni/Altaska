@@ -2,6 +2,7 @@ package com.example.Altaska.controller;
 
 import com.example.Altaska.models.ProjectMembers;
 import com.example.Altaska.models.Projects;
+import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
@@ -71,12 +72,22 @@ public class ProjectApiController {
             Map<String, Object> map = new HashMap<>();
             map.put("userId", member.getIdUser().getId());
             map.put("email", member.getIdUser().getEmail());
-            map.put("role", member.getIdRole().getName());
+
+            Roles role = member.getIdRole();
+            if (role != null) {
+                map.put("roleId", role.getId());
+                map.put("roleName", role.getName());
+            } else {
+                map.put("roleId", null);
+                map.put("roleName", "Без роли");
+            }
+
             return map;
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
     }
+
 
     @PostMapping("/archive/{id}")
     public ResponseEntity<?> toggleArchiveStatus(@PathVariable Long id,
