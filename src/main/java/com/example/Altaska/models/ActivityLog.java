@@ -1,7 +1,9 @@
 package com.example.Altaska.models;
 
-import com.example.Altaska.converters.JsonConverter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -13,9 +15,9 @@ public class ActivityLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Type(JsonType.class)
     @Column(name = "details", columnDefinition = "json", nullable = false)
-    @Convert(converter = JsonConverter.class)
-    private Map<String, Object> details;
+    private JsonNode details;
 
     @Column(name = "activity_date", nullable = false)
     private OffsetDateTime activityDate;
@@ -35,7 +37,7 @@ public class ActivityLog {
         return id;
     }
 
-    public Map<String, Object> getDetails() {
+    public JsonNode getDetails() {
         return details;
     }
 
@@ -55,7 +57,7 @@ public class ActivityLog {
         return activityDateServer;
     }
 
-    public void setDetails(Map<String, Object> details) {
+    public void setDetails(JsonNode details) {
         this.details = details;
     }
 

@@ -2,8 +2,6 @@ package com.example.Altaska.models;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import java.util.Map;
-import com.example.Altaska.converters.JsonConverter;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.annotations.Type;
 
