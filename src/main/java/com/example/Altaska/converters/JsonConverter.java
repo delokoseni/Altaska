@@ -18,8 +18,12 @@ public class JsonConverter implements AttributeConverter<Map<String, Object>, St
     public String convertToDatabaseColumn(Map<String, Object> attribute) {
         if (attribute == null) return null;
         try {
-            return objectMapper.writeValueAsString(attribute);
+            System.out.println("Конвертация объекта в JSON: " + attribute);
+            String jsonString = objectMapper.writeValueAsString(attribute);
+            System.out.println("Результат конвертации в JSON: " + jsonString);
+            return jsonString;
         } catch (JsonProcessingException e) {
+            System.err.println("Ошибка при сериализации JSON: " + e.getMessage());
             throw new IllegalArgumentException("Ошибка при сериализации JSON", e);
         }
     }
@@ -27,10 +31,17 @@ public class JsonConverter implements AttributeConverter<Map<String, Object>, St
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> convertToEntityAttribute(String dbData) {
-        if (dbData == null || dbData.isBlank()) return new HashMap<>();
+        if (dbData == null || dbData.isBlank()) {
+            System.out.println("Получены пустые данные для десериализации. Возвращаем пустую карту.");
+            return new HashMap<>();
+        }
         try {
-            return objectMapper.readValue(dbData, Map.class);
+            System.out.println("Конвертация JSON в объект: " + dbData);
+            Map<String, Object> result = objectMapper.readValue(dbData, Map.class);
+            System.out.println("Результат десериализации: " + result);
+            return result;
         } catch (IOException e) {
+            System.err.println("Ошибка при десериализации JSON: " + e.getMessage());
             throw new IllegalArgumentException("Ошибка при десериализации JSON", e);
         }
     }

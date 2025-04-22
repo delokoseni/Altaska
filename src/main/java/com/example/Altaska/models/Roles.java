@@ -17,9 +17,8 @@ public class Roles {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    //todo Добавить конвертер для JSON и сделать
-    @Column(name = "permissions", nullable = false, columnDefinition = "json")
     @Convert(converter = JsonConverter.class)
+    @Column(name = "permissions", columnDefinition = "json", nullable = false)
     private Map<String, Object> permissions;
 
     @ManyToOne

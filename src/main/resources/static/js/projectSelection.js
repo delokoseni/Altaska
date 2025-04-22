@@ -334,6 +334,7 @@ function loadProjectInfoView(projectId) {
                 });
             const archiveButton = createArchiveToggleButton(project, projectId);
             container.appendChild(archiveButton);
+            renderRolesSection(container, projectId);
         })
         .catch(error => {
             console.error('Ошибка загрузки проекта:', error);
@@ -561,5 +562,170 @@ function createArchiveToggleButton(project, projectId) {
     };
 
     return button;
+}
+
+function renderRolesSection(container, projectId) {
+    fetch(`/api/projects/${projectId}/roles`) // Получаем роли проекта и общие (где id_project = null)
+        .then(response => response.json())
+        .then(roles => {
+            const rolesSection = document.createElement('div');
+            rolesSection.className = 'roles-section';
+
+            const title = document.createElement('h3');
+            title.textContent = 'Роли в проекте';
+            rolesSection.appendChild(title);
+
+            if (roles.length === 0) {
+                const noRoles = document.createElement('p');
+                noRoles.textContent = 'Нет доступных ролей.';
+                rolesSection.appendChild(noRoles);
+            } else {
+                const list = document.createElement('ul');
+                roles.forEach(role => {
+                    const li = document.createElement('li');
+                    li.textContent = role.name + (role.idProject === null ? ' (глобальная)' : '');
+                    list.appendChild(li);
+                });
+                rolesSection.appendChild(list);
+            }
+
+            const addRoleButton = document.createElement('button');
+            addRoleButton.textContent = 'Добавить роль в проект';
+            addRoleButton.onclick = () => {
+                renderCreateRoleView(container, projectId, rolesSection);
+            };
+            rolesSection.appendChild(addRoleButton);
+
+            container.appendChild(rolesSection);
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки ролей:', error);
+        });
+}
+
+function renderCreateRoleView(container, projectId, previousSection) {
+    // Скрываем предыдущую секцию
+    previousSection.style.display = 'none';
+
+    // Создаем секцию для создания роли
+    const createSection = document.createElement('div');
+    createSection.className = 'create-role-section';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Создание кастомной роли';
+    createSection.appendChild(title);
+
+    // Поле для ввода имени роли
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Имя роли:';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    createSection.appendChild(nameLabel);
+    createSection.appendChild(nameInput);
+
+    // Список прав с чекбоксами
+    const permissionsList = document.createElement('div');
+    permissionsList.className = 'permissions-list';
+
+    const allPermissions = [
+        "add_roles", "edit_roles", "delete_roles",
+        "add_project_members", "delete_project_members",
+        "rename_project", "edit_project_description",
+        "add_task_lists", "rename_task_lists", "edit_task_lists_description", "delete_task_lists",
+        "add_tasks_yourself", "add_tasks_another",
+        "rename_tasks_yourself", "rename_tasks_another",
+        "edit_tasks_description_yourself", "edit_tasks_description_another",
+        "delete_tasks_yourself", "delete_tasks_another",
+        "add_attachments_yourself", "add_attachments_another",
+        "delete_attachments_yourself", "delete_attachments_another",
+        "change_task_priority_yourself", "change_task_priority_another",
+        "add_priorities", "edit_priorities", "delete_priorities",
+        "add_statuses", "edit_statuses", "delete_statuses",
+        "add_comments_yourself", "add_comments_another",
+        "edit_comments", "delete_comments", "delete_other_comments",
+        "add_tags", "edit_tags", "delete_tags",
+        "set_tags_yourself", "set_tags_another",
+        "delete_tags_yourself", "delete_tags_another",
+        "add_subtasks_yourself", "add_subtasks_another",
+        "rename_subtasks_yourself", "rename_subtasks_another",
+        "edit_subtasks_description_yourself", "edit_subtasks_description_another",
+        "make_edit_gantt", "take_tasks", "change_task_assignee", "cancel_tasks",
+        "change_roles_another"
+    ];
+
+    allPermissions.forEach(permission => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = permission;
+        checkbox.name = permission;
+
+        const label = document.createElement('label');
+        label.htmlFor = permission;
+        label.textContent = permission;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'permission-item';
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(label);
+
+        permissionsList.appendChild(wrapper);
+    });
+
+    createSection.appendChild(permissionsList);
+
+    // Кнопка "Создать"
+    const createButton = document.createElement('button');
+    createButton.textContent = 'Создать';
+    createButton.onclick = () => {
+        const name = nameInput.value.trim();
+        if (!name) {
+            alert('Имя роли не может быть пустым');
+            return;
+        }
+
+        // Собираем объект прав
+        const permissions = {};
+        allPermissions.forEach(p => {
+            const checkbox = document.getElementById(p);
+            permissions[p] = checkbox.checked;
+        });
+
+        // Логируем объект прав для дебага
+        console.log("Права перед отправкой на сервер:", permissions);
+
+        // Отправляем данные на сервер
+        fetch(`/api/projects/${projectId}/roles`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                name: name,
+                permissions: permissions
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Роль создана!');
+                container.removeChild(createSection);
+                previousSection.style.display = '';  // Показываем предыдущую секцию
+                renderRolesSection(container, projectId); // Перерисовываем список ролей
+            } else {
+                // Обработка ошибок, если статус не OK
+                response.text().then(errorMessage => {
+                    alert(`Ошибка при создании роли: ${errorMessage}`);
+                });
+            }
+        })
+        .catch(err => {
+            // Логирование ошибок при отправке
+            console.error('Ошибка при отправке данных:', err);
+            alert('Произошла ошибка при отправке данных на сервер');
+        });
+    };
+
+    createSection.appendChild(createButton);
+    container.appendChild(createSection);
 }
 
