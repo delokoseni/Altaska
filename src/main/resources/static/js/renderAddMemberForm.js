@@ -1,4 +1,4 @@
-export function renderAddMemberForm(container, projectId, roles, previousContentBackup) {
+export function renderAddMemberForm(container, projectId, roles, previousContentBackup, loadProjectInfoView) {
     // Сохраняем текущий контент, если нужно
     if (!previousContentBackup) {
         previousContentBackup = container.innerHTML;
@@ -38,9 +38,8 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
             return;
         }
 
-        // Формируем URL с параметрами
-        const inviteUrl = `/api/projects/${projectId}/invite?email=${encodeURIComponent(email)}&roleId=${roleId}`;
-
+        const clientDate = new Date().toISOString().split('T')[0];
+        const inviteUrl = `/api/projects/${projectId}/invite?email=${encodeURIComponent(email)}&roleId=${roleId}&clientDate=${clientDate}`;
         fetch(inviteUrl, {
             method: 'POST',
             headers: {
@@ -66,6 +65,7 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
     cancelButton.textContent = 'Отмена';
     cancelButton.onclick = () => {
         container.innerHTML = previousContentBackup;
+        loadProjectInfoView(projectId);
     };
 
     form.appendChild(emailLabel);

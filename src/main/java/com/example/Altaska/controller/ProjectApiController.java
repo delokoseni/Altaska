@@ -153,6 +153,7 @@ public class ProjectApiController {
     public ResponseEntity<?> inviteMember(@PathVariable Long projectId,
                                           @RequestParam String email,
                                           @RequestParam Long roleId,
+                                          @RequestParam String clientDate,
                                           Principal principal) {
 
         if (!EmailValidator.isValidLength(email)) {
@@ -207,7 +208,7 @@ public class ProjectApiController {
         member.setIdRole(role);
         member.setConfirmed(false);
         member.setConfirmationToken(token);
-        member.setAddedAt(LocalDate.now()); //TODO Заменить на время клиента
+        member.setAddedAt(LocalDate.parse(clientDate));
         member.setAddedAtServer(LocalDate.now());
         member.setInvitedBy(inviter.getEmail());
         member.setInviteeEmail(email);
