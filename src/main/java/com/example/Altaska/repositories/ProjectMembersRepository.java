@@ -23,4 +23,7 @@ public interface ProjectMembersRepository extends JpaRepository<ProjectMembers, 
     boolean existsByIdProjectAndIdUser(Projects project, Users user);
 
     boolean existsByIdProjectAndInviteeEmail(Projects project, String inviteeEmail);
+
+    List<ProjectMembers> findByIdUserAndConfirmedTrue(Users user);
+
 }

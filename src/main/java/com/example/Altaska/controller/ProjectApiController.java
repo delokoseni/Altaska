@@ -96,7 +96,6 @@ public class ProjectApiController {
         return ResponseEntity.ok(result);
     }
 
-
     @PostMapping("/archive/{id}")
     public ResponseEntity<?> toggleArchiveStatus(@PathVariable Long id,
                                                  @RequestBody Map<String, Boolean> payload,

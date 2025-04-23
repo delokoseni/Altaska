@@ -24,19 +24,21 @@ public class ProjectService {
     public List<Projects> getAllUserProjects(Users user) {
         Set<Projects> allProjects = new LinkedHashSet<>();
 
+        // Добавляем проекты, созданные пользователем
         allProjects.addAll(projectsRepo.findByIdOwner(user));
 
-        List<ProjectMembers> memberships = membersRepo.findByIdUser(user);
+        // Добавляем проекты, где пользователь участник и подтвержден
+        List<ProjectMembers> memberships = membersRepo.findByIdUserAndConfirmedTrue(user);
         for (ProjectMembers member : memberships) {
             allProjects.add(member.getIdProject());
         }
 
+        // Сортировка по дате создания (от новых к старым)
         List<Projects> sortedProjects = new ArrayList<>(allProjects);
         sortedProjects.sort(Comparator.comparing(Projects::getCreatedAt).reversed());
 
         return sortedProjects;
     }
-
 
 
     public void createProject(String name, String description, Users owner, LocalDate createdAt,
