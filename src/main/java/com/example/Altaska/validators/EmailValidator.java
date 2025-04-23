@@ -2,7 +2,7 @@ package com.example.Altaska.validators;
 
 public class EmailValidator {
 
-    private static final int MAX_EMAIL_LENGTH = 255;
+    private static final int MAX_EMAIL_LENGTH = 254;
     private static final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
     /**

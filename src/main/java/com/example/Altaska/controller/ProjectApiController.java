@@ -10,6 +10,7 @@ import com.example.Altaska.repositories.RolesRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.EmailService;
 import com.example.Altaska.services.PermissionService;
+import com.example.Altaska.validators.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -121,6 +122,7 @@ public class ProjectApiController {
                                               @PathVariable Long userId,
                                               @RequestBody Map<String, Long> body,
                                               Principal principal) {
+
         Long newRoleId = body.get("roleId");
 
         Projects project = projectsRepository.findById(projectId)
@@ -152,6 +154,17 @@ public class ProjectApiController {
                                           @RequestParam String email,
                                           @RequestParam Long roleId,
                                           Principal principal) {
+
+        if (!EmailValidator.isValidLength(email)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Превышена максимальная длина электронной почты: " + EmailValidator.getMaxEmailLength());
+        }
+
+        if (!EmailValidator.isValidFormat(email)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный формат электронной почты.");
+        }
+
         Projects project = projectsRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Проект не найден"));
 
