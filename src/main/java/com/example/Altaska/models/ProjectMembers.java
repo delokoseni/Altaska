@@ -81,27 +81,27 @@ public class ProjectMembers {
         this.idProject = idProject;
     }
 
-    public void SetAddedAt(LocalDate addedAt) {
+    public void setAddedAt(LocalDate addedAt) {
         this.addedAt = addedAt;
     }
 
-    public void SetIdRole(Roles idRole) {
+    public void setIdRole(Roles idRole) {
         this.idRole = idRole;
     }
 
-    public void SetConfirmed(boolean confirmed) {
+    public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
     }
 
-    public void SetConfirmationToken(String confirmationToken) {
+    public void setConfirmationToken(String confirmationToken) {
         this.confirmationToken = confirmationToken;
     }
 
-    public void SetAddedAtServer(LocalDate addedAtServer) {
+    public void setAddedAtServer(LocalDate addedAtServer) {
         this.addedAtServer = addedAtServer;
     }
 
-    public void SetInvitedBy(String invitedBy) {
+    public void setInvitedBy(String invitedBy) {
         this.invitedBy = invitedBy;
     }
 }

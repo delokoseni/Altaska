@@ -889,31 +889,34 @@ function renderMemberItem(member, projectId, roles) {
     emailSpan.textContent = member.email + ' — ';
     listItem.appendChild(emailSpan);
 
-    // Текущая роль
-    const roleSpan = document.createElement('span');
-    const currentRole = roles.find(r => r.id === member.roleId);
-    roleSpan.textContent = currentRole ? currentRole.name : member.roleName || 'Без роли';
-    roleSpan.style.fontWeight = 'bold';
-    listItem.appendChild(roleSpan);
+    // Выпадающий список ролей
+    const roleSelect = document.createElement('select');
 
-    // Кнопка смены роли
-    const changeRoleBtn = document.createElement('button');
-    changeRoleBtn.textContent = 'Сменить роль';
-    changeRoleBtn.onclick = () => {
-        const newRoleId = prompt(`Введите ID новой роли для ${member.email}:`, member.roleId);
-        if (newRoleId && newRoleId !== member.roleId.toString()) {
-            fetch(`/api/projects/${projectId}/members/${member.id}/role`, {
+    roles.forEach(role => {
+        const option = document.createElement('option');
+        option.value = role.id;
+        option.textContent = role.name;
+        if (role.id === member.roleId) {
+            option.selected = true;
+        }
+        roleSelect.appendChild(option);
+    });
+
+    roleSelect.onchange = () => {
+        const newRoleId = parseInt(roleSelect.value);
+        if (newRoleId !== member.roleId) {
+            fetch(`/api/projects/${projectId}/members/${member.userId}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ roleId: parseInt(newRoleId) })
+                body: JSON.stringify({ roleId: newRoleId })
             })
             .then(res => {
                 if (res.ok) {
                     alert('Роль обновлена');
-                    loadProjectInfoView(projectId); // Перезагружаем весь блок
+                    loadProjectInfoView(projectId);
                 } else {
                     res.text().then(text => alert('Ошибка: ' + text));
                 }
@@ -921,7 +924,8 @@ function renderMemberItem(member, projectId, roles) {
             .catch(err => console.error('Ошибка смены роли:', err));
         }
     };
-    listItem.appendChild(changeRoleBtn);
+
+    listItem.appendChild(roleSelect);
 
     // Кнопка удаления участника
     const deleteBtn = document.createElement('button');
@@ -933,3 +937,4 @@ function renderMemberItem(member, projectId, roles) {
 
     return listItem;
 }
+

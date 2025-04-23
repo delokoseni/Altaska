@@ -6,6 +6,7 @@ import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
+import com.example.Altaska.repositories.RolesRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class ProjectApiController {
 
     @Autowired
     private ProjectMembersRepository projectMembersRepository;
+
+    @Autowired
+    private RolesRepository rolesRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
@@ -107,6 +111,37 @@ public class ProjectApiController {
         project.setIsArchived(newStatus);
         projectsRepository.save(project);
         return ResponseEntity.ok(project);
+    }
+
+    @PutMapping("/{projectId}/members/{userId}/role")
+    public ResponseEntity<?> changeMemberRole(@PathVariable Long projectId,
+                                              @PathVariable Long userId,
+                                              @RequestBody Map<String, Long> body,
+                                              Principal principal) {
+        Long newRoleId = body.get("roleId");
+
+        Projects project = projectsRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+
+        Users currentUser = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(currentUser.getId(), project.getId(), "EDIT_ROLE")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав");
+        }
+
+        permissionService.checkIfProjectArchived(project);
+
+        ProjectMembers member = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, userId)
+                .orElseThrow(() -> new RuntimeException("Участник не найден"));
+
+        Roles newRole = rolesRepository.findById(newRoleId)
+                .orElseThrow(() -> new RuntimeException("Роль не найдена"));
+
+        member.setIdRole(newRole);
+        projectMembersRepository.save(member);
+
+        return ResponseEntity.ok("Роль обновлена");
     }
 
 }
