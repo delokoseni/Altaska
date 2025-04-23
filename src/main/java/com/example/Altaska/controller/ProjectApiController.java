@@ -183,7 +183,7 @@ public class ProjectApiController {
         member.setAddedAt(LocalDate.now()); //TODO Заменить на время клиента
         member.setAddedAtServer(LocalDate.now());
         member.setInvitedBy(inviter.getEmail());
-
+        member.setInviteeEmail(email);
         projectMembersRepository.save(member);
 
         // Формирование и отправка письма

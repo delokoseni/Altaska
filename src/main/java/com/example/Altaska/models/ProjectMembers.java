@@ -37,6 +37,9 @@ public class ProjectMembers {
     @Column(name = "invited_by", length = 254, nullable = false)
     private String invitedBy;
 
+    @Column(name = "inviteeEmail", length = 254, nullable = false)
+    private String inviteeEmail;
+
     public Long getId() {
         return id;
     }
@@ -73,6 +76,8 @@ public class ProjectMembers {
         return invitedBy;
     }
 
+    public String getInviteeEmail() {return inviteeEmail; }
+
     public void setIdUser(Users idUser) {
         this.idUser = idUser;
     }
@@ -104,4 +109,6 @@ public class ProjectMembers {
     public void setInvitedBy(String invitedBy) {
         this.invitedBy = invitedBy;
     }
+
+    public void setInviteeEmail(String inviteeEmail) { this.inviteeEmail = inviteeEmail;}
 }

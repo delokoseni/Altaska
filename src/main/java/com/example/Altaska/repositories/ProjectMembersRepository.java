@@ -1,6 +1,7 @@
 package com.example.Altaska.repositories;
 
 import com.example.Altaska.models.ProjectMembers;
+import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,8 @@ public interface ProjectMembersRepository extends JpaRepository<ProjectMembers, 
     Optional<ProjectMembers> findByIdProjectIdAndIdUserId(Long projectId, Long userId);
 
     Optional<ProjectMembers> findByConfirmationToken(String confirmationToken);
+
+    boolean existsByIdProjectAndIdUser(Projects project, Users user);
+
+    boolean existsByIdProjectAndInviteeEmail(Projects project, String inviteeEmail);
 }
