@@ -308,7 +308,7 @@ function loadProjectInfoView(projectId) {
                 const addMemberBtn = document.createElement('button');
                 addMemberBtn.textContent = 'Добавить участника';
                 addMemberBtn.onclick = () => {
-                    renderAddMemberForm(container, projectId, roles, container.innerHTML);
+                    renderAddMemberForm(container, projectId, roles, container.innerHTML, loadProjectInfoView);
                 };
                 membersSection.appendChild(addMemberBtn);
 
