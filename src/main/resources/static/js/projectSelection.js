@@ -1,4 +1,5 @@
 import { renderAddMemberForm } from './renderAddMemberForm.js';
+import { removeProjectMember } from './memberActions.js';
 
 window.selectProject = selectProject;
 
@@ -890,7 +891,8 @@ function renderMemberItem(member, projectId, roles) {
 
     // Почта участника
     const emailSpan = document.createElement('span');
-    emailSpan.textContent = member.email + ' — ';
+    emailSpan.textContent = member.email + (member.confirmed ? ' — ' : ' (Приглашение отправлено) — ');
+    emailSpan.style.color = member.confirmed ? '' : '#888';
     listItem.appendChild(emailSpan);
 
     // Выпадающий список ролей
@@ -933,9 +935,12 @@ function renderMemberItem(member, projectId, roles) {
 
     // Кнопка удаления участника
     const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Удалить';
+    if(member.confirmed)
+        deleteBtn.textContent = 'Удалить';
+    else
+        deleteBtn.textContent = 'Отозвать';
     deleteBtn.onclick = () => {
-        alert(`Удаление участника ${member.email}`);
+        removeProjectMember(projectId, member.userId, member.email, loadProjectInfoView);
     };
     listItem.appendChild(deleteBtn);
 

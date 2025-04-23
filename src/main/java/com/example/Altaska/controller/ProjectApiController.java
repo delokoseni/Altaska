@@ -80,6 +80,7 @@ public class ProjectApiController {
             Map<String, Object> map = new HashMap<>();
             map.put("userId", member.getIdUser().getId());
             map.put("email", member.getIdUser().getEmail());
+            map.put("confirmed", member.getConfirmed());
 
             Roles role = member.getIdRole();
             if (role != null) {
@@ -239,5 +240,31 @@ public class ProjectApiController {
 
         return ResponseEntity.ok("Участие в проекте подтверждено");
     }
+
+    @DeleteMapping("/{projectId}/members/{userId}")
+    public ResponseEntity<?> removeMember(@PathVariable Long projectId,
+                                          @PathVariable Long userId,
+                                          Principal principal) {
+        Projects project = projectsRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+
+        Users currentUser = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(currentUser.getId(), projectId, "edit")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав для удаления участника");
+        }
+
+        permissionService.checkIfProjectArchived(project);
+
+        Optional<ProjectMembers> memberOpt = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, userId);
+        if (memberOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Участник не найден");
+        }
+
+        projectMembersRepository.delete(memberOpt.get());
+        return ResponseEntity.ok("Участник удалён");
+    }
+
 }
 
