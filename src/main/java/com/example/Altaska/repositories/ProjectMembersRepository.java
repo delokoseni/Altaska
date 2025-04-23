@@ -17,4 +17,5 @@ public interface ProjectMembersRepository extends JpaRepository<ProjectMembers, 
 
     Optional<ProjectMembers> findByIdProjectIdAndIdUserId(Long projectId, Long userId);
 
+    Optional<ProjectMembers> findByConfirmationToken(String confirmationToken);
 }

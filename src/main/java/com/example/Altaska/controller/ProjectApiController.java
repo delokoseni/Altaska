@@ -8,6 +8,7 @@ import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
 import com.example.Altaska.repositories.RolesRepository;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.EmailService;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,6 +38,9 @@ public class ProjectApiController {
 
     @Autowired
     private RolesRepository rolesRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
@@ -144,5 +147,69 @@ public class ProjectApiController {
         return ResponseEntity.ok("Роль обновлена");
     }
 
+    @PostMapping("/{projectId}/invite")
+    public ResponseEntity<?> inviteMember(@PathVariable Long projectId,
+                                          @RequestParam String email,
+                                          @RequestParam Long roleId,
+                                          Principal principal) {
+        Projects project = projectsRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+
+        Users inviter = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(inviter.getId(), projectId, "invite")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет прав для приглашения");
+        }
+
+        permissionService.checkIfProjectArchived(project);
+
+        Users invitee = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Приглашаемый пользователь не найден"));
+
+        Roles role = rolesRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Роль не найдена"));
+
+        // Генерация токена
+        String token = UUID.randomUUID().toString();
+
+        // Создание участника проекта
+        ProjectMembers member = new ProjectMembers();
+        member.setIdProject(project);
+        member.setIdUser(invitee);
+        member.setIdRole(role);
+        member.setConfirmed(false);
+        member.setConfirmationToken(token);
+        member.setAddedAt(LocalDate.now()); //TODO Заменить на время клиента
+        member.setAddedAtServer(LocalDate.now());
+        member.setInvitedBy(inviter.getEmail());
+
+        projectMembersRepository.save(member);
+
+        // Формирование и отправка письма
+        String link = "http://localhost:8080/api/projects/confirm-invite?token=" + token;
+        String subject = "Приглашение в проект";
+        String body = "Вас пригласили в проект \"" + project.getName() + "\". Подтвердите участие, перейдя по ссылке:\n" + link;
+
+        emailService.sendEmail(email, subject, body);
+
+        return ResponseEntity.ok("Приглашение отправлено");
+    }
+
+    @GetMapping("/confirm-invite")
+    public ResponseEntity<?> confirmInvite(@RequestParam String token) {
+        Optional<ProjectMembers> memberOpt = projectMembersRepository.findByConfirmationToken(token);
+
+        if (memberOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Недействительный токен");
+        }
+
+        ProjectMembers member = memberOpt.get();
+        member.setConfirmed(true);
+        member.setConfirmationToken(null); // Можно удалить токен после подтверждения
+        projectMembersRepository.save(member);
+
+        return ResponseEntity.ok("Участие в проекте подтверждено");
+    }
 }
 

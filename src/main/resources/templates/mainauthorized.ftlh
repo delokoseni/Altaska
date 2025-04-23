@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/css/taskdetailssidebar.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>
-    <script src="/js/projectSelection.js"></script>
+    <script type = "module" src="/js/projectSelection.js"></script>
     <script src="/js/taskDetails.js"></script>
     <title>Главная</title>
 </head>

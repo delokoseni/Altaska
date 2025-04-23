@@ -1,3 +1,7 @@
+import { renderAddMemberForm } from './renderAddMemberForm.js';
+
+window.selectProject = selectProject;
+
 function selectProject(projectId, projectName) {
     sessionStorage.setItem('currentProjectId', projectId);
     sessionStorage.setItem('currentProjectName', projectName);
@@ -304,7 +308,7 @@ function loadProjectInfoView(projectId) {
                 const addMemberBtn = document.createElement('button');
                 addMemberBtn.textContent = 'Добавить участника';
                 addMemberBtn.onclick = () => {
-                    alert('Открыть форму добавления участника');
+                    renderAddMemberForm(container, projectId, roles, container.innerHTML);
                 };
                 membersSection.appendChild(addMemberBtn);
 
