@@ -164,8 +164,22 @@ public class ProjectApiController {
 
         permissionService.checkIfProjectArchived(project);
 
-        Users invitee = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Приглашаемый пользователь не найден"));
+        if (email.equalsIgnoreCase(project.getIdOwner().getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Владелец проекта не может быть приглашён.");
+        }
+
+        // Проверка: не является ли пользователь уже участником проекта
+        boolean alreadyMember = projectMembersRepository.existsByIdProjectAndInviteeEmail(project, email);
+        if (alreadyMember) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь уже является участником проекта.");
+        }
+
+        Optional<Users> optionalInvitee = usersRepository.findByEmail(email);
+        if (optionalInvitee.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Приглашаемый пользователь не найден");
+        }
+        Users invitee = optionalInvitee.get();
+
 
         Roles role = rolesRepository.findById(roleId)
                 .orElseThrow(() -> new RuntimeException("Роль не найдена"));
@@ -196,6 +210,7 @@ public class ProjectApiController {
         return ResponseEntity.ok("Приглашение отправлено");
     }
 
+
     @GetMapping("/confirm-invite")
     public ResponseEntity<?> confirmInvite(@RequestParam String token) {
         Optional<ProjectMembers> memberOpt = projectMembersRepository.findByConfirmationToken(token);
@@ -206,7 +221,7 @@ public class ProjectApiController {
 
         ProjectMembers member = memberOpt.get();
         member.setConfirmed(true);
-        member.setConfirmationToken(null); // Можно удалить токен после подтверждения
+        member.setConfirmationToken(null);
         projectMembersRepository.save(member);
 
         return ResponseEntity.ok("Участие в проекте подтверждено");
