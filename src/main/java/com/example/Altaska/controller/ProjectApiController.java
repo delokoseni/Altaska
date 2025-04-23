@@ -266,5 +266,25 @@ public class ProjectApiController {
         return ResponseEntity.ok("Участник удалён");
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProject(@PathVariable Long id, Principal principal) {
+        Projects project = projectsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "edit")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет доступа");
+        }
+
+        permissionService.checkIfProjectArchived(project);
+
+        projectMembersRepository.deleteAll(projectMembersRepository.findByIdProjectId(project.getId()));
+        projectsRepository.delete(project);
+
+        return ResponseEntity.ok("Проект удалён");
+    }
+
 }
 

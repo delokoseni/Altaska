@@ -1,5 +1,6 @@
 import { renderAddMemberForm } from './renderAddMemberForm.js';
 import { removeProjectMember } from './memberActions.js';
+import { deleteProject } from './projectActions.js';
 
 window.selectProject = selectProject;
 
@@ -320,6 +321,20 @@ function loadProjectInfoView(projectId) {
             const archiveButton = createArchiveToggleButton(project, projectId);
             container.appendChild(archiveButton);
             renderRolesSection(container, projectId);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Удалить проект';
+            deleteButton.style.backgroundColor = 'red';
+            deleteButton.style.color = 'white';
+            deleteButton.style.marginTop = '20px';
+            deleteButton.onclick = () => {
+                deleteButton.onclick = () => {
+                    deleteProject(projectId, () => {
+                        window.location.reload();
+                    });
+                };
+            };
+            container.appendChild(deleteButton);
         })
         .catch(error => {
             console.error('Ошибка загрузки проекта:', error);
