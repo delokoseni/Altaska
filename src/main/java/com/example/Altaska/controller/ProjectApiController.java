@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -223,7 +224,7 @@ public class ProjectApiController {
         projectMembersRepository.save(member);
 
         // Формирование и отправка письма
-        String link = "http://localhost:8080/api/projects/confirm-invite?token=" + token;
+        String link = "http://localhost:8080/confirm-invite?token=" + token;
         String subject = "Приглашение в проект";
         String body = "Вас пригласили в проект \"" + project.getName() + "\". Подтвердите участие, перейдя по ссылке:\n" + link;
 
@@ -234,11 +235,13 @@ public class ProjectApiController {
 
 
     @GetMapping("/confirm-invite")
-    public ResponseEntity<?> confirmInvite(@RequestParam String token) {
+    public String confirmInvite(@RequestParam String token, Model model) {
         Optional<ProjectMembers> memberOpt = projectMembersRepository.findByConfirmationToken(token);
 
         if (memberOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Недействительный токен");
+            model.addAttribute("statusTitle", "Ошибка");
+            model.addAttribute("statusMessage", "Недействительный или просроченный токен.");
+            return "confirmInvite";
         }
 
         ProjectMembers member = memberOpt.get();
@@ -246,7 +249,11 @@ public class ProjectApiController {
         member.setConfirmationToken(null);
         projectMembersRepository.save(member);
 
-        return ResponseEntity.ok("Участие в проекте подтверждено");
+        model.addAttribute("statusTitle", "Приглашение подтверждено");
+        model.addAttribute("statusMessage", "Вы успешно присоединились к проекту \"" + member.getIdProject().getName() + "\"!");
+        model.addAttribute("goToLogin", true);
+
+        return "confirmInvite";
     }
 
     @DeleteMapping("/{projectId}/members/{userId}")
