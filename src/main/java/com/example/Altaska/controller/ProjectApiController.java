@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -105,6 +106,31 @@ public class ProjectApiController {
 
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/{id}/confirmed-members")
+    public ResponseEntity<?> getConfirmedMembersWithOwner(@PathVariable Long id) {
+        Projects project = projectsRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
+
+        List<ProjectMembers> members = projectMembersRepository.findByIdProjectIdAndConfirmedTrue(id);
+
+        // Уникальные пользователи: участники + владелец
+        Set<Users> users = members.stream()
+                .map(ProjectMembers::getIdUser)
+                .collect(Collectors.toSet());
+        users.add(project.getIdOwner());
+
+        // Преобразуем в формат ответа
+        List<Map<String, Object>> result = users.stream().map(user -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("userId", user.getId());
+            map.put("email", user.getEmail());
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
+    }
+
 
     @PostMapping("/archive/{id}")
     public ResponseEntity<?> toggleArchiveStatus(@PathVariable Long id,

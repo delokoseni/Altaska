@@ -1,0 +1,19 @@
+package com.example.Altaska.repositories;
+
+import com.example.Altaska.models.TaskPerformers;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import jakarta.transaction.Transactional;
+import java.util.List;
+
+public interface TaskPerformersRepository extends JpaRepository<TaskPerformers, Long> {
+
+    List<TaskPerformers> findByIdTaskId(Long taskId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM TaskPerformers tp WHERE tp.idTask.id = :taskId AND tp.idUser.id = :userId")
+    void deleteByIdTaskIdAndIdUserId(Long taskId, Long userId);
+}

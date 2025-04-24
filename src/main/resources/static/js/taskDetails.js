@@ -1,4 +1,5 @@
 import { initSubtasksSection } from './subTasks.js';
+import { createPerformersSection } from './taskPerformers.js'
 
 window.showTaskDetails = showTaskDetails;
 
@@ -102,6 +103,12 @@ function showTaskDetails(task) {
             sidebar.appendChild(closeButton);
             sidebar.appendChild(content);
             document.body.appendChild(sidebar);
+
+            const performersSection = document.createElement('div');
+            performersSection.className = 'task-performers-section';
+            content.appendChild(performersSection);
+            createPerformersSection(task.id, task.idProject.id, performersSection, csrfToken);
+
             initTaskTagsSection(task, csrfParam, csrfToken, content);
 
             const subtasksSection = initSubtasksSection(task, csrfToken);
