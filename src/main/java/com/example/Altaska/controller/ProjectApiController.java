@@ -4,13 +4,12 @@ import com.example.Altaska.models.ProjectMembers;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
-import com.example.Altaska.repositories.ProjectMembersRepository;
-import com.example.Altaska.repositories.ProjectsRepository;
-import com.example.Altaska.repositories.RolesRepository;
-import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.models.Tasks;
+import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.EmailService;
 import com.example.Altaska.services.PermissionService;
 import com.example.Altaska.validators.EmailValidator;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +41,15 @@ public class ProjectApiController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private TasksRepository tasksRepository;
+
+    @Autowired
+    private TasksTagsRepository tasksTagsRepository;
+
+    @Autowired
+    private TagsRepository tagsRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
@@ -266,7 +274,8 @@ public class ProjectApiController {
         return ResponseEntity.ok("Участник удалён");
     }
 
-    @DeleteMapping("/{id}")
+    @Transactional
+    @DeleteMapping("/{id}") //TODO Переделать, метод не работает
     public ResponseEntity<?> deleteProject(@PathVariable Long id, Principal principal) {
         Projects project = projectsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Проект не найден"));
@@ -280,11 +289,30 @@ public class ProjectApiController {
 
         permissionService.checkIfProjectArchived(project);
 
+        // --- Удаление Tasks и TasksTags ---
+        List<Tasks> tasks = tasksRepository.findByIdProject_Id(id);
+        for (Tasks task : tasks) {
+            tasksTagsRepository.deleteAll(tasksTagsRepository.findByIdTask(task));
+        }
+        tasksRepository.deleteAll(tasks);
+
+        // --- Удаление Tags ---
+        tagsRepository.deleteAll(tagsRepository.findByIdProjectId(id));
+
+        // --- Удаление Roles ---
+        List<Roles> roles = rolesRepository.findByIdProject_IdOrIdProjectIsNull(id);
+        roles.removeIf(role -> role.getIdProject() == null); // не удаляем глобальные роли
+        rolesRepository.deleteAll(roles);
+
+        // --- Удаление участников проекта ---
         projectMembersRepository.deleteAll(projectMembersRepository.findByIdProjectId(project.getId()));
+
+        // --- Удаление самого проекта ---
         projectsRepository.delete(project);
 
         return ResponseEntity.ok("Проект удалён");
     }
+
 
 }
 
