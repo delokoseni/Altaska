@@ -1,5 +1,6 @@
+import { showLoader, hideLoader } from './loader.js';
+
 export function renderAddMemberForm(container, projectId, roles, previousContentBackup, loadProjectInfoView) {
-    // Сохраняем текущий контент, если нужно
     if (!previousContentBackup) {
         previousContentBackup = container.innerHTML;
     }
@@ -37,7 +38,7 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
             alert('Пожалуйста, заполните все поля.');
             return;
         }
-
+        showLoader();
         const clientDate = new Date().toISOString().split('T')[0];
         const inviteUrl = `/api/projects/${projectId}/invite?email=${encodeURIComponent(email)}&roleId=${roleId}&clientDate=${clientDate}`;
         fetch(inviteUrl, {
@@ -47,6 +48,7 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
             }
         })
         .then(res => {
+            hideLoader();
             if (res.ok) {
                 alert('Приглашение отправлено!');
                 container.innerHTML = previousContentBackup;
