@@ -2,6 +2,7 @@ package com.example.Altaska.controller;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -68,12 +69,66 @@ public class SubTaskApiController {
         return saved;
     }
 
+    @GetMapping
+    public List<SubTasks> getSubtasks(@PathVariable Long taskId, Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "view")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        return subTasksRepository.findByIdTask_Id(taskId);
+    }
+
     public static class SubTaskDTO {
         private String name;
         private String description;
 
         public String getName() { return name; }
         public String getDescription() { return description; }
+    }
+
+    @PutMapping("/{subtaskId}")
+    public SubTasks updateSubtask(@PathVariable Long subtaskId,
+                                  @RequestBody SubTaskDTO dto,
+                                  Principal principal) {
+        SubTasks subTask = subTasksRepository.findById(subtaskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Подзадача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+        permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
+
+        if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        subTask.setName(dto.getName());
+        subTask.setDescription(dto.getDescription());
+        return subTasksRepository.save(subTask);
+    }
+
+    @DeleteMapping("/{subtaskId}")
+    public ResponseEntity<Void> deleteSubtask(@PathVariable Long subtaskId, Principal principal) {
+        SubTasks subTask = subTasksRepository.findById(subtaskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Подзадача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+        permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
+
+        if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        subTasksRepository.delete(subTask);
+        return ResponseEntity.ok().build();
     }
 
 }

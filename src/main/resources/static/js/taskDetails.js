@@ -1,3 +1,7 @@
+import { initSubtasksSection } from './subTasks.js';
+
+window.showTaskDetails = showTaskDetails;
+
 function showTaskDetails(task) {
     const existing = document.querySelector('.task-details-sidebar');
     if (existing) existing.remove();
@@ -99,6 +103,9 @@ function showTaskDetails(task) {
             sidebar.appendChild(content);
             document.body.appendChild(sidebar);
             initTaskTagsSection(task, csrfParam, csrfToken, content);
+
+            const subtasksSection = initSubtasksSection(task, csrfToken);
+            content.appendChild(subtasksSection);
 
             sidebar.querySelectorAll('.edit-button').forEach(button => {
                 button.addEventListener('click', () => {

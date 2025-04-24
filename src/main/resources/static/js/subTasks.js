@@ -21,44 +21,45 @@ export function addSubtask(taskId, subtaskData, callback) {
     });
 }
 
-export function updateSubtask(taskId, subtaskId, subtaskData, callback) {
-    const url = `/api/tasks/${taskId}/subtasks/${subtaskId}`; // API эндпоинт для редактирования подзадачи
+export function updateSubtask(taskId, subtaskId, subtaskData, csrfToken, callback) {
+    const url = `/api/tasks/${taskId}/subtasks/${subtaskId}`;
     fetch(url, {
         method: 'PUT',
         headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken,  // CSRF-токен
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
         },
         body: JSON.stringify(subtaskData),
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            callback(data.subtask);  // Возвращаем обновлённую подзадачу
-        } else {
-            alert('Ошибка при редактировании подзадачи');
+    .then(async response => {
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error('Ошибка от сервера: ' + errorText);
         }
+        return response.json();
+    })
+    .then(subtask => {
+        callback(subtask); // просто передаём подзадачу
     })
     .catch(error => {
         console.error('Ошибка:', error);
+        alert('Ошибка: ' + error.message);
     });
 }
 
-export function deleteSubtask(taskId, subtaskId, callback) {
-    const url = `/api/tasks/${taskId}/subtasks/${subtaskId}`; // API эндпоинт для удаления подзадачи
+export function deleteSubtask(taskId, subtaskId, csrfToken, callback) {
+    const url = `/api/tasks/${taskId}/subtasks/${subtaskId}`;
     fetch(url, {
         method: 'DELETE',
         headers: {
-        'X-CSRF-TOKEN': csrfToken,  // CSRF-токен
+            'X-CSRF-TOKEN': csrfToken,
         },
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            callback(subtaskId);  // Возвращаем ID удалённой подзадачи
-        } else {
-            alert('Ошибка при удалении подзадачи');
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Ошибка при удалении подзадачи');
         }
+        callback(subtaskId);  // Успешно удалили подзадачу, вызываем callback
     })
     .catch(error => {
         console.error('Ошибка:', error);
@@ -108,4 +109,133 @@ export function createSubtasksSection() {
 
     container.appendChild(addBtn);
     return container;
+}
+
+export function initSubtasksSection(task, csrfToken) {
+    const section = document.createElement('div');
+    section.className = 'task-subtasks-section';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Подзадачи';
+    section.appendChild(title);
+
+    const list = document.createElement('div');
+    list.className = 'subtask-list';
+    section.appendChild(list);
+
+    const addButton = document.createElement('button');
+    addButton.textContent = 'Добавить подзадачу';
+    addButton.onclick = () => addSubtaskForm(task.id, list, csrfToken);
+    section.appendChild(addButton);
+
+    fetch(`/api/tasks/${task.id}/subtasks`)
+        .then(res => res.json())
+        .then(subtasks => {
+            if (subtasks.length === 0) {
+                const empty = document.createElement('p');
+                empty.textContent = 'Нет подзадач';
+                list.appendChild(empty);
+            } else {
+                subtasks.forEach(st => list.appendChild(createSubtaskItem(st, task.id, csrfToken)));
+            }
+        });
+
+    return section;
+}
+
+function createSubtaskItem(subtask, taskId, csrfToken) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'subtask-item';
+
+    const nameInput = document.createElement('input');
+    nameInput.className = 'subtask-name';
+    nameInput.value = subtask.name;
+    nameInput.disabled = true;
+
+    const descInput = document.createElement('input');
+    descInput.className = 'subtask-description';
+    descInput.value = subtask.description || '';
+    descInput.disabled = true;
+
+    const editButton = document.createElement('button');
+    editButton.textContent = 'Изменить';
+    editButton.onclick = () => {
+        if (nameInput.disabled) {
+            nameInput.disabled = false;
+            descInput.disabled = false;
+            editButton.textContent = 'Сохранить';
+        } else {
+            const updatedData = {
+                name: nameInput.value,
+                description: descInput.value
+            };
+
+            updateSubtask(taskId, subtask.id, updatedData, csrfToken, (updatedSubtask) => {
+                // можно обновить UI, если нужно
+                nameInput.disabled = true;
+                descInput.disabled = true;
+                editButton.textContent = 'Изменить';
+            });
+        }
+    };
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Удалить';
+    deleteButton.onclick = () => {
+        deleteSubtask(taskId, subtask.id, csrfToken, () => {
+            wrapper.remove();
+        });
+    };
+
+    wrapper.appendChild(nameInput);
+    wrapper.appendChild(descInput);
+    wrapper.appendChild(editButton);
+    wrapper.appendChild(deleteButton);
+
+    return wrapper;
+}
+
+function addSubtaskForm(taskId, list, csrfToken) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'subtask-item';
+
+    const nameInput = document.createElement('input');
+    nameInput.placeholder = 'Название подзадачи';
+    nameInput.className = 'subtask-name';
+
+    const descInput = document.createElement('input');
+    descInput.placeholder = 'Описание';
+    descInput.className = 'subtask-description';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Сохранить';
+    saveBtn.onclick = () => {
+        const name = nameInput.value.trim();
+        const description = descInput.value.trim();
+
+        if (!name) return alert('Название обязательно');
+
+        fetch(`/api/tasks/${taskId}/subtasks`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify([{ name, description }])
+        }).then(res => {
+            if (!res.ok) throw new Error('Ошибка добавления');
+            return res.json();
+        }).then(() => {
+            list.innerHTML = '';
+            initSubtasksSection({ id: taskId }, csrfToken).querySelectorAll('.subtask-item').forEach(item => {
+                list.appendChild(item);
+            });
+        }).catch(err => alert(err.message));
+    };
+
+    wrapper.appendChild(nameInput);
+    wrapper.appendChild(descInput);
+    wrapper.appendChild(saveBtn);
+
+    list.appendChild(wrapper);
 }
