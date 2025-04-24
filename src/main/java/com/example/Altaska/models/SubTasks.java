@@ -31,7 +31,7 @@ public class SubTasks {
     @Column(name = "created_at_server", nullable = false)
     private LocalDate createdAtServer;
 
-    @Column(name = "completed_at_server", nullable = false)
+    @Column(name = "completed_at_server")
     private LocalDateTime completedAtServer;
 
     @ManyToOne
