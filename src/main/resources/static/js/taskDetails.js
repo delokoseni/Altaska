@@ -1,5 +1,5 @@
 import { initSubtasksSection } from './subTasks.js';
-import { createPerformersSection } from './taskPerformers.js'
+import { createPerformersSection, assignTask, unassignTask } from './taskPerformers.js'
 
 window.showTaskDetails = showTaskDetails;
 
@@ -103,6 +103,41 @@ function showTaskDetails(task) {
             sidebar.appendChild(closeButton);
             sidebar.appendChild(content);
             document.body.appendChild(sidebar);
+
+            const takeTaskButton = document.createElement('button');
+
+                takeTaskButton.className = 'take-task-button';
+                if (task.assignedToUser) {
+                    takeTaskButton.textContent = 'Отказаться от задачи';
+                } else {
+                    takeTaskButton.textContent = 'Взять задачу';
+                }
+                takeTaskButton.onclick = () => {
+                    const formData = new URLSearchParams();
+
+                    if (task.assignedToUser) {
+                        // Отказаться от задачи
+                        unassignTask(task.id, formData, csrfToken)
+                            .then(() => {
+                                takeTaskButton.textContent = 'Взять задачу';
+                                task.assignedToUser = false;
+                            })
+                            .catch(err => {
+                                alert('Ошибка при отказе от задачи: ' + err.message);
+                            });
+                    } else {
+                        // Взять задачу
+                        assignTask(task.id, formData, csrfToken)
+                            .then(() => {
+                                takeTaskButton.textContent = 'Отказаться от задачи';
+                                task.assignedToUser = true;
+                            })
+                            .catch(err => {
+                                alert('Ошибка при принятии задачи: ' + err.message);
+                            });
+                    }
+                };
+                content.appendChild(takeTaskButton);
 
             const performersSection = document.createElement('div');
             performersSection.className = 'task-performers-section';

@@ -119,3 +119,27 @@ export async function addPerformer(taskId, userId, csrfToken) {
         throw new Error("Ошибка: " + errorMessage);
     }
 }
+
+// Функция для взятия задачи
+export function assignTask(taskId, formData, csrfToken) {
+    return fetch(`/api/task-performers/${taskId}/assign`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: formData
+    });
+}
+
+// Функция для отказа от задачи
+export function unassignTask(taskId, formData, csrfToken) {
+    return fetch(`/api/task-performers/${taskId}/unassign`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: formData
+    });
+}

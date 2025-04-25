@@ -88,4 +88,50 @@ public class TaskPerformerApiController {
         taskPerformersRepository.deleteByIdTaskIdAndIdUserId(taskId, userId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{taskId}/assign")
+    public ResponseEntity<?> assignPerformer(@PathVariable Long taskId, Principal principal) {
+        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
+        permissionService.checkIfProjectArchived(task.getIdProject());
+
+        Users currentUser = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
+
+        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "edit")) {
+            return ResponseEntity.status(403).body("Нет прав для назначения исполнителя");
+        }
+
+        if (taskPerformersRepository.existsByIdTaskAndIdUser(task, currentUser)) {
+            return ResponseEntity.badRequest().body("Вы уже являетесь исполнителем этой задачи");
+        }
+
+        TaskPerformers newPerformer = new TaskPerformers();
+        newPerformer.setIdTask(task);
+        newPerformer.setIdUser(currentUser);
+        newPerformer.setAddedAtServer(OffsetDateTime.now());
+
+        taskPerformersRepository.save(newPerformer);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{taskId}/unassign")
+    public ResponseEntity<?> unassignPerformer(@PathVariable Long taskId, Principal principal) {
+        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
+        permissionService.checkIfProjectArchived(task.getIdProject());
+
+        Users currentUser = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
+
+        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "edit")) {
+            return ResponseEntity.status(403).body("Нет прав для удаления исполнителя");
+        }
+
+        TaskPerformers performer = taskPerformersRepository.findByIdTaskAndIdUser(task, currentUser)
+                .orElseThrow(() -> new RuntimeException("Вы не являетесь исполнителем этой задачи"));
+
+        taskPerformersRepository.delete(performer);
+
+        return ResponseEntity.ok().build();
+    }
 }
