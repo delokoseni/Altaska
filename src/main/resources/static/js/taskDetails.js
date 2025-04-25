@@ -121,6 +121,7 @@ function showTaskDetails(task) {
                             .then(() => {
                                 takeTaskButton.textContent = 'Взять задачу';
                                 task.assignedToUser = false;
+                                showTaskDetails(task);
                             })
                             .catch(err => {
                                 alert('Ошибка при отказе от задачи: ' + err.message);
@@ -131,6 +132,7 @@ function showTaskDetails(task) {
                             .then(() => {
                                 takeTaskButton.textContent = 'Отказаться от задачи';
                                 task.assignedToUser = true;
+                                showTaskDetails(task);
                             })
                             .catch(err => {
                                 alert('Ошибка при принятии задачи: ' + err.message);
