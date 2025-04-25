@@ -2,7 +2,7 @@ import { renderAddMemberForm } from './renderAddMemberForm.js';
 import { removeProjectMember } from './memberActions.js';
 import { deleteProject } from './projectActions.js';
 import { createSubtasksSection } from './subTasks.js';
-
+import { addPerformer } from './taskPerformers.js';
 
 window.selectProject = selectProject;
 
@@ -102,6 +102,12 @@ function showTaskForm(projectId, container) {
     fetch('/api/priorities')
         .then(response => response.json())
         .then(priorities => {
+            return Promise.all([
+                priorities,
+                fetch(`/api/projects/${projectId}/confirmed-members`).then(res => res.json())
+            ]);
+        })
+        .then(([priorities, members]) => {
             const form = document.createElement('form');
             form.className = 'task-form';
 
@@ -113,14 +119,12 @@ function showTaskForm(projectId, container) {
             updatedAtInput.type = 'hidden';
             updatedAtInput.name = 'updatedAt';
 
-            form.appendChild(createdAtInput);
-            form.appendChild(updatedAtInput);
-
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = csrfParam;
             csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
+
+            form.append(createdAtInput, updatedAtInput, csrfInput);
 
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
@@ -139,14 +143,10 @@ function showTaskForm(projectId, container) {
 
             const prioritySelect = document.createElement('select');
             prioritySelect.name = 'priorityId';
-
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Без приоритета';
             prioritySelect.appendChild(defaultOption);
-
-            const selectedTagIds = [];
-            const tagSelector = createTagSelector(projectId, selectedTagIds);
 
             priorities.forEach(p => {
                 const option = document.createElement('option');
@@ -154,6 +154,32 @@ function showTaskForm(projectId, container) {
                 option.textContent = p.name;
                 prioritySelect.appendChild(option);
             });
+
+            const performerLabel = document.createElement('div');
+            performerLabel.textContent = 'Назначить исполнителей:';
+
+            const performerCheckboxes = [];
+
+            members.forEach(m => {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = m.userId;
+                checkbox.name = 'performerIds';
+
+                const label = document.createElement('label');
+                label.appendChild(checkbox);
+                label.append(` ${m.email}`);
+
+                performerCheckboxes.push(checkbox);
+                performerLabel.appendChild(label);
+                performerLabel.appendChild(document.createElement('br'));
+            });
+
+
+            const selectedTagIds = [];
+            const tagSelector = createTagSelector(projectId, selectedTagIds);
+
+            const subtasksSection = createSubtasksSection();
 
             const submitBtn = document.createElement('button');
             submitBtn.type = 'submit';
@@ -167,17 +193,17 @@ function showTaskForm(projectId, container) {
                 container.innerHTML = previousContent;
             };
 
-            form.appendChild(backButton);
-            form.appendChild(nameInput);
-            form.appendChild(descriptionInput);
-            form.appendChild(deadlineInput);
-            form.appendChild(prioritySelect);
-            form.appendChild(tagSelector);
-
-            const subtasksSection = createSubtasksSection();
-            form.appendChild(subtasksSection);
-
-            form.appendChild(submitBtn);
+            form.append(
+                backButton,
+                nameInput,
+                descriptionInput,
+                deadlineInput,
+                prioritySelect,
+                tagSelector,
+                performerLabel,
+                subtasksSection,
+                submitBtn
+            );
 
             form.onsubmit = function (e) {
                 e.preventDefault();
@@ -186,19 +212,8 @@ function showTaskForm(projectId, container) {
                 createdAtInput.value = now.toISOString().split('T')[0];
                 updatedAtInput.value = now.toISOString();
 
-                const formData = new FormData();
-                formData.append('createdAt', createdAtInput.value);
-                formData.append('updatedAt', updatedAtInput.value);
-                formData.append('name', nameInput.value);
-                formData.append('description', descriptionInput.value);
-                formData.append('priorityId', prioritySelect.value);
-                if (deadlineInput.value) {
-                    formData.append('deadline', deadlineInput.value);
-                }
-                formData.append(csrfParam, csrfToken);
-                selectedTagIds.forEach(tagId => {
-                    formData.append('tagIds', tagId);
-                });
+                const formData = new FormData(form);
+                selectedTagIds.forEach(tagId => formData.append('tagIds', tagId));
 
                 const subtaskElements = subtasksSection.querySelectorAll('.subtask-item');
                 const subtasksToSend = [];
@@ -219,22 +234,34 @@ function showTaskForm(projectId, container) {
                     return response.json();
                 })
                 .then(data => {
-                    if (subtasksToSend.length > 0) {
-                        return fetch(`/api/tasks/${data.id}/subtasks`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfToken
-                            },
-                            body: JSON.stringify(subtasksToSend)
-                        });
-                    }
+                    const taskId = data.id;
+
+                    // Назначение исполнителей
+                    const selectedUserIds = performerCheckboxes
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.value);
+                    const performerPromises = selectedUserIds.map(userId => addPerformer(taskId, userId, csrfToken));
+
+                    return Promise.all([
+                        ...performerPromises,
+                        subtasksToSend.length > 0
+                            ? fetch(`/api/tasks/${taskId}/subtasks`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify(subtasksToSend)
+                            })
+                            : Promise.resolve()
+                    ]);
                 })
                 .then(() => {
                     loadView('список', projectId);
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);
+                    alert('Произошла ошибка при создании задачи');
                 });
             };
 

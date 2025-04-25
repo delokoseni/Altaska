@@ -1,16 +1,37 @@
 export async function createPerformersSection(taskId, projectId, containerElement, csrfToken) {
     containerElement.innerHTML = "";
 
-    // Заголовок
+    renderTitle(containerElement);
+
+    const performers = await fetchPerformers(taskId);
+    const members = await fetchMembers(projectId);
+
+    renderPerformersList(performers, taskId, projectId, containerElement, csrfToken);
+    const select = renderMemberSelect(members, containerElement);
+    renderAddButton(select, taskId, projectId, containerElement, csrfToken);
+}
+
+// Заголовок
+function renderTitle(containerElement) {
     const title = document.createElement("h3");
     title.textContent = "Исполнители";
     containerElement.appendChild(title);
+}
 
-    // Загружаем исполнителей и участников проекта
-    const performers = await fetch(`/api/task-performers/${taskId}`).then(r => r.json());
-    const members = await fetch(`/api/projects/${projectId}/confirmed-members`).then(r => r.json());
+// Получение исполнителей
+async function fetchPerformers(taskId) {
+    const response = await fetch(`/api/task-performers/${taskId}`);
+    return await response.json();
+}
 
-    // Отображаем исполнителей или "Нет исполнителей"
+// Получение подтверждённых участников проекта
+async function fetchMembers(projectId) {
+    const response = await fetch(`/api/projects/${projectId}/confirmed-members`);
+    return await response.json();
+}
+
+// Отображение списка исполнителей
+function renderPerformersList(performers, taskId, projectId, containerElement, csrfToken) {
     if (performers.length === 0) {
         const empty = document.createElement("p");
         empty.textContent = "Нет исполнителей";
@@ -36,18 +57,23 @@ export async function createPerformersSection(taskId, projectId, containerElemen
         });
         containerElement.appendChild(list);
     }
+}
 
-    // Выпадающий список с участниками
+// Отображение выпадающего списка участников
+function renderMemberSelect(members, containerElement) {
     const select = document.createElement("select");
     members.forEach(m => {
         const opt = document.createElement("option");
-        opt.value = m.userId; // т.к. ты возвращаешь { userId, email }
+        opt.value = m.userId;
         opt.textContent = m.email;
         select.appendChild(opt);
     });
     containerElement.appendChild(select);
+    return select;
+}
 
-    // Кнопка "Назначить исполнителем"
+// Кнопка назначения исполнителя
+function renderAddButton(select, taskId, projectId, containerElement, csrfToken) {
     const addBtn = document.createElement("button");
     addBtn.textContent = "Назначить исполнителем";
     addBtn.onclick = async () => {
@@ -76,4 +102,20 @@ export async function createPerformersSection(taskId, projectId, containerElemen
         }
     };
     containerElement.appendChild(addBtn);
+}
+
+export async function addPerformer(taskId, userId, csrfToken) {
+    const response = await fetch(`/api/task-performers/${taskId}`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: new URLSearchParams({ userId })
+    });
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error("Ошибка: " + errorMessage);
+    }
 }
