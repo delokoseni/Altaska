@@ -57,6 +57,10 @@ public class TaskPerformerApiController {
             return ResponseEntity.status(403).body("Нет прав для добавления исполнителя");
         }
 
+        if (taskPerformersRepository.existsByIdTaskAndIdUser(task, performer)) {
+            return ResponseEntity.badRequest().body("Пользователь уже является исполнителем этой задачи");
+        }
+
         TaskPerformers newPerformer = new TaskPerformers();
         newPerformer.setIdTask(task);
         newPerformer.setIdUser(performer);

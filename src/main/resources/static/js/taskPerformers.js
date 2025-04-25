@@ -52,15 +52,28 @@ export async function createPerformersSection(taskId, projectId, containerElemen
     addBtn.textContent = "Назначить исполнителем";
     addBtn.onclick = async () => {
         const userId = select.value;
-        await fetch(`/api/task-performers/${taskId}`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: new URLSearchParams({ userId })
-        });
-        createPerformersSection(taskId, projectId, containerElement, csrfToken);
+
+        try {
+            const response = await fetch(`/api/task-performers/${taskId}`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: new URLSearchParams({ userId })
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                alert("Ошибка: " + errorMessage);
+                return;
+            }
+
+            createPerformersSection(taskId, projectId, containerElement, csrfToken);
+        } catch (error) {
+            console.error("Ошибка при назначении исполнителя:", error);
+            alert("Произошла ошибка при назначении исполнителя.");
+        }
     };
     containerElement.appendChild(addBtn);
 }

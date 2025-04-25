@@ -1,6 +1,8 @@
 package com.example.Altaska.repositories;
 
 import com.example.Altaska.models.TaskPerformers;
+import com.example.Altaska.models.Tasks;
+import com.example.Altaska.models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +18,7 @@ public interface TaskPerformersRepository extends JpaRepository<TaskPerformers, 
     @Modifying
     @Query("DELETE FROM TaskPerformers tp WHERE tp.idTask.id = :taskId AND tp.idUser.id = :userId")
     void deleteByIdTaskIdAndIdUserId(Long taskId, Long userId);
+
+    boolean existsByIdTaskAndIdUser(Tasks task, Users user);
+
 }
