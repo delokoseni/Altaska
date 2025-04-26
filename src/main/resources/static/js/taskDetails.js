@@ -104,43 +104,6 @@ function showTaskDetails(task) {
             sidebar.appendChild(content);
             document.body.appendChild(sidebar);
 
-            const takeTaskButton = document.createElement('button');
-
-                takeTaskButton.className = 'take-task-button';
-                if (task.assignedToUser) {
-                    takeTaskButton.textContent = 'Отказаться от задачи';
-                } else {
-                    takeTaskButton.textContent = 'Взять задачу';
-                }
-                takeTaskButton.onclick = () => {
-                    const formData = new URLSearchParams();
-
-                    if (task.assignedToUser) {
-                        // Отказаться от задачи
-                        unassignTask(task.id, formData, csrfToken)
-                            .then(() => {
-                                takeTaskButton.textContent = 'Взять задачу';
-                                task.assignedToUser = false;
-                                showTaskDetails(task);
-                            })
-                            .catch(err => {
-                                alert('Ошибка при отказе от задачи: ' + err.message);
-                            });
-                    } else {
-                        // Взять задачу
-                        assignTask(task.id, formData, csrfToken)
-                            .then(() => {
-                                takeTaskButton.textContent = 'Отказаться от задачи';
-                                task.assignedToUser = true;
-                                showTaskDetails(task);
-                            })
-                            .catch(err => {
-                                alert('Ошибка при принятии задачи: ' + err.message);
-                            });
-                    }
-                };
-                content.appendChild(takeTaskButton);
-
             const performersSection = document.createElement('div');
             performersSection.className = 'task-performers-section';
             content.appendChild(performersSection);
@@ -150,6 +113,50 @@ function showTaskDetails(task) {
 
             const subtasksSection = initSubtasksSection(task, csrfToken);
             content.appendChild(subtasksSection);
+
+            // Проверка, является ли текущий пользователь исполнителем задачи
+            fetch(`/api/task-performers/${task.id}/is-assigned`)
+                .then(response => response.json())
+                .then(isAssigned => {
+                    const takeTaskButton = document.createElement('button');
+                    takeTaskButton.className = 'take-task-button';
+
+                    if (isAssigned) {
+                        takeTaskButton.textContent = 'Отказаться от задачи';
+                    } else {
+                        takeTaskButton.textContent = 'Взять задачу';
+                    }
+
+                    takeTaskButton.onclick = () => {
+                        const formData = new URLSearchParams();
+
+                        if (isAssigned) {
+                            // Отказаться от задачи
+                            unassignTask(task.id, formData, csrfToken)
+                                .then(() => {
+                                    takeTaskButton.textContent = 'Взять задачу';
+                                    showTaskDetails(task);  // Обновить детали задачи
+                                })
+                                .catch(err => {
+                                    alert('Ошибка при отказе от задачи: ' + err.message);
+                                });
+                        } else {
+                            // Взять задачу
+                            assignTask(task.id, formData, csrfToken)
+                                .then(() => {
+                                    takeTaskButton.textContent = 'Отказаться от задачи';
+                                    showTaskDetails(task);  // Обновить детали задачи
+                                })
+                                .catch(err => {
+                                    alert('Ошибка при принятии задачи: ' + err.message);
+                                });
+                        }
+                    };
+                    content.appendChild(takeTaskButton);
+                })
+                .catch(err => {
+                    alert('Ошибка при проверке исполнителя: ' + err.message);
+                });
 
             sidebar.querySelectorAll('.edit-button').forEach(button => {
                 button.addEventListener('click', () => {

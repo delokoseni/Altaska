@@ -134,4 +134,19 @@ public class TaskPerformerApiController {
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{taskId}/is-assigned")
+    public ResponseEntity<?> isAssigned(@PathVariable Long taskId, Principal principal) {
+        // Получаем задачу
+        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        // Получаем текущего пользователя
+        Users currentUser = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
+
+        // Проверяем, является ли текущий пользователь исполнителем задачи
+        boolean isAssigned = taskPerformersRepository.existsByIdTaskAndIdUser(task, currentUser);
+
+        return ResponseEntity.ok(isAssigned);
+    }
 }
