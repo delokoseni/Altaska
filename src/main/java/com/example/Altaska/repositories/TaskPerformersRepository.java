@@ -24,4 +24,9 @@ public interface TaskPerformersRepository extends JpaRepository<TaskPerformers, 
 
     Optional<TaskPerformers> findByIdTaskAndIdUser(Tasks task, Users user);
 
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM TaskPerformers tp WHERE tp.idTask.id = :taskId")
+    void deleteByTaskId(Long taskId);
+
 }

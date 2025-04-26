@@ -3,11 +3,13 @@ package com.example.Altaska.controller;
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.PermissionService;
+import com.example.Altaska.services.TaskCleanupService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -15,6 +17,7 @@ import java.security.Principal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -48,6 +51,9 @@ public class TaskApiController {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private TaskCleanupService taskCleanupService;
 
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
@@ -251,6 +257,29 @@ public class TaskApiController {
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
         return tasksRepository.save(task);
+    }
+
+    @DeleteMapping("/{taskId}/delete")
+    public ResponseEntity<?> deleteTask(@PathVariable Long taskId, Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        permissionService.checkIfProjectArchived(task.getIdProject());
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        taskCleanupService.deleteTaskDependencies(taskId);
+        taskCleanupService.deleteComments(taskId);
+        taskCleanupService.deleteSubtasks(taskId);
+
+        tasksRepository.delete(task);
+
+        // Отправляем JSON-ответ
+        return ResponseEntity.ok(Map.of("message", "Задача успешно удалена"));
     }
 
 }

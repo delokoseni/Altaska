@@ -1,5 +1,6 @@
 import { initSubtasksSection } from './subTasks.js';
-import { createPerformersSection, assignTask, unassignTask } from './taskPerformers.js'
+import { createPerformersSection, assignTask, unassignTask } from './taskPerformers.js';
+import { deleteTask } from './deleteTask.js';
 
 window.showTaskDetails = showTaskDetails;
 
@@ -218,6 +219,17 @@ function showTaskDetails(task) {
             setTimeout(() => {
                 window.addEventListener('click', outsideClickListener);
             }, 0);
+
+            // Вставляем кнопку "Удалить задачу"
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-task-button';
+            deleteButton.textContent = 'Удалить задачу';
+            deleteButton.onclick = () => {
+                if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                    deleteTask(task.id, csrfToken);  // Вызываем функцию для удаления
+                }
+            };
+            content.appendChild(deleteButton);
 
             function outsideClickListener(e) {
                 if (!sidebar.contains(e.target)) {
