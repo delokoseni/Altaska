@@ -8,6 +8,7 @@ import com.example.Altaska.models.Tasks;
 import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.EmailService;
 import com.example.Altaska.services.PermissionService;
+import com.example.Altaska.services.TaskCleanupService;
 import com.example.Altaska.validators.EmailValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,9 @@ public class ProjectApiController {
 
     @Autowired
     private TagsRepository tagsRepository;
+
+    @Autowired
+    private TaskCleanupService taskCleanupService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
@@ -308,7 +312,7 @@ public class ProjectApiController {
     }
 
     @Transactional
-    @DeleteMapping("/{id}") //TODO Переделать, метод не работает
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProject(@PathVariable Long id, Principal principal) {
         Projects project = projectsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Проект не найден"));
@@ -317,35 +321,29 @@ public class ProjectApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         if (!permissionService.hasPermission(user.getId(), project.getId(), "edit")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет доступа");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Нет доступа"));
         }
 
         permissionService.checkIfProjectArchived(project);
 
-        // --- Удаление Tasks и TasksTags ---
         List<Tasks> tasks = tasksRepository.findByIdProject_Id(id);
         for (Tasks task : tasks) {
-            tasksTagsRepository.deleteAll(tasksTagsRepository.findByIdTask(task));
+            taskCleanupService.deleteTaskDependencies(task.getId());
+            taskCleanupService.deleteComments(task.getId());
+            taskCleanupService.deleteSubtasks(task.getId());
+            tasksRepository.delete(task);
         }
-        tasksRepository.deleteAll(tasks);
 
-        // --- Удаление Tags ---
         tagsRepository.deleteAll(tagsRepository.findByIdProjectId(id));
-
-        // --- Удаление Roles ---
+        projectMembersRepository.deleteAll(projectMembersRepository.findByIdProjectId(project.getId()));
         List<Roles> roles = rolesRepository.findByIdProject_IdOrIdProjectIsNull(id);
-        roles.removeIf(role -> role.getIdProject() == null); // не удаляем глобальные роли
+        roles.removeIf(role -> role.getIdProject() == null);
         rolesRepository.deleteAll(roles);
 
-        // --- Удаление участников проекта ---
-        projectMembersRepository.deleteAll(projectMembersRepository.findByIdProjectId(project.getId()));
-
-        // --- Удаление самого проекта ---
         projectsRepository.delete(project);
 
-        return ResponseEntity.ok("Проект удалён");
+        return ResponseEntity.ok(Map.of("message", "Проект успешно удалён"));
     }
-
 
 }
 
