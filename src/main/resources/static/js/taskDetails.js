@@ -3,8 +3,6 @@ import { createPerformersSection, assignTask, unassignTask } from './taskPerform
 import { deleteTask } from './deleteTask.js';
 import { initTaskCommentsSection, initCommentInputSection } from './comments.js';
 
-window.showTaskDetails = showTaskDetails;
-
 function showTaskDetails(task) {
     const existing = document.querySelector('.task-details-sidebar');
     if (existing) existing.remove();
@@ -377,3 +375,5 @@ function initTaskTagsSection(task, csrfParam, csrfToken, content) {
     setupAddTagButton(task, tagSelect, addTagButton, csrfParam, csrfToken, () => currentTaskTagIds);
 
 }
+
+window.showTaskDetails = showTaskDetails;

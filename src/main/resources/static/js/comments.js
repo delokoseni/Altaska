@@ -1,17 +1,28 @@
 export function initTaskCommentsSection(taskId, container, currentUserEmail) {
-    const commentsWrapper = document.createElement('div');
-    commentsWrapper.className = 'task-comments-section';
+    let commentsWrapper = container.querySelector('.task-comments-section');
 
-    const title = document.createElement('h3');
-    title.textContent = 'Комментарии';
-    title.style.textAlign = 'center';
-    commentsWrapper.appendChild(title);
+    if (!commentsWrapper) {
+        commentsWrapper = document.createElement('div');
+        commentsWrapper.className = 'task-comments-section';
 
-    const commentsList = document.createElement('div');
-    commentsList.className = 'comments-list';
-    commentsWrapper.appendChild(commentsList);
+        const title = document.createElement('h3');
+        title.textContent = 'Комментарии';
+        title.className = 'comments-title';
+        title.style.textAlign = 'center';
+        commentsWrapper.appendChild(title);
 
-    container.appendChild(commentsWrapper);
+        const commentsList = document.createElement('div');
+        commentsList.className = 'comments-list';
+        commentsWrapper.appendChild(commentsList);
+
+        container.appendChild(commentsWrapper);
+    }
+
+    // После создания/проверки обертки сразу загружаем комментарии
+    loadTaskComments(taskId, commentsWrapper.querySelector('.comments-list'), currentUserEmail);
+}
+
+export function loadTaskComments(taskId, commentsList, currentUserEmail) {
     commentsList.innerHTML = '';
 
     fetch(`/api/comments/task/${taskId}`)
@@ -40,7 +51,7 @@ export function initTaskCommentsSection(taskId, container, currentUserEmail) {
                     commentBlock.appendChild(author);
                     commentBlock.appendChild(text);
 
-                    // Если это комментарий текущего пользователя, добавляем кнопки "Редактировать" и "Удалить"
+                    // Кнопки "Редактировать" и "Удалить" для своего комментария
                     if (comment.authorName === currentUserEmail) {
                         const editButton = document.createElement('button');
                         editButton.textContent = 'Редактировать';
@@ -50,7 +61,7 @@ export function initTaskCommentsSection(taskId, container, currentUserEmail) {
                         const deleteButton = document.createElement('button');
                         deleteButton.textContent = 'Удалить';
                         deleteButton.className = 'delete-comment-button';
-                        deleteButton.addEventListener('click', () => deleteComment(comment.id, commentsList));
+                        deleteButton.addEventListener('click', () => deleteComment(comment.id, commentsList, taskId, currentUserEmail));
 
                         commentBlock.appendChild(editButton);
                         commentBlock.appendChild(deleteButton);
@@ -135,7 +146,7 @@ function editComment(commentId, currentText, taskId, commentsList, currentUserEm
         })
         .then(response => {
             if (response.ok) {
-                initTaskCommentsSection(taskId, commentsList, currentUserEmail);  // Обновляем комментарии
+                loadTaskComments(taskId, commentsList, currentUserEmail);
             } else {
                 alert('Ошибка редактирования комментария');
             }
@@ -147,7 +158,7 @@ function editComment(commentId, currentText, taskId, commentsList, currentUserEm
 }
 
 // Функция для удаления комментария
-function deleteComment(commentId, commentsList) {
+function deleteComment(commentId, commentsList, taskId, currentUserEmail) {
     if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
         fetch(`/api/comments/delete-comment/${commentId}`, {
             method: 'DELETE',
@@ -157,8 +168,7 @@ function deleteComment(commentId, commentsList) {
         })
         .then(response => {
             if (response.ok) {
-                commentsList.innerHTML = '';  // Очищаем список и перезагружаем комментарии
-                initTaskCommentsSection(taskId, commentsList, currentUserEmail);
+                loadTaskComments(taskId, commentsList, currentUserEmail);
             } else {
                 alert('Ошибка удаления комментария');
             }
