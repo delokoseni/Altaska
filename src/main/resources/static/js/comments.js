@@ -1,4 +1,4 @@
-export function initTaskCommentsSection(taskId, container) {
+export function initTaskCommentsSection(taskId, container, currentUserEmail) {
     const commentsWrapper = document.createElement('div');
     commentsWrapper.className = 'task-comments-section';
 
@@ -13,6 +13,7 @@ export function initTaskCommentsSection(taskId, container) {
 
     container.appendChild(commentsWrapper);
     commentsList.innerHTML = '';
+
     fetch(`/api/comments/task/${taskId}`)
         .then(response => response.json())
         .then(comments => {
@@ -38,6 +39,23 @@ export function initTaskCommentsSection(taskId, container) {
 
                     commentBlock.appendChild(author);
                     commentBlock.appendChild(text);
+
+                    // Если это комментарий текущего пользователя, добавляем кнопки "Редактировать" и "Удалить"
+                    if (comment.authorName === currentUserEmail) {
+                        const editButton = document.createElement('button');
+                        editButton.textContent = 'Редактировать';
+                        editButton.className = 'edit-comment-button';
+                        editButton.addEventListener('click', () => editComment(comment.id, comment.text, taskId, commentsList, currentUserEmail));
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Удалить';
+                        deleteButton.className = 'delete-comment-button';
+                        deleteButton.addEventListener('click', () => deleteComment(comment.id, commentsList));
+
+                        commentBlock.appendChild(editButton);
+                        commentBlock.appendChild(deleteButton);
+                    }
+
                     commentsList.appendChild(commentBlock);
                 });
             }
@@ -104,3 +122,49 @@ export function sendComment(taskId, text, csrfToken) {
     });
 }
 
+function editComment(commentId, currentText, taskId, commentsList, currentUserEmail) {
+    const newText = prompt('Редактировать комментарий:', currentText);
+    if (newText !== null) {
+        fetch(`/api/comments/edit-comment/${commentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken // Передайте CSRF токен
+            },
+            body: JSON.stringify(newText)
+        })
+        .then(response => {
+            if (response.ok) {
+                initTaskCommentsSection(taskId, commentsList, currentUserEmail);  // Обновляем комментарии
+            } else {
+                alert('Ошибка редактирования комментария');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка редактирования комментария:', error);
+        });
+    }
+}
+
+// Функция для удаления комментария
+function deleteComment(commentId, commentsList) {
+    if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
+        fetch(`/api/comments/delete-comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken // Передайте CSRF токен
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                commentsList.innerHTML = '';  // Очищаем список и перезагружаем комментарии
+                initTaskCommentsSection(taskId, commentsList, currentUserEmail);
+            } else {
+                alert('Ошибка удаления комментария');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка удаления комментария:', error);
+        });
+    }
+}

@@ -221,9 +221,18 @@ function showTaskDetails(task) {
                 window.addEventListener('click', outsideClickListener);
             }, 0);
 
-            initTaskCommentsSection(task.id, content);
-            initCommentInputSection(task.id, content, () => initTaskCommentsSection(task.id, content), csrfToken);
+            // Выполняем запрос к серверу, чтобы получить email текущего пользователя
+            fetch('/current-user-email')
+                .then(response => response.text())  // Получаем email как строку
+                .then(email => {
+                    // Если email получен, используем его
+                    console.log(email);  // Можно заменить на логику, где используется email
 
+                    // Теперь можно передавать email в функцию, как ранее
+                    initTaskCommentsSection(task.id, content, email);
+                    initCommentInputSection(task.id, content, () => initTaskCommentsSection(task.id, content, email), csrfToken);
+                })
+                .catch(error => console.error('Error:', error));  // Обрабатываем возможные ошибки
 
             // Вставляем кнопку "Удалить задачу"
             const deleteButton = document.createElement('button');

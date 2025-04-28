@@ -38,6 +38,7 @@ public class CommentApiController {
         List<Comments> comments = commentsRepository.findByIdTask_Id(taskId);
         return comments.stream()
                 .map(comment -> new CommentDto(
+                        comment.getId(),
                         comment.getIdUser().getEmail(),
                         comment.getContent()
                 ))
@@ -72,6 +73,52 @@ public class CommentApiController {
         return ResponseEntity.ok().build();
     }
 
+    // Редактирование комментария
+    @PutMapping("/edit-comment/{commentId}")
+    public ResponseEntity<?> editComment(@PathVariable Long commentId, @RequestBody String content, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Users user = usersRepository.findByEmail(principal.getName()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Comments comment = commentsRepository.findById(commentId).orElse(null);
+        if (comment == null || !comment.getIdUser().equals(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Можно редактировать только свои комментарии
+        }
+
+        comment.setContent(content);
+        commentsRepository.save(comment);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // Удаление комментария
+    @DeleteMapping("/delete-comment/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Users user = usersRepository.findByEmail(principal.getName()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Comments comment = commentsRepository.findById(commentId).orElse(null);
+        if (comment == null || !comment.getIdUser().equals(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Можно удалять только свои комментарии
+        }
+
+        commentsRepository.delete(comment);
+
+        return ResponseEntity.ok().build();
+    }
+
+
     // DTO для запроса
     public static class CommentRequest {
         private Long taskId;
@@ -94,14 +141,20 @@ public class CommentApiController {
         }
     }
 
-    // DTO класс, чтобы на фронт отправлять только нужные данные
     public static class CommentDto {
+        private Long id; // ID комментария
         private String authorName;
         private String text;
 
-        public CommentDto(String authorName, String text) {
+        public CommentDto(Long id, String authorName, String text) {
+            this.id = id;
             this.authorName = authorName;
             this.text = text;
+        }
+
+        // Геттеры
+        public Long getId() {
+            return id;
         }
 
         public String getAuthorName() {
