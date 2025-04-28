@@ -14,7 +14,7 @@ public class Comments {
     @Column(name = "content", columnDefinition = "text", nullable = false)
     private String content;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @ManyToOne
@@ -25,7 +25,7 @@ public class Comments {
     @JoinColumn(name = "id_user", referencedColumnName = "id")
     private Users idUser;
 
-    @Column(name = "created_at_server", nullable = false)
+    @Column(name = "created_at_server", nullable = false, updatable = false)
     private OffsetDateTime createdAtServer;
 
     public Long getId() {

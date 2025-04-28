@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -36,7 +37,10 @@ public class CommentApiController {
     @GetMapping("/task/{taskId}")
     public List<CommentDto> getCommentsByTask(@PathVariable Long taskId) {
         List<Comments> comments = commentsRepository.findByIdTask_Id(taskId);
+
+        // Сортируем комментарии по времени создания (createdAt) по возрастанию
         return comments.stream()
+                .sorted(Comparator.comparing(Comments::getCreatedAtServer))  // Сортировка по возрастанию
                 .map(comment -> new CommentDto(
                         comment.getId(),
                         comment.getIdUser().getEmail(),
@@ -89,7 +93,9 @@ public class CommentApiController {
         if (comment == null || !comment.getIdUser().equals(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Можно редактировать только свои комментарии
         }
-
+        if (content.startsWith("\"") && content.endsWith("\"")) {
+            content = content.substring(1, content.length() - 1);
+        }
         comment.setContent(content);
         commentsRepository.save(comment);
 
