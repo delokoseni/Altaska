@@ -1,17 +1,32 @@
 package com.example.Altaska.controller;
 
 import com.example.Altaska.models.Comments;
+import com.example.Altaska.models.Tasks;
+import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.CommentsRepository;
+import com.example.Altaska.repositories.TasksRepository;
+import com.example.Altaska.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/comments")
 public class CommentApiController {
 
+    @Autowired
     private final CommentsRepository commentsRepository;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
+    @Autowired
+    private TasksRepository tasksRepository;
 
     @Autowired
     public CommentApiController(CommentsRepository commentsRepository) {
@@ -27,6 +42,56 @@ public class CommentApiController {
                         comment.getContent()
                 ))
                 .toList();
+    }
+
+    @PostMapping("/add-comment")
+    public ResponseEntity<?> addComment(@RequestBody CommentRequest commentRequest, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Users user = usersRepository.findByEmail(principal.getName()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Tasks task = tasksRepository.findById(commentRequest.getTaskId()).orElse(null);
+        if (task == null) {
+            return ResponseEntity.badRequest().body("Задача не найдена");
+        }
+
+        Comments comment = new Comments();
+        comment.setContent(commentRequest.getContent());
+        comment.setCreatedAt(OffsetDateTime.now()); //TODO Изменить
+        comment.setCreatedAtServer(OffsetDateTime.now());
+        comment.setIdTask(task);
+        comment.setIdUser(user);
+
+        commentsRepository.save(comment);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // DTO для запроса
+    public static class CommentRequest {
+        private Long taskId;
+        private String content;
+
+        public Long getTaskId() {
+            return taskId;
+        }
+
+        public void setTaskId(Long taskId) {
+            this.taskId = taskId;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
     }
 
     // DTO класс, чтобы на фронт отправлять только нужные данные

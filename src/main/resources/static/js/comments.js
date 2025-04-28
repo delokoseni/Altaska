@@ -12,7 +12,7 @@ export function initTaskCommentsSection(taskId, container) {
     commentsWrapper.appendChild(commentsList);
 
     container.appendChild(commentsWrapper);
-
+    commentsList.innerHTML = '';
     fetch(`/api/comments/task/${taskId}`)
         .then(response => response.json())
         .then(comments => {
@@ -47,3 +47,60 @@ export function initTaskCommentsSection(taskId, container) {
             commentsList.innerHTML = '<div class="no-comments">Ошибка загрузки комментариев</div>';
         });
 }
+
+export function initCommentInputSection(taskId, container, onCommentAdded, csrfToken) {
+    const inputWrapper = document.createElement('div');
+    inputWrapper.className = 'comment-input-section';
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'comment-textarea';
+    textarea.placeholder = 'Введите ваш комментарий...';
+
+    const sendButton = document.createElement('button');
+    sendButton.className = 'comment-send-button';
+    sendButton.textContent = 'Отправить';
+
+    sendButton.addEventListener('click', () => {
+        const text = textarea.value.trim();
+        if (text.length === 0) {
+            alert('Комментарий не может быть пустым!');
+            return;
+        }
+
+        sendComment(taskId, text, csrfToken)
+            .then(() => {
+                textarea.value = ''; // очистить поле
+                if (onCommentAdded) {
+                    onCommentAdded(); // обновить список комментариев
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка отправки комментария:', error);
+                alert('Ошибка отправки комментария');
+            });
+    });
+
+    inputWrapper.appendChild(textarea);
+    inputWrapper.appendChild(sendButton);
+    container.appendChild(inputWrapper);
+}
+
+// Функция отправки комментария на сервер
+export function sendComment(taskId, text, csrfToken) {
+    return fetch('/api/comments/add-comment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+            taskId: taskId,
+            content: text
+        })
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Ошибка сервера');
+        }
+    });
+}
+

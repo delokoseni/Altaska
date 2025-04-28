@@ -1,7 +1,7 @@
 import { initSubtasksSection } from './subTasks.js';
 import { createPerformersSection, assignTask, unassignTask } from './taskPerformers.js';
 import { deleteTask } from './deleteTask.js';
-import { initTaskCommentsSection } from './comments.js';
+import { initTaskCommentsSection, initCommentInputSection } from './comments.js';
 
 window.showTaskDetails = showTaskDetails;
 
@@ -222,6 +222,8 @@ function showTaskDetails(task) {
             }, 0);
 
             initTaskCommentsSection(task.id, content);
+            initCommentInputSection(task.id, content, () => initTaskCommentsSection(task.id, content), csrfToken);
+
 
             // Вставляем кнопку "Удалить задачу"
             const deleteButton = document.createElement('button');
