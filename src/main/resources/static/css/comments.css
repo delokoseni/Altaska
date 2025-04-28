@@ -1,0 +1,33 @@
+.task-comments-section {
+    margin-top: 20px;
+    background-color: var(--second-text-color);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.comments-list {
+    margin-top: 10px;
+}
+
+.comment-block {
+    background-color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid #4CAF50;
+    border-radius: 5px;
+}
+
+.comment-author {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.comment-text {
+    white-space: pre-wrap;
+}
+
+.no-comments {
+    text-align: center;
+    color: gray;
+    font-style: italic;
+}

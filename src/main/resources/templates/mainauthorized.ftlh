@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/sidebar.css">
     <link rel="stylesheet" href="/css/taskdetailssidebar.css">
+    <link rel="stylesheet" href="/css/comments.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>
     <script type = "module" src="/js/projectSelection.js"></script>
