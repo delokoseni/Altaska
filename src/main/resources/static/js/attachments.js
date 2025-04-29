@@ -46,7 +46,8 @@ export function initTaskFilesSection(taskId, container, csrfToken, currentUserEm
         container.appendChild(filesWrapper);
     }
 
-    loadFilesList(taskId, filesWrapper.querySelector('.files-list'), currentUserEmail);
+    loadFilesList(taskId, filesWrapper.querySelector('.files-list'), csrfToken, currentUserEmail);
+
 }
 
 // Функция для загрузки списка файлов
