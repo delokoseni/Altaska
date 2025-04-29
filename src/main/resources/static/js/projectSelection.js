@@ -175,11 +175,15 @@ function showTaskForm(projectId, container) {
                 performerLabel.appendChild(document.createElement('br'));
             });
 
-
             const selectedTagIds = [];
             const tagSelector = createTagSelector(projectId, selectedTagIds);
 
             const subtasksSection = createSubtasksSection();
+
+            const filesInput = document.createElement('input');
+            filesInput.type = 'file';
+            filesInput.name = 'files';
+            filesInput.multiple = true;
 
             const submitBtn = document.createElement('button');
             submitBtn.type = 'submit';
@@ -202,11 +206,21 @@ function showTaskForm(projectId, container) {
                 tagSelector,
                 performerLabel,
                 subtasksSection,
+                filesInput,
                 submitBtn
             );
 
             form.onsubmit = function (e) {
                 e.preventDefault();
+
+                // Проверка файлов
+                const maxFileSize = 25 * 1024 * 1024; // 25MB
+                for (let file of filesInput.files) {
+                    if (file.size > maxFileSize) {
+                        alert(`Файл "${file.name}" превышает 25 МБ`);
+                        return;
+                    }
+                }
 
                 const now = new Date();
                 createdAtInput.value = now.toISOString().split('T')[0];
@@ -242,6 +256,26 @@ function showTaskForm(projectId, container) {
                         .map(cb => cb.value);
                     const performerPromises = selectedUserIds.map(userId => addPerformer(taskId, userId, csrfToken));
 
+                    // Загрузка файлов
+                    const files = filesInput.files;
+                    const uploadPromises = [];
+
+                    for (let i = 0; i < files.length; i++) {
+                        const formDataFile = new FormData();
+                        formDataFile.append('file', files[i]);
+                        formDataFile.append('taskId', taskId);
+
+                        const uploadPromise = fetch('/api/files/upload', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: formDataFile
+                        });
+
+                        uploadPromises.push(uploadPromise);
+                    }
+
                     return Promise.all([
                         ...performerPromises,
                         subtasksToSend.length > 0
@@ -253,7 +287,8 @@ function showTaskForm(projectId, container) {
                                 },
                                 body: JSON.stringify(subtasksToSend)
                             })
-                            : Promise.resolve()
+                            : Promise.resolve(),
+                        ...uploadPromises
                     ]);
                 })
                 .then(() => {
