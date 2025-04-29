@@ -156,6 +156,7 @@ function showTaskForm(projectId, container) {
             });
 
             const performerLabel = document.createElement('div');
+            performerLabel.className = 'performer-container';
             performerLabel.textContent = 'Назначить исполнителей:';
 
             const performerCheckboxes = [];
@@ -567,6 +568,7 @@ function createTagSelector(projectId, selectedTags) {
     const addBtn = document.createElement('button');
     addBtn.type = 'button';
     addBtn.textContent = 'Добавить тег';
+    addBtn.style.width = '100%';
 
     const tagsList = document.createElement('div');
     tagsList.className = 'selected-tags';

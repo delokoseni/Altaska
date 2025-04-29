@@ -80,3 +80,173 @@ form select:invalid {
 .back-button:hover {
     transform: scale(1.03);
 }
+
+/* Заголовок формы */
+.task-form-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--header-color);
+    text-align: center;
+}
+
+/* Контейнер чекбоксов исполнителей */
+.performer-container {
+    border: 2px solid var(--button-color);
+    border-radius: 6px;
+    padding: 10px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.performer-container label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+/* Секция тегов и подзадач (если они не имеют встроенного стиля) */
+.tag-selector,
+.subtasks-section {
+    border: 2px dashed var(--button-color);
+    padding: 10px;
+    border-radius: 6px;
+    background-color: var(--background-color);
+    margin-top: 10px;
+    color: var(--text-color);
+}
+
+/* Поля ввода в подзадачах */
+.subtask-item input,
+.subtask-item textarea {
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 8px;
+    border: 1px solid var(--button-color);
+    border-radius: 4px;
+    background-color: var(--text-color);
+    color: var(--button-color);
+}
+
+/* Стили для input[type=file] */
+form input[type="file"] {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 10px;
+    border: 2px dashed var(--button-color);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    form {
+        width: 95%;
+    }
+}
+
+/* Общий стиль чекбоксов исполнителей */
+form .task-form div label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    color: var(--button-color);
+    font-size: 14px;
+}
+
+/* Секция с чекбоксами исполнителей */
+form .task-form div {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+/* Секция тегов */
+.tag-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+/* Оформление отдельных тегов */
+.tag-selector .tag {
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tag-selector .tag:hover {
+    background-color: var(--hover-button-color);
+}
+
+/* Секция подзадач */
+.subtasks-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.subtask-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background-color: var(--background-color);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--button-color);
+}
+
+.subtask-item input,
+.subtask-item textarea {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    padding: 8px;
+    border: 1px solid var(--button-color);
+    border-radius: 5px;
+}
+
+/* Поле выбора файлов */
+form input[type="file"] {
+    font-size: 13px;
+    color: var(--button-color);
+}
+
+/* Дополнительные стили кнопок */
+form button {
+    font-family: 'Nunito', sans-serif;
+    font-weight: bold;
+}
+
+form button[type="button"]:not(.back-button) {
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+form button[type="button"]:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-form textarea {
+    height: 400px;
+    resize: none; /* запрет изменения размеров */
+    overflow-y: auto; /* добавить прокрутку по вертикали, если текст выйдет за пределы */
+}
+
+.tag-select {
+    width: 100%;
+    margin-bottom: 12px; /* такой же, как у других полей */
+}
+
