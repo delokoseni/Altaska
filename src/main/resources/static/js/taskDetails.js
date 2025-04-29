@@ -2,6 +2,7 @@ import { initSubtasksSection } from './subTasks.js';
 import { createPerformersSection, assignTask, unassignTask } from './taskPerformers.js';
 import { deleteTask } from './deleteTask.js';
 import { initTaskCommentsSection, initCommentInputSection } from './comments.js';
+import { initTaskFilesSection } from './attachments.js';
 
 function showTaskDetails(task) {
     const existing = document.querySelector('.task-details-sidebar');
@@ -231,6 +232,8 @@ function showTaskDetails(task) {
                     initCommentInputSection(task.id, content, () => initTaskCommentsSection(task.id, content, email), csrfToken);
                 })
                 .catch(error => console.error('Error:', error));  // Обрабатываем возможные ошибки
+
+            initTaskFilesSection(task.id, content, csrfToken);
 
             // Вставляем кнопку "Удалить задачу"
             const deleteButton = document.createElement('button');
