@@ -1,5 +1,5 @@
 // Функция для отображения блока с файлами
-export function initTaskFilesSection(taskId, container, csrfToken) {
+export function initTaskFilesSection(taskId, container, csrfToken, currentUserEmail) {
     let filesWrapper = container.querySelector('.task-files-section');
 
     if (!filesWrapper) {
@@ -34,7 +34,7 @@ export function initTaskFilesSection(taskId, container, csrfToken) {
         uploadButton.addEventListener('click', () => {
             const file = fileInput.files[0];
             if (file) {
-                uploadFile(file, taskId, filesList, csrfToken);
+                uploadFile(file, taskId, filesList, csrfToken, currentUserEmail);
             } else {
                 alert('Пожалуйста, выберите файл');
             }
@@ -46,12 +46,11 @@ export function initTaskFilesSection(taskId, container, csrfToken) {
         container.appendChild(filesWrapper);
     }
 
-    loadFilesList(taskId, filesWrapper.querySelector('.files-list'));
+    loadFilesList(taskId, filesWrapper.querySelector('.files-list'), currentUserEmail);
 }
 
 // Функция для загрузки списка файлов
-export function loadFilesList(taskId, filesListContainer) {
-    // Очищаем старое содержимое
+export function loadFilesList(taskId, filesListContainer, csrfToken, currentUserEmail) {
     filesListContainer.innerHTML = '';
 
     fetch(`/api/files/task/${taskId}`)
@@ -77,8 +76,18 @@ export function loadFilesList(taskId, filesListContainer) {
                 downloadButton.addEventListener('click', () => {
                     window.location.href = `/api/files/download/${file.id}`;
                 });
-
                 fileItem.appendChild(downloadButton);
+
+                if (file.uploadedByEmail === currentUserEmail) {
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Удалить';
+                    deleteButton.style.marginLeft = '10px';
+                    deleteButton.addEventListener('click', () => {
+                        deleteFile(file.id, taskId, filesListContainer, csrfToken, currentUserEmail);
+                    });
+                    fileItem.appendChild(deleteButton);
+                }
+
                 filesListContainer.appendChild(fileItem);
             });
         })
@@ -91,8 +100,7 @@ export function loadFilesList(taskId, filesListContainer) {
 }
 
 // Функция для отправки файла на сервер
-// Функция для отправки файла на сервер с CSRF токеном
-export function uploadFile(file, taskId, filesListContainer, csrfToken) {
+export function uploadFile(file, taskId, filesListContainer, csrfToken, currentUserEmail) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('taskId', taskId);
@@ -112,10 +120,33 @@ export function uploadFile(file, taskId, filesListContainer, csrfToken) {
     })
     .then(data => {
         console.log('Файл загружен успешно:', data);
-        loadFilesList(taskId, filesListContainer); // Перезагружаем список файлов
+        loadFilesList(taskId, filesListContainer, csrfToken, currentUserEmail);
     })
     .catch(error => {
         console.error('Ошибка при загрузке файла:', error);
         alert('Не удалось загрузить файл');
     });
 }
+
+function deleteFile(fileId, taskId, filesListContainer, csrfToken, currentUserEmail) {
+    fetch(`/api/files/${fileId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Ошибка при удалении файла');
+        return response.text();
+    })
+    .then(() => {
+        console.log('Файл удалён успешно');
+        loadFilesList(taskId, filesListContainer, csrfToken, currentUserEmail);
+    })
+    .catch(error => {
+        console.error('Ошибка при удалении файла:', error);
+        alert('Не удалось удалить файл');
+    });
+}
+
+

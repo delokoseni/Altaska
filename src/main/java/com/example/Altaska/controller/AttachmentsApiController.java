@@ -6,9 +6,12 @@ import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.AttachmentsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +20,7 @@ import java.security.Principal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/files")
@@ -45,7 +49,8 @@ public class AttachmentsApiController {
                         file.getId(),
                         file.getFileName(),
                         file.getFileType(),
-                        file.getUploadedAt().toString()
+                        file.getUploadedAt().toString(),
+                        file.getIdUser().getEmail()
                 ))
                 .toList());
     }
@@ -101,18 +106,48 @@ public class AttachmentsApiController {
                 .body(attachment.getUploadedFile());
     }
 
+    @DeleteMapping("/{fileId}")
+    public ResponseEntity<?> deleteFile(@PathVariable Long fileId, Authentication authentication) {
+        Optional<Attachments> optionalAttachment = attachmentsRepository.findById(fileId);
+        if (optionalAttachment.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Attachments file = optionalAttachment.get();
+
+        // Получаем ID текущего пользователя
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof CustomUserDetails userDetails)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не аутентифицирован.");
+        }
+
+        Long currentUserId = userDetails.GetUserId();
+
+        // Проверка: только тот, кто загрузил файл, может его удалить
+        if (!file.getIdUser().getId().equals(currentUserId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не можете удалить этот файл.");
+        }
+
+        attachmentsRepository.delete(file);
+        return ResponseEntity.ok("Файл удален.");
+    }
+
+
+
     // DTO для ответа на запрос о файлах
     public static class FileDto {
         private Long id;
         private String fileName;
         private String fileType;
         private String uploadedAt;
+        private String uploadedByEmail;
 
-        public FileDto(Long id, String fileName, String fileType, String uploadedAt) {
+        public FileDto(Long id, String fileName, String fileType, String uploadedAt, String uploadedByEmail) {
             this.id = id;
             this.fileName = fileName;
             this.fileType = fileType;
             this.uploadedAt = uploadedAt;
+            this.uploadedByEmail = uploadedByEmail;
         }
 
         // Геттеры
@@ -130,6 +165,10 @@ public class AttachmentsApiController {
 
         public String getUploadedAt() {
             return uploadedAt;
+        }
+
+        public  String getUploadedByEmail() {
+            return uploadedByEmail;
         }
     }
 }

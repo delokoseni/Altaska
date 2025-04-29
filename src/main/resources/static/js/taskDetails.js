@@ -230,10 +230,9 @@ function showTaskDetails(task) {
                     // Теперь можно передавать email в функцию, как ранее
                     initTaskCommentsSection(task.id, content, email);
                     initCommentInputSection(task.id, content, () => initTaskCommentsSection(task.id, content, email), csrfToken);
+                    initTaskFilesSection(task.id, content, csrfToken, email);
                 })
                 .catch(error => console.error('Error:', error));  // Обрабатываем возможные ошибки
-
-            initTaskFilesSection(task.id, content, csrfToken);
 
             // Вставляем кнопку "Удалить задачу"
             const deleteButton = document.createElement('button');
