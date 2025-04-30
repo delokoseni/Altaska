@@ -5,6 +5,7 @@ import { createSubtasksSection } from './subTasks.js';
 import { addPerformer } from './taskPerformers.js';
 
 window.selectProject = selectProject;
+window.loadView = loadView;
 
 function selectProject(projectId, projectName) {
     sessionStorage.setItem('currentProjectId', projectId);
@@ -108,6 +109,9 @@ function showTaskForm(projectId, container) {
             ]);
         })
         .then(([priorities, members]) => {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('task-form-wrapper');
+
             const form = document.createElement('form');
             form.className = 'task-form';
 
@@ -301,7 +305,8 @@ function showTaskForm(projectId, container) {
                 });
             };
 
-            container.appendChild(form);
+            wrapper.appendChild(form);
+            container.appendChild(wrapper);
         });
 }
 
@@ -568,7 +573,6 @@ function createTagSelector(projectId, selectedTags) {
     const addBtn = document.createElement('button');
     addBtn.type = 'button';
     addBtn.textContent = 'Добавить тег';
-    addBtn.style.width = '100%';
 
     const tagsList = document.createElement('div');
     tagsList.className = 'selected-tags';

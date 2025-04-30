@@ -1,0 +1,251 @@
+/* Стили для шапки */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+}
+
+/* Стили для названия */
+.site-title {
+    font-size: 24px;
+    color: var(--header-color); /* Цвет надписи */
+}
+
+/* Контейнер для меню */
+.menu-container {
+    display: flex;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-grow: 1; /* Позволяем контейнеру занимать оставшееся пространство */
+}
+
+.theme-icon-container {
+    display: flex;
+    align-items: center;
+    margin-right: 8px; /* Отступ между иконкой и меню */
+}
+
+.theme-toggle {
+    width: 32px; /* Размер иконки */
+    height: 32px; /* Размер иконки */
+    cursor: pointer; /* Указатель курсора */
+}
+
+/* Стили для меню */
+.menu {
+    display: flex;
+    background-color: var(--text-color); /* Цвет фона элемента меню */
+    border: 3px solid var(--button-color); /* Цвет границы элемента */
+    border-radius: 15px; /* Радиус закругления углов */
+    padding: 8px; /* Отступы внутри контейнера */
+}
+
+.language-container {
+    display: flex;
+    align-items: center;
+    margin-left: 8px; /* Отступ между иконкой и меню */
+}
+
+.language-toggle {
+    width: 32px; /* Размер иконки */
+    height: 32px; /* Размер иконки */
+    cursor: pointer; /* Указатель курсора */
+}
+
+/* Стили для кнопок в меню */
+.menu-button {
+    background-color: transparent; /* Прозрачный фон для кнопок */
+    color: var(--second-text-color); /* Цвет текста */
+    border: none; /* Убираем стандартную обводку */
+    border-radius: 8px; /* Радиус закругления углов */
+    padding: 16px; /* Отступы внутри кнопок */
+    margin: 0 8px; /* Отступ между кнопками */
+    cursor: pointer; /* Указатель курсора */
+    font-size: 16px; /* Размер шрифта кнопки */
+}
+
+/* Стили для кнопок */
+.login-button, .register-button {
+    padding: 24px 48px; /* Отступы по кнопкам */
+    border-radius: 15px; /* Радиус обводки */
+    cursor: pointer; /* Указатель курсора */
+    border: none; /* Убираем стандартную обводку */
+    font-size: 16px; /* Размер шрифта кнопок */
+    margin-left: 8px; /* Менять */
+}
+
+/* Стили для кнопки "Войти" */
+.login-button {
+    background-color: var(--background-color); /* Цвет фона кнопки "Войти" */
+    border: 3px solid var(--button-color); /* Обводка */
+    color: var(--text-color); /* Цвет текста */
+}
+
+/* Стили для кнопки "Зарегистрироваться" */
+.register-button {
+    background-color: var(--button-color); /* Цвет фона кнопки "Зарегистрироваться" */
+    color: var(--text-color); /* Цвет текста */
+    padding: 24px; /* Отступы */
+}
+
+main h1 {
+    font-size: 32px;
+    text-align: center;
+}
+
+.content-block {
+    background-color: var(--second-text-color); /* Цвет фона блока */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, [1)](1)); /* Увеличенная тень */
+    border-radius: 32px; /* Радиус углов */
+    padding: 16px 16px 16px; /* Верхний отступ уменьшен до 16px */
+    max-width: fit-content; /* Чтобы ширина подстраивалась под текст */
+    margin-left: 40px; /* Отступ слева */
+    margin-bottom: 16px; /* Межблочный отступ снизу */
+}
+
+.content-block p {
+    font-size: 16px;
+}
+
+.gallery-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-container {
+    width: 60vw; /* Ширина 60% страницы */
+    aspect-ratio: 16/9; /* Соотношение сторон 720:1280 */
+    border-radius: 32px; /* Радиус углов */
+    overflow: hidden;
+    background-color: #f0f0f0; /* Фоновый цвет */
+    margin-bottom: 20px;
+}
+
+.current-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Масштабирование изображения */
+}
+
+.prev-button, .next-button {
+    margin: 0 16px; /* Отступы между кнопками и контейнером */
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+.center-button {
+    display: flex;
+    flex-direction: column; /* Для вертикального выравнивания */
+    align-items: center; /* Центрирование по горизонтали */
+    margin-bottom: 40px;
+}
+
+.content-block ul {
+    font-size: 16px;
+}
+
+footer {
+    padding: 16px;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    font-weight: 700;
+    src: url('../fonts/Nunito-Bold.ttf') format('truetype');
+}
+
+/* Общие настройки */
+body {
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Светлая тема */
+:root {
+    --header-color: #5680E9; /* Цвет заголовков */
+    --background-color: #C1C8E4; /* Цвет фона */
+    --button-color: #8860D0; /* Цвет кнопок */
+    --text-color: #FFFFFF; /* Цвет текста */
+    --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --hover-button-color: #7449C6;
+}
+
+/* Темная тема */
+.dark-mode {
+    --header-color: #FFFFFF; /* Цвет заголовков в темной теме */
+    --background-color: #1F1F1F; /* Цвет фона в темной теме */
+    --button-color: #5A5A5A; /* Цвет кнопков в темной теме */
+    --text-color: #FFFFFF; /* Цвет текста в темной теме */
+    --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --hover-button-color: #7A7A7A;
+}
+
+/* Стили для заголовков */
+h1, h2, h3 {
+    color: var(--header-color);
+    font-weight: 700; /* Устанавливаем жирный шрифт для заголовков */
+}
+
+/* Стили для кнопок */
+a.menu-button,
+a.login-button,
+a.register-button {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none; /* чтобы убрать подчёркивание у ссылок */
+    display: inline-block; /* чтобы вести себя как кнопки */
+}
+
+a.menu-button:not(.prev-button):not(.next-button):hover,
+a.login-button:hover,
+a.register-button:hover {
+    transform: scale(1.05);
+    background-color: var(--hover-button-color);
+    border-color: var(--hover-button-color);
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid var(--main-color, #3498db);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
