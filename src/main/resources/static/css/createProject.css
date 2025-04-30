@@ -1,0 +1,74 @@
+#create-project-form {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 40px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#create-project-form label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+}
+
+#create-project-form input[type="text"],
+#create-project-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #000;
+}
+
+
+#create-project-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+#create-project-form button[type="submit"],
+#create-project-form button[type="button"] {
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    width: 100%;
+}
+
+#create-project-form button[type="submit"]:hover,
+#create-project-form button[type="button"]:hover {
+    background-color: var(--hover-button-color);
+    transform: scale(1.02);
+}
+
+#create-project-form .back-button {
+    align-self: flex-start;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    border: 2px solid var(--button-color);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 120px !important;
+    margin-bottom: 10px;
+}
+
+#create-project-form .back-button:hover {
+    background-color: var(--hover-button-color);
+}
