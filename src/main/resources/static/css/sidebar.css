@@ -193,30 +193,35 @@
     transition: background-color 0.3s ease;
     text-align: left; /* чтобы текст не был по центру */
 }
-/* Его надобность под вопросом */
-.project-button:hover {
-    background-color: var(--hover-button-color);
-}
-/* Его надобность под вопросом */
-.project-menu button {
-    font-family: 'Nunito', sans-serif;
-}
 
 .profile-button {
     position: absolute;
     top: 10px;
     right: 10px;
+    width: 40px;
+    height: 40px;
     background-color: var(--button-color);
     color: var(--text-color);
-    padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: 50%;
     text-decoration: none;
     font-family: 'Nunito', sans-serif;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.profile-button:hover {
+.profile-button img {
+    width: 25px;
+    height: 25px;
+}
+
+.profile-button:hover, .project-button:hover {
     background-color: var(--hover-button-color);
+}
+
+.project-menu button {
+    font-family: 'Nunito', sans-serif;
 }
 
 /* Стиль полосы прокрутки */

@@ -18,7 +18,10 @@
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/" class="profile-button">Мой профиль</a>
+        <a href="/profile" class="profile-button">
+            <img src="/icons/profile.svg" alt="Профиль">
+        </a>
+
         <div class="sidebar-header">
             <h2>Проекты</h2>
             <div class="add-button-container">
