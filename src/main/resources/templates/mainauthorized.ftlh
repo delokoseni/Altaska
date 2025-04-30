@@ -9,26 +9,16 @@
     <link rel="stylesheet" href="/css/taskdetailssidebar.css">
     <link rel="stylesheet" href="/css/comments.css">
     <script src="/js/themeToggle.js" defer></script>
+    <script src="/js/sidebar.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>
     <script type = "module" src="/js/projectSelection.js"></script>
     <script type = "module" src="/js/taskDetails.js"></script>
     <title>Главная</title>
 </head>
 <body>
-<header>
-    <div class="site-title">altaska</div>
-    <div class="menu-container">
-        <div class="theme-icon-container">
-            <img class="theme-toggle" src="/icons/sun.svg" alt="Сменить тему">
-        </div>
-    </div>
-    <div>
-        <a href="/" class="register-button">Мой профиль</a>
-    </div>
-</header>
-<main>
-    <div class="layout">
+<div class="layout">
     <aside class="sidebar">
+        <a href="/" class="profile-button">Мой профиль</a>
         <div class="sidebar-header">
             <h2>Проекты</h2>
             <div class="add-button-container">
@@ -50,13 +40,8 @@
             <div class="no-projects-message">Нет проектов</div>
         </#if>
     </aside>
-    <section class="main-content">
-    </section>
-    </div>
-</main>
-<footer>
-
-</footer>
+<section class="main-content"></section>
+</div>
 <script>
     const csrfParam = '${_csrf.parameterName}';
     const csrfToken = '${_csrf.token}';

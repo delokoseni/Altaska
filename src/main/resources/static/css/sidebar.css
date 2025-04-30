@@ -1,3 +1,9 @@
+.layout {
+    display: flex;
+    height: 100%;
+    align-items: stretch;
+}
+
 .sidebar {
     width: 20%;
     min-width: 200px;
@@ -7,7 +13,9 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 60px);
+    overflow-y: auto; /* Включаем прокрутку, если контента слишком много */
+    min-height: 100%;
+    overflow-x: hidden;
 }
 
 .main-content {
@@ -20,7 +28,6 @@
     align-items: flex-start;
     justify-content: flex-start;
 }
-
 
 .sidebar-header {
     display: flex;
@@ -113,11 +120,6 @@
     color: var(--second-text-color);
 }
 
-.layout {
-    display: flex;
-    height: 100%;
-}
-
 .project-menu {
     display: flex;
     gap: 10px;
@@ -191,11 +193,51 @@
     transition: background-color 0.3s ease;
     text-align: left; /* чтобы текст не был по центру */
 }
-
+/* Его надобность под вопросом */
 .project-button:hover {
     background-color: var(--hover-button-color);
 }
-
+/* Его надобность под вопросом */
 .project-menu button {
     font-family: 'Nunito', sans-serif;
+}
+
+.profile-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: 'Nunito', sans-serif;
+    z-index: 1000;
+}
+
+.profile-button:hover {
+    background-color: var(--hover-button-color);
+}
+
+/* Стиль полосы прокрутки */
+.sidebar::-webkit-scrollbar {
+    width: 8px; /* Ширина полосы прокрутки */
+}
+
+/* Стиль самой полосы прокрутки */
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--button-color); /* Цвет фона для ползунка */
+    border-radius: 10px; /* Радиус скругления ползунка */
+    border: 2px solid var(--background-color); /* Цвет обводки */
+}
+
+/* Стиль дорожки полосы прокрутки */
+.sidebar::-webkit-scrollbar-track {
+    background: var(--second-text-color); /* Цвет фона дорожки */
+    border-radius: 10px; /* Радиус скругления дорожки */
+}
+
+/* Стиль при наведении на ползунок */
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--hover-button-color); /* Цвет фона при наведении */
 }
