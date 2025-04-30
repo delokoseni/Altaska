@@ -52,7 +52,6 @@ function loadView(view, projectId) {
 
                 const addBtn = document.createElement('button');
                 addBtn.className = 'add-project-button';
-                addBtn.title = 'Добавить';
 
                 const plusText = document.createTextNode('+');
                 addBtn.appendChild(plusText);

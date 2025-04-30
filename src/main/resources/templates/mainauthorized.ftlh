@@ -25,7 +25,7 @@
         <div class="sidebar-header">
             <h2>Проекты</h2>
             <div class="add-button-container">
-                <button class="add-project-button" title="Добавить" id="show-create-form">
+                <button class="add-project-button" id="show-create-form">
                     +
                     <span class="add-label">Добавить</span>
                 </button>
