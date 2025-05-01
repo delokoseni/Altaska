@@ -197,3 +197,42 @@
 .project-info-view .roles-section li button:hover {
     color: var(--button-color);
 }
+
+.tag-item button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.tag-item .icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    filter: grayscale(100%); /* можно стилизовать под цвет темы */
+    transition: filter 0.2s;
+}
+
+.tag-item button:hover .icon {
+    filter: none;
+}
+
+.roles-section li button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.roles-section li .icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    filter: grayscale(100%);
+    transition: filter 0.2s;
+}
+
+.roles-section li button:hover .icon {
+    filter: none;
+}

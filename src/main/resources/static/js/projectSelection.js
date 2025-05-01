@@ -523,11 +523,13 @@ function createTagElement(tag, projectId) {
     tagName.textContent = tag.name;
 
     const editBtn = document.createElement('button');
-    editBtn.textContent = '✎';
+    editBtn.className = 'tag-edit-button';
+    editBtn.innerHTML = `<img src="/icons/pencil.svg" alt="Редактировать" class="icon">`;
     editBtn.onclick = () => editTag(tag.id, tag.name, projectId);
 
     const delBtn = document.createElement('button');
-    delBtn.textContent = '✖';
+    delBtn.className = 'tag-delete-button';
+    delBtn.innerHTML = `<img src="/icons/trash.svg" alt="Удалить" class="icon">`;
     delBtn.onclick = () => {
         fetch(`/api/tags/${tag.id}`, {
             method: 'DELETE',
@@ -705,19 +707,17 @@ function renderRolesSection(container, projectId) {
 
                     // Только для проектных ролей
                     if (role.idProject !== null) {
-                        // Кнопка "Редактировать"
                         const editButton = document.createElement('button');
-                        editButton.textContent = '✏️';
-                        editButton.style.marginLeft = '10px';
+                        editButton.className = 'role-edit-button';
+                        editButton.innerHTML = `<img src="/icons/pencil.svg" alt="Редактировать" class="icon">`;
                         editButton.onclick = () => {
                             renderEditRoleView(container, projectId, role, rolesSection);
                         };
                         li.appendChild(editButton);
 
-                        // Кнопка "Удалить"
                         const deleteButton = document.createElement('button');
-                        deleteButton.textContent = '🗑️';
-                        deleteButton.style.marginLeft = '5px';
+                        deleteButton.className = 'role-delete-button';
+                        deleteButton.innerHTML = `<img src="/icons/trash.svg" alt="Удалить" class="icon">`;
                         deleteButton.onclick = () => {
                             deleteRole(role.id, projectId, rolesSection);
                         };
