@@ -145,8 +145,8 @@
 }
 
 .task-details-sidebar .take-task-button {
-    background-color: #9be2ae;
-    color: #000;
+    background-color: var(--button-color);
+    color: white;
 }
 
 .task-details-sidebar .delete-task-button {
@@ -469,3 +469,105 @@
     text-align: center;
 }
 
+/* Изолированный контейнер для файлов */
+.task-details-sidebar .task-files-section {
+    padding: 10px;
+    background-color: var(--background-color, #f9f9f9);
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    font-family: inherit;
+    overflow: hidden; /* Чтобы элементы не выходили за пределы */
+}
+
+/* Заголовок секции */
+.task-details-sidebar .task-files-section .files-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: var(--header-color, #5680E9); /* Цвет заголовка */
+}
+
+/* Список файлов */
+.task-details-sidebar .task-files-section .files-list {
+    margin-bottom: 15px;
+    max-height: 250px; /* Ограничение по высоте */
+    overflow-y: auto; /* Скроллинг для списка файлов */
+}
+
+/* Один файл */
+.task-details-sidebar .task-files-section .file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    background-color: var(--light-background, #ffffff);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95em;
+    gap: 10px;
+}
+
+.task-details-sidebar .task-files-section .file-item {
+    color: #000;
+}
+
+/* Контейнер кнопок загрузки */
+.task-details-sidebar .task-files-section .upload-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%; /* Убедимся, что контейнер занимает всю доступную ширину */
+    box-sizing: border-box; /* Чтобы padding и border не выходили за пределы */
+}
+
+/* Инпут выбора файла */
+.task-details-sidebar .task-files-section input[type="file"] {
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 6px;
+    background-color: #fff;
+    font-size: 0.95em;
+    width: 100%; /* Убедимся, что инпут не выходит за пределы */
+    box-sizing: border-box; /* Чтобы padding и border не выходили за пределы */
+}
+
+/* Стиль для иконки удаления */
+.task-details-sidebar .task-files-section .file-item .delete-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer; /* Указатель на курсор при наведении */
+    margin-left: 10px; /* Отступ от других элементов */
+    transition: transform 0.3s ease; /* Плавное увеличение при наведении */
+}
+
+.task-details-sidebar .task-files-section .file-item .delete-icon:hover {
+    transform: scale(1.2); /* Увеличение иконки при наведении */
+}
+
+/* Стиль для иконки скачивания */
+.task-details-sidebar .task-files-section .file-item .download-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer; /* Указатель на курсор при наведении */
+    transition: transform 0.3s ease; /* Плавное увеличение при наведении */
+}
+
+.task-details-sidebar .task-files-section .file-item .download-icon:hover {
+    transform: scale(1.2); /* Увеличение иконки при наведении */
+}
+
+.task-details-sidebar .task-files-section .upload-controls button {
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: auto; /* Убираем ограничение на ширину кнопки */
+    background-color: var(--button-color);
+    box-sizing: border-box; /* Чтобы padding и border не выходили за пределы */
+}
+
+/* Наведение */
+.task-details-sidebar .task-files-section button:hover {
+    background-color: var(--hover-button-color);
+}

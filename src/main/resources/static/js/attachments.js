@@ -26,6 +26,7 @@ export function initTaskFilesSection(taskId, container, csrfToken, currentUserEm
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.id = 'fileInput';
+        fileInput.style.color = 'black';
         uploadControls.appendChild(fileInput);
 
         const uploadButton = document.createElement('button');
@@ -72,21 +73,29 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
                 fileItem.className = 'file-item';
                 fileItem.textContent = `${file.fileName} (${file.fileType}) `;
 
-                const downloadButton = document.createElement('button');
-                downloadButton.textContent = 'Скачать';
-                downloadButton.addEventListener('click', () => {
+                const downloadIcon = document.createElement('img');
+                downloadIcon.src = '/icons/download.svg';
+                downloadIcon.alt = 'Скачать';
+                downloadIcon.classList.add('download-icon');
+
+                downloadIcon.addEventListener('click', () => {
                     window.location.href = `/api/files/download/${file.id}`;
                 });
-                fileItem.appendChild(downloadButton);
+
+                fileItem.appendChild(downloadIcon);
+
 
                 if (file.uploadedByEmail === currentUserEmail) {
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Удалить';
-                    deleteButton.style.marginLeft = '10px';
-                    deleteButton.addEventListener('click', () => {
+                    const deleteIcon = document.createElement('img');
+                    deleteIcon.src = '/icons/trash.svg'; // Замените на путь к вашей SVG-иконке
+                    deleteIcon.alt = 'Удалить';
+                    deleteIcon.classList.add('delete-icon'); // Добавляем класс для стилизации
+
+                    deleteIcon.addEventListener('click', () => {
                         deleteFile(file.id, taskId, filesListContainer, csrfToken, currentUserEmail);
                     });
-                    fileItem.appendChild(deleteButton);
+
+                    fileItem.appendChild(deleteIcon);
                 }
 
                 filesListContainer.appendChild(fileItem);
