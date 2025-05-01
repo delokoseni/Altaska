@@ -145,17 +145,6 @@
 }
 
 .task-details-sidebar .take-task-button {
-    background-color: var(--button-color);
-    color: white;
-}
-
-.task-details-sidebar .delete-task-button {
-    background-color: #f5a9a9;
-    color: #000;
-}
-
-.task-details-sidebar .take-task-button,
-.task-details-sidebar .delete-task-button {
     margin-top: 20px;
     padding: 10px;
     width: 100%;
@@ -163,6 +152,9 @@
     cursor: pointer;
     border: none;
     border-radius: 5px;
+    background-color: var(--button-color);
+    color: white;
+    margin-bottom: 30px;
 }
 
 .task-details-sidebar .comment-submit-button {
