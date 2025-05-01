@@ -3,6 +3,7 @@ import { removeProjectMember } from './memberActions.js';
 import { deleteProject } from './projectActions.js';
 import { createSubtasksSection } from './subTasks.js';
 import { addPerformer } from './taskPerformers.js';
+import { deleteTask } from './deleteTask.js';
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -72,6 +73,23 @@ function loadView(view, projectId) {
                             <h3>${task.name}</h3>
                             <p>${task.idStatus.name} ${task.idPriority ? task.idPriority.name : ''}</p>
                         `;
+
+                        const deleteIcon = document.createElement('img');
+                        deleteIcon.src = '/icons/trash.svg';
+                        deleteIcon.alt = 'Удалить задачу';
+                        deleteIcon.className = 'delete-task-icon';
+                        deleteIcon.width = 24;
+                        deleteIcon.height = 24;
+
+                        deleteIcon.onclick = (e) => {
+                            e.stopPropagation();
+                            if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                                deleteTask(task.id, csrfToken);
+                            }
+                        };
+
+                        taskDiv.appendChild(deleteIcon);
+
                         taskDiv.addEventListener('click', () => {
                             showTaskDetails(task);
                         });
