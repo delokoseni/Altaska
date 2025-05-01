@@ -2,89 +2,470 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 35%;
-    height: 100vh;
-    background-color: var(--second-text-color);
-    color: white;
-    padding: 24px 20px;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    height: 100%;
+    background-color: var(--second-text-color, #f9f9f9);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     overflow-y: auto;
-    font-family: 'Nunito', sans-serif;
-    transform: translateX(100%);
-    transition: transform 0.3s ease-out;
+    padding: 20px;
+    transition: transform 0.3s ease-in-out;
+    color: var(--text-color);
 }
 
 .task-details-sidebar.slide-in {
-    transform: translateX(0%);
+    transform: translateX(0);
 }
 
-.task-details-content h2 {
-    margin-top: 0;
-    margin-bottom: 16px;
-}
-
-.close-button {
+.task-details-sidebar .close-button {
     position: absolute;
     top: 12px;
     right: 16px;
     font-size: 28px;
     background: none;
     border: none;
-    color: white;
+    color: var(--text-color);
     cursor: pointer;
     transition: transform 0.2s;
 }
 
-.close-button:hover {
+.task-details-sidebar .close-button:hover {
     transform: scale(1.2);
 }
 
-.task-details-content {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-right: 16px;
+.task-details-sidebar .task-details-content {
+    padding-top: 40px;
 }
 
-.editable-field {
+.task-details-sidebar h2,
+.task-details-sidebar h3 {
+    margin-top: 0;
+    color: var(--header-color);
+}
+
+.task-details-sidebar .field-label {
+    font-weight: bold;
+    margin-top: 15px;
+    display: block;
+}
+
+.task-details-sidebar .editable-field {
     width: 100%;
+    margin-top: 5px;
+    margin-bottom: 10px;
     padding: 8px;
-    font-size: 16px;
+    font-size: 14px;
+    box-sizing: border-box;
     border: 1px solid #ccc;
-    border-radius: 6px;
-    resize: none;
-    background-color: #fff;
+    border-radius: 4px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.task-details-sidebar textarea.editable-field {
+    resize: vertical;
+}
+
+.task-details-sidebar .edit-button {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: var(--button-color);
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-color);
+}
+
+.task-details-sidebar .edit-button:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-details-sidebar .task-performers-section,
+.task-details-sidebar .task-tags-section {
+    margin-top: 20px;
+}
+
+.task-details-sidebar .task-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.task-details-sidebar .task-tag-item {
+    background-color: var(--header-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+.task-details-sidebar .task-tag-item button {
+    background: none;
+    border: none;
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #fff;
+}
+
+.task-details-sidebar .add-task-tag {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.task-details-sidebar .add-task-tag select {
+    flex: 1;
+    padding: 5px;
+    font-size: 13px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.task-details-sidebar .add-task-tag button {
+    padding: 5px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+}
+
+.task-details-sidebar .add-task-tag button:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-details-sidebar .take-task-button {
+    background-color: #9be2ae;
     color: #000;
 }
 
-.editable-field:disabled {
-    background-color: #e0e0e0;
-    color: #555;
+.task-details-sidebar .delete-task-button {
+    background-color: #f5a9a9;
+    color: #000;
 }
 
-.field-label {
+.task-details-sidebar .take-task-button,
+.task-details-sidebar .delete-task-button {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.task-details-sidebar .comment-submit-button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.task-details-sidebar .comment-submit-button:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-details-sidebar .task-comments-section {
+    margin-top: 20px;
+    background-color: var(--second-text-color);
+    padding: 15px;
+    border-radius: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.task-details-sidebar .task-comments-section::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.task-details-sidebar .task-comments-section:hover::-webkit-scrollbar {
+    width: 8px;
+}
+
+.task-details-sidebar .task-comments-section:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.task-details-sidebar .task-comments-section:hover::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.task-details-sidebar .comments-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-details-sidebar .comment-block {
+    background-color: white;
+    padding: 10px;
+    border-left: 4px solid var(--button-color);
+    border-radius: 8px;
+    position: relative;
+}
+
+.task-details-sidebar .comment-author {
     font-weight: bold;
-    margin-top: 8px;
+    margin-bottom: 5px;
+    color: #333;
 }
 
-.field-value {
-    font-size: 16px;
-    padding: 6px 0;
+.task-details-sidebar .comment-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #333;
 }
 
-.edit-button {
-    align-self: flex-end;
-    margin-bottom: 12px;
+.task-details-sidebar .no-comments {
+    text-align: center;
+    color: gray;
+    font-style: italic;
+}
+
+.task-details-sidebar .comment-input-section {
+    margin-top: 20px;
+    background-color: var(--second-text-color);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-details-sidebar .comment-textarea {
+    width: 100%;
+    height: 80px;
+    resize: vertical;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.task-details-sidebar .comment-send-button {
+    width: 100%;
     background-color: var(--button-color);
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
     font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.edit-button:hover {
+.task-details-sidebar .comment-send-button:hover {
     background-color: var(--hover-button-color);
 }
+
+.task-details-sidebar .edit-comment-button,
+.task-details-sidebar .delete-comment-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-details-sidebar .edit-comment-button img,
+.task-details-sidebar .delete-comment-button img {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.task-details-sidebar .edit-comment-button:hover img,
+.task-details-sidebar .delete-comment-button:hover img {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+}
+
+.task-details-sidebar .performers-section h3 {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--main-text-color);
+}
+
+.task-details-sidebar .performers-section ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 12px;
+}
+
+.task-details-sidebar .performers-section ul li {
+    color: black;
+}
+
+.task-details-sidebar .performers-section li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f6f6f6;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.task-details-sidebar .performers-section li button {
+    background-color: var(--button-color);
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
+}
+
+.task-details-sidebar .performers-section select {
+    width: 100%;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+}
+
+.task-details-sidebar .performers-section button.assign-button {
+    width: 100%;
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    padding: 8px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+}
+
+.task-details-sidebar .performers-section p {
+    font-style: italic;
+    color: var(--second-text-color);
+}
+
+/* Стили для раздела с подзадачами внутри task-details-sidebar */
+.task-details-sidebar .subtasks-section {
+    padding: 15px;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.task-details-sidebar .subtasks-section h4 {
+    font-size: 1.25em;
+    margin: 20px 0 12px;
+    text-align: center;
+    color: var(--header-color);
+}
+
+.task-details-sidebar .task-subtasks-section button {
+    margin-top: 10px;
+    background-color: var(--button-color);
+    color: white;
+    padding: 8px 16px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.task-details-sidebar .task-subtasks-section button:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-details-sidebar .subtask-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.task-details-sidebar .subtask-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+    border: 1px solid var(--second-text-color);
+    border-radius: 10px;
+    padding: 12px;
+    background-color: #D7DBEE;
+}
+
+.task-details-sidebar .subtask-item input,
+.task-details-sidebar .subtask-item textarea {
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--second-text-color);
+    border-radius: 8px;
+    background-color: #EFF1FA;
+    color: #000;
+}
+
+.task-details-sidebar .subtask-item button {
+    width: 100%;
+    padding: 6px 12px;
+    margin-top: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.task-details-sidebar .subtask-item button:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-details-sidebar .subtasks-section button {
+    margin-top: 10px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 10px 18px;
+    font-size: 1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.task-details-sidebar .subtasks-section button:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-details-sidebar .subtasks-section p {
+    font-style: italic;
+    color: var(--second-text-color);
+    text-align: center;
+}
+

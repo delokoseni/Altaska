@@ -54,17 +54,18 @@ export function loadTaskComments(taskId, commentsList, currentUserEmail) {
                     // Кнопки "Редактировать" и "Удалить" для своего комментария
                     if (comment.authorName === currentUserEmail) {
                         const editButton = document.createElement('button');
-                        editButton.textContent = 'Редактировать';
                         editButton.className = 'edit-comment-button';
+                        editButton.innerHTML = '<img src="/icons/pencil.svg" alt="Редактировать" class="icon-svg">';
                         editButton.addEventListener('click', () => editComment(comment.id, comment.text, taskId, commentsList, currentUserEmail));
 
                         const deleteButton = document.createElement('button');
-                        deleteButton.textContent = 'Удалить';
                         deleteButton.className = 'delete-comment-button';
+                        deleteButton.innerHTML = '<img src="/icons/trash.svg" alt="Удалить" class="icon-svg">';
                         deleteButton.addEventListener('click', () => deleteComment(comment.id, commentsList, taskId, currentUserEmail));
 
                         commentBlock.appendChild(editButton);
                         commentBlock.appendChild(deleteButton);
+
                     }
 
                     commentsList.appendChild(commentBlock);

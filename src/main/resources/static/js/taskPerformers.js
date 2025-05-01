@@ -1,14 +1,19 @@
 export async function createPerformersSection(taskId, projectId, containerElement, csrfToken) {
     containerElement.innerHTML = "";
 
-    renderTitle(containerElement);
+    // Создаём обёртку
+    const wrapper = document.createElement("div");
+    wrapper.className = "performers-section";
+    containerElement.appendChild(wrapper);
+
+    renderTitle(wrapper);
 
     const performers = await fetchPerformers(taskId);
     const members = await fetchMembers(projectId);
 
-    renderPerformersList(performers, taskId, projectId, containerElement, csrfToken);
-    const select = renderMemberSelect(members, containerElement);
-    renderAddButton(select, taskId, projectId, containerElement, csrfToken);
+    renderPerformersList(performers, taskId, projectId, wrapper, csrfToken);
+    const select = renderMemberSelect(members, wrapper);
+    renderAddButton(select, taskId, projectId, wrapper, csrfToken);
 }
 
 // Заголовок
@@ -76,6 +81,7 @@ function renderMemberSelect(members, containerElement) {
 function renderAddButton(select, taskId, projectId, containerElement, csrfToken) {
     const addBtn = document.createElement("button");
     addBtn.textContent = "Назначить исполнителем";
+    addBtn.className = "assign-button";
     addBtn.onclick = async () => {
         const userId = select.value;
 
