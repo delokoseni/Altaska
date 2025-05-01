@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/createProject.css">
     <link rel="stylesheet" href="/css/sidebar.css">
     <link rel="stylesheet" href="/css/taskdetailssidebar.css">
+    <link rel="stylesheet" href="/css/loadProjectInfoView.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/sidebar.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>

@@ -1,0 +1,199 @@
+.project-info-view {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 40px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+.project-info-view label {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.project-info-view input[type="text"],
+.project-info-view textarea,
+.project-info-view select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px;
+    font-size: 1rem;
+    font-family: 'Nunito', sans-serif;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #000;
+    box-sizing: border-box;
+}
+
+.project-info-view textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.project-info-view button {
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 15px;
+    margin: 10px;
+    border-radius: 5px;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    width: fit-content;
+}
+
+.project-info-view button:hover {
+    background-color: var(--hover-button-color);
+    transform: scale(1.02);
+}
+
+.project-info-view .project-members-section,
+.project-info-view .roles-section,
+.project-info-view .tags-group {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.project-info-view .project-members-section ul,
+.project-info-view .roles-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.project-info-view .project-members-section li,
+.project-info-view .roles-section li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.project-info-view .add-member-form label {
+    margin-top: 10px;
+}
+
+.project-info-view .add-member-form input,
+.project-info-view .add-member-form select {
+    margin: 10px;
+}
+
+.project-info-view .tags-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-info-view .tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px;
+}
+
+.project-info-view .tag-list .tag {
+    background-color: #e2e2e2;
+    color: #000;
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #bbb;
+}
+
+.project-info-view .tag-list .tag button {
+    margin-left: 6px;
+    background-color: transparent;
+    color: red;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+
+.project-info-view .danger-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.project-info-view .danger-button:hover {
+    background-color: #c82333;
+}
+
+.project-info-view .tag-list .tag-item {
+    background-color: #f5f5f5; /* Новый фон */
+    color: #000;
+    padding: 8px 12px;
+    border-radius: 6px; /* Закругление */
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #aaa; /* Новый цвет границы */
+}
+
+.project-info-view .tag-list .tag-item span {
+    flex-grow: 1;
+}
+
+.project-info-view .tag-list .tag-item button {
+    margin-left: 10px;
+    background-color: transparent;
+    color: #888;
+    font-size: 16px; /* Увеличен размер */
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.project-info-view .tag-list .tag-item button:hover {
+    color: var(--button-color);
+}
+
+.project-info-view .roles-section ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px;
+}
+
+.project-info-view .roles-section li {
+    background-color: #f5f5f5;
+    color: #000;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #aaa;
+}
+
+.project-info-view .roles-section li span {
+    flex-grow: 1;
+}
+
+.project-info-view .roles-section li button {
+    margin-left: 10px;
+    background-color: transparent;
+    color: #888;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.project-info-view .roles-section li button:hover {
+    color: var(--button-color);
+}

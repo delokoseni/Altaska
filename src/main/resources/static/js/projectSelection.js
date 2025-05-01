@@ -330,6 +330,10 @@ function showTaskForm(projectId, container) {
 function loadProjectInfoView(projectId) {
     const viewContent = document.querySelector('.view-content');
     viewContent.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'project-info-view';
+    viewContent.appendChild(wrapper);
+
 
     fetch(`/api/projects/${projectId}`)
         .then(response => response.json())
@@ -339,7 +343,7 @@ function loadProjectInfoView(projectId) {
 
             // --- Название ---
             const nameGroup = document.createElement('div');
-            const nameLabel = document.createElement('label');
+            const nameLabel = document.createElement('h3');
             nameLabel.textContent = 'Название проекта:';
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
@@ -355,7 +359,7 @@ function loadProjectInfoView(projectId) {
 
             // --- Описание ---
             const descGroup = document.createElement('div');
-            const descLabel = document.createElement('label');
+            const descLabel = document.createElement('h3');
             descLabel.textContent = 'Описание проекта:';
             const descInput = document.createElement('textarea');
             descInput.value = project.description || '';
@@ -392,7 +396,7 @@ function loadProjectInfoView(projectId) {
 
             container.appendChild(nameGroup);
             container.appendChild(descGroup);
-            viewContent.appendChild(container);
+            wrapper.appendChild(container);
 
             // --- Теги ---
             renderTagsSection(container, projectId);
@@ -432,21 +436,18 @@ function loadProjectInfoView(projectId) {
             }).catch(err => {
                 console.error('Ошибка загрузки участников или ролей:', err);
             });
+            renderRolesSection(container, projectId);
             const archiveButton = createArchiveToggleButton(project, projectId);
             container.appendChild(archiveButton);
-            renderRolesSection(container, projectId);
-
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Удалить проект';
             deleteButton.style.backgroundColor = 'red';
             deleteButton.style.color = 'white';
             deleteButton.style.marginTop = '20px';
             deleteButton.onclick = () => {
-                deleteButton.onclick = () => {
-                    deleteProject(projectId, () => {
-                        window.location.reload();
-                    });
-                };
+                deleteProject(projectId, () => {
+                    window.location.reload();
+                });
             };
             container.appendChild(deleteButton);
         })
@@ -483,7 +484,7 @@ function renderTagsSection(container, projectId) {
     const tagsHeader = document.createElement('div');
     tagsHeader.className = 'tags-header';
 
-    const tagsTitle = document.createElement('span');
+    const tagsTitle = document.createElement('h3');
     tagsTitle.textContent = 'Список тэгов';
 
     const addTagButton = document.createElement('button');
@@ -1020,7 +1021,7 @@ function renderMemberItem(member, projectId, roles) {
 
     // Почта участника
     const emailSpan = document.createElement('span');
-    emailSpan.textContent = member.email + (member.confirmed ? ' — ' : ' (Приглашение отправлено) — ');
+    emailSpan.textContent = member.email + (member.confirmed ? ' ' : ' (Приглашение отправлено) ');
     emailSpan.style.color = member.confirmed ? '' : '#888';
     listItem.appendChild(emailSpan);
 
