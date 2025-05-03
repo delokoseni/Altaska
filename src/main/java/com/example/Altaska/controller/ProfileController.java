@@ -1,17 +1,58 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.models.Users;
+import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.security.CustomUserDetails;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import java.security.Principal;
+import java.util.Map;
 
 
 @Controller
 public class ProfileController {
 
-    @GetMapping("/profile")
-    public String ShowProfile(Model model, Principal principal) {
+    @Autowired
+    private UsersRepository usersRepository;
 
+    @GetMapping("/profile")
+    public String getProfile(Model model, Principal principal) {
+        if (principal instanceof UsernamePasswordAuthenticationToken auth) {
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            model.addAttribute("user", userDetails);
+        }
         return "profile";
     }
+
+    @PostMapping("/profile/change-email")
+    public ResponseEntity<?> changeEmail(@RequestBody Map<String, String> requestBody, Principal principal) {
+        // Извлекаем новый email из тела запроса
+        String newEmail = requestBody.get("newEmail");
+
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не авторизован");
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
+        Long userId = userDetails.GetUserId();
+
+        Users user = usersRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователь не найден");
+        }
+
+        user.setEmail(newEmail);
+        usersRepository.save(user);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

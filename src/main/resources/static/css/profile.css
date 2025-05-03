@@ -1,0 +1,95 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Nunito', sans-serif;
+    padding: 20px;
+}
+
+.profile-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--header-color);
+    margin-bottom: 10px;
+}
+
+.profile-email {
+    font-size: 18px;
+    color: var(--second-text-color);
+    margin-bottom: 30px;
+}
+
+.profile-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.profile-button {
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.profile-button:hover {
+    background-color: var(--hover-button-color);
+    transform: scale(1.03);
+}
+
+.logout-button {
+    font-family: 'Nunito', sans-serif;
+    background-color: #e74c3c;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+    transform: scale(1.03);
+}
+
+.back-button-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.back-button {
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    display: inline-block;
+}
+
+.back-button:hover {
+    background-color: var(--hover-button-color);
+    transform: scale(1.03);
+}
