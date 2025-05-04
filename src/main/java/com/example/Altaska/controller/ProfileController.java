@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 
@@ -111,6 +114,8 @@ public class ProfileController {
 
         if (user.getEmailChangeStatus() == null) {
             user.setEmailChangeStatus(false);
+            user.setOldEmailChangeToken(null);
+            user.setOldEmailChangeTokenExpiresAt(null);
         } else if (!user.getEmailChangeStatus()) {
             completeEmailChange(user);
         }
@@ -134,6 +139,8 @@ public class ProfileController {
 
         if (user.getEmailChangeStatus() == null) {
             user.setEmailChangeStatus(false);
+            user.setNewEmailChangeToken(null);
+            user.setNewEmailChangeTokenExpiresAt(null);
         } else if (!user.getEmailChangeStatus()) {
             completeEmailChange(user);
         }
@@ -145,13 +152,28 @@ public class ProfileController {
         return "confirmInvite";
     }
 
+    @Autowired
+    private SessionRegistry sessionRegistry;
+
+    private void expireUserSessions(String email) {
+        List<Object> principals = sessionRegistry.getAllPrincipals();
+
+        for (Object principal : principals) {
+            if (principal instanceof CustomUserDetails userDetails) {
+                if (userDetails.getUsername().equals(email)) {
+                    for (SessionInformation session : sessionRegistry.getAllSessions(principal, false)) {
+                        session.expireNow();
+                    }
+                }
+            }
+        }
+    }
+
+
     private void completeEmailChange(Users user) {
+        expireUserSessions(user.getEmail());
         user.setEmail(user.getNewEmail());
         user.setNewEmail(null);
-        user.setOldEmailChangeToken(null);
-        user.setOldEmailChangeTokenExpiresAt(null);
-        user.setNewEmailChangeToken(null);
-        user.setNewEmailChangeTokenExpiresAt(null);
         user.setEmailChangeStatus(null);
     }
 

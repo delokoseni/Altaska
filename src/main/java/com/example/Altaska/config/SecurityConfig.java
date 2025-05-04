@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,13 +22,42 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+
     public SecurityConfig() {
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((authorize) -> ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)authorize.requestMatchers(new String[]{"/", "/login", "/registration", "/confirm", "/error", "/confirm-invite", "/confirm-old", "/confirm-new", "/css/**", "/js/**", "/icons/**", "/images/**", "/fonts/**",})).permitAll().anyRequest()).authenticated()).formLogin((form) -> ((FormLoginConfigurer)form.loginPage("/login").defaultSuccessUrl("/mainauthorized")).permitAll()).logout((logout) -> logout.logoutUrl("/logout").clearAuthentication(true).invalidateHttpSession(true).deleteCookies(new String[]{"JSESSIONID"}).logoutSuccessUrl("/login"));
-        return (SecurityFilterChain)http.build();
+        http
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/", "/login", "/registration", "/confirm", "/error", "/confirm-invite",
+                                "/confirm-old", "/confirm-new", "/css/**", "/js/**", "/icons/**", "/images/**", "/fonts/**")
+                        .permitAll()
+                        .anyRequest().authenticated()
+                )
+                .formLogin((form) -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/mainauthorized")
+                        .permitAll()
+                )
+                .logout((logout) -> logout
+                        .logoutUrl("/logout")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessUrl("/login")
+                )
+                .sessionManagement((session) -> session
+                        .maximumSessions(10)
+                        .sessionRegistry(sessionRegistry())
+                );
+
+        return http.build();
     }
 
     @Bean
