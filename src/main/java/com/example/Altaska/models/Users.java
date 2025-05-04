@@ -51,7 +51,7 @@ public class Users {
     private LocalDate newEmailChangeTokenExpiresAt;     //В БД тип данных Timestamp with time zone
 
     @Column(name = "email_change_status")
-    private boolean emailChangeStatus;
+    private Boolean emailChangeStatus;
 
     public Long getId() {
         return id;
