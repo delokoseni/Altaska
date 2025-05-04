@@ -88,7 +88,6 @@ public class ProfileController {
 
         usersRepository.save(user);
 
-        // Отправка писем
         String confirmOldUrl = "http://localhost:8080/confirm-old?token=" + oldToken;
         String confirmNewUrl = "http://localhost:8080/confirm-new?token=" + newToken;
 
@@ -101,55 +100,49 @@ public class ProfileController {
     }
 
     @GetMapping("/confirm-old")
-    public ResponseEntity<Map<String, String>> confirmOldEmail(@RequestParam("token") String token) {
+    public String confirmOldEmail(@RequestParam("token") String token, Model model) {
         Users user = usersRepository.findByOldEmailChangeToken(token).orElse(null);
-
         if (user == null || user.getOldEmailChangeTokenExpiresAt().isBefore(LocalDateTime.now())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("error", "Ссылка недействительна или устарела."));
+            model.addAttribute("statusTitle", "Ошибка");
+            model.addAttribute("statusMessage", "Ссылка недействительна или устарела.");
+            model.addAttribute("goToLogin", true);
+            return "confirmInvite";
         }
 
         if (user.getEmailChangeStatus() == null) {
             user.setEmailChangeStatus(false);
         } else if (!user.getEmailChangeStatus()) {
-            try {
-                completeEmailChange(user);
-            } catch (DataIntegrityViolationException e) {
-                return ResponseEntity
-                        .status(HttpStatus.CONFLICT)
-                        .body(Map.of("error", "Такой email уже существует."));
-            }
+            completeEmailChange(user);
         }
 
         usersRepository.save(user);
-        return ResponseEntity.ok(Map.of("message", "Старый email подтверждён."));
+        model.addAttribute("statusTitle", "Email подтверждён");
+        model.addAttribute("statusMessage", "Старый email успешно подтверждён.");
+        model.addAttribute("goToLogin", true);
+        return "confirmInvite";
     }
 
     @GetMapping("/confirm-new")
-    public ResponseEntity<Map<String, String>> confirmNewEmail(@RequestParam("token") String token) {
+    public String confirmNewEmail(@RequestParam("token") String token, Model model) {
         Users user = usersRepository.findByNewEmailChangeToken(token).orElse(null);
-
         if (user == null || user.getNewEmailChangeTokenExpiresAt().isBefore(LocalDateTime.now())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("error", "Ссылка недействительна или устарела."));
+            model.addAttribute("statusTitle", "Ошибка");
+            model.addAttribute("statusMessage", "Ссылка недействительна или устарела.");
+            model.addAttribute("goToLogin", true);
+            return "confirmInvite";
         }
 
         if (user.getEmailChangeStatus() == null) {
             user.setEmailChangeStatus(false);
         } else if (!user.getEmailChangeStatus()) {
-            try {
-                completeEmailChange(user);
-            } catch (DataIntegrityViolationException e) {
-                return ResponseEntity
-                        .status(HttpStatus.CONFLICT)
-                        .body(Map.of("error", "Такой email уже существует."));
-            }
+            completeEmailChange(user);
         }
 
         usersRepository.save(user);
-        return ResponseEntity.ok(Map.of("message", "Новый email подтверждён."));
+        model.addAttribute("statusTitle", "Email подтверждён");
+        model.addAttribute("statusMessage", "Новый email успешно подтверждён.");
+        model.addAttribute("goToLogin", true);
+        return "confirmInvite";
     }
 
     private void completeEmailChange(Users user) {
