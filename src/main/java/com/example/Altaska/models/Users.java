@@ -53,6 +53,9 @@ public class Users {
     @Column(name = "email_change_status")
     private Boolean emailChangeStatus;
 
+    @Column(name = "new_password")
+    private String newPassword;
+
     public Long getId() { return id; }
 
     public String getEmail() {
@@ -71,12 +74,20 @@ public class Users {
 
     public String getConfirmationToken() { return confirmationToken; }
 
+    public String getNewPassword() {
+        return newPassword;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 
     public void setUserType(UserType userType) {

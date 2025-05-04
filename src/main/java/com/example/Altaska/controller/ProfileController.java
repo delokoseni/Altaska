@@ -26,6 +26,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Controller
@@ -181,18 +182,11 @@ public class ProfileController {
 
     @PostMapping("/profile/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> requestBody, Principal principal) {
-        System.out.println("Запрос на смену пароля получен");
-
         String oldPassword = requestBody.get("oldPassword");
         String newPassword = requestBody.get("newPassword");
         String repeatPassword = requestBody.get("repeatPassword");
 
-        System.out.println("oldPassword: " + oldPassword);
-        System.out.println("newPassword: " + newPassword);
-        System.out.println("repeatPassword: " + repeatPassword);
-
         if (principal == null) {
-            System.out.println("Пользователь не авторизован");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не авторизован");
         }
 
@@ -200,44 +194,66 @@ public class ProfileController {
         Long userId = userDetails.GetUserId();
         Users user = usersRepository.findById(userId).orElse(null);
         if (user == null) {
-            System.out.println("Пользователь не найден в базе");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователь не найден");
         }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if (!encoder.matches(oldPassword, user.getPassword())) {
-            System.out.println("Старый пароль не совпадает");
             return ResponseEntity.badRequest().body("Неверный старый пароль");
         }
 
-        if (newPassword == null || repeatPassword == null) {
-            System.out.println("Один из новых паролей null");
-            return ResponseEntity.badRequest().body("Новые пароли не могут быть пустыми");
-        }
-
-        if (!newPassword.equals(repeatPassword)) {
-            System.out.println("Новые пароли не совпадают");
-            return ResponseEntity.badRequest().body("Новые пароли не совпадают");
+        if (newPassword == null || repeatPassword == null || !newPassword.equals(repeatPassword)) {
+            return ResponseEntity.badRequest().body("Новые пароли не совпадают или пустые");
         }
 
         if (encoder.matches(newPassword, user.getPassword())) {
-            System.out.println("Новый пароль совпадает со старым");
             return ResponseEntity.badRequest().body("Новый пароль совпадает со старым");
         }
 
         String validationError = PasswordValidator.validatePassword(newPassword);
         if (validationError != null) {
-            System.out.println("Ошибка валидации нового пароля: " + validationError);
             return ResponseEntity.badRequest().body(validationError);
         }
 
-        user.setPassword(encoder.encode(newPassword));
+        // Сохраняем закодированный новый пароль временно
+        String encodedNewPassword = encoder.encode(newPassword);
+        String confirmToken = UUID.randomUUID().toString();
+        LocalDateTime expiresAt = LocalDateTime.now().plusHours(1);
+
+        user.setPasswordResetToken(confirmToken);
+        user.setPasswordResetTokenExpiresAt(expiresAt);
+        user.setNewPassword(encodedNewPassword); // временно используем confirmationToken для хранения
+
         usersRepository.save(user);
 
-        System.out.println("Пароль успешно изменён");
-        return ResponseEntity.ok("Пароль успешно изменён");
+        String confirmUrl = "http://localhost:8080/confirm-password-change?token=" + confirmToken;
+        emailService.sendEmail(user.getEmail(), "Подтверждение смены пароля",
+                "Для завершения смены пароля перейдите по ссылке: " + confirmUrl);
+
+        return ResponseEntity.ok("Письмо с подтверждением отправлено на почту");
     }
 
+    @GetMapping("/confirm-password-change")
+    public String confirmPasswordChange(@RequestParam("token") String token, Model model) {
+        Users user = usersRepository.findByPasswordResetToken(token).orElse(null);
+        if (user == null || user.getPasswordResetTokenExpiresAt().isBefore(LocalDateTime.now())) {
+            model.addAttribute("statusTitle", "Ошибка");
+            model.addAttribute("statusMessage", "Ссылка для подтверждения недействительна или устарела.");
+            model.addAttribute("goToLogin", true);
+            return "confirmInvite";
+        }
+        user.setPassword(user.getNewPassword());
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiresAt(null);
+        user.setNewPassword(null);
+
+        usersRepository.save(user);
+
+        model.addAttribute("statusTitle", "Пароль обновлён");
+        model.addAttribute("statusMessage", "Пароль успешно изменён. Теперь вы можете войти с новым паролем.");
+        model.addAttribute("goToLogin", true);
+        return "confirmInvite";
+    }
 
 }

@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             hideLoader();
             saveButton.disabled = false;
             if (response.ok) {
-                alert("Пароль успешно изменён");
+                alert("Вам на почту было отправлено письмо со ссылкой для завершения смены пароля.");
                 location.reload();
             } else {
                 return response.text().then(text => {

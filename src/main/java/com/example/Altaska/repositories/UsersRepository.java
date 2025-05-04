@@ -13,4 +13,7 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByOldEmailChangeToken(String token);
 
     Optional<Users> findByNewEmailChangeToken(String token);
+
+    Optional<Users> findByPasswordResetToken(String token);
+
 }
