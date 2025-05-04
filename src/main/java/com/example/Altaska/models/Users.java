@@ -2,7 +2,7 @@ package com.example.Altaska.models;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -33,13 +33,13 @@ public class Users {
     private String passwordResetToken;
 
     @Column(name = "password_reset_token_expires_at")
-    private LocalDate passwordResetTokenExpiresAt;      //В БД тип данных Timestamp with time zone
+    private LocalDateTime passwordResetTokenExpiresAt;      //В БД тип данных Timestamp with time zone
 
     @Column(name = "old_email_change_token")
     private String oldEmailChangeToken;
 
     @Column(name = "old_email_change_token_expires_at")
-    private LocalDate oldEmailChangeTokenExpiresAt;     //В БД тип данных Timestamp with time zone
+    private LocalDateTime oldEmailChangeTokenExpiresAt;     //В БД тип данных Timestamp with time zone
 
     @Column(name = "new_email")
     private String newEmail;
@@ -48,14 +48,12 @@ public class Users {
     private String newEmailChangeToken;
 
     @Column(name = "new_email_change_token_expires_at")
-    private LocalDate newEmailChangeTokenExpiresAt;     //В БД тип данных Timestamp with time zone
+    private LocalDateTime newEmailChangeTokenExpiresAt;     //В БД тип данных Timestamp with time zone
 
     @Column(name = "email_change_status")
     private Boolean emailChangeStatus;
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
     public String getEmail() {
         return email;
@@ -65,9 +63,13 @@ public class Users {
         return password;
     }
 
+    public boolean getConfirmed() { return confirmed; }
+
     public UserType getUserType() {
         return userType;
     }
+
+    public String getConfirmationToken() { return confirmationToken; }
 
     public void setEmail(String email) {
         this.email = email;
@@ -80,4 +82,41 @@ public class Users {
     public void setUserType(UserType userType) {
         this.userType = userType;
     }
+
+    public void setConfirmed(boolean confirmed) { this.confirmed = confirmed; }
+
+    public void setConfirmationToken(String confirmationToken) { this.confirmationToken = confirmationToken; }
+
+    public String getPasswordResetToken() { return passwordResetToken; }
+
+    public void setPasswordResetToken(String passwordResetToken) { this.passwordResetToken = passwordResetToken; }
+
+    public LocalDateTime getPasswordResetTokenExpiresAt() { return passwordResetTokenExpiresAt; }
+
+    public void setPasswordResetTokenExpiresAt(LocalDateTime passwordResetTokenExpiresAt) { this.passwordResetTokenExpiresAt = passwordResetTokenExpiresAt; }
+
+    public String getOldEmailChangeToken() { return oldEmailChangeToken; }
+
+    public void setOldEmailChangeToken(String oldEmailChangeToken) { this.oldEmailChangeToken = oldEmailChangeToken; }
+
+    public LocalDateTime getOldEmailChangeTokenExpiresAt() { return oldEmailChangeTokenExpiresAt; }
+
+    public void setOldEmailChangeTokenExpiresAt(LocalDateTime oldEmailChangeTokenExpiresAt) { this.oldEmailChangeTokenExpiresAt = oldEmailChangeTokenExpiresAt; }
+
+    public String getNewEmail() { return newEmail; }
+
+    public void setNewEmail(String newEmail) { this.newEmail = newEmail; }
+
+    public String getNewEmailChangeToken() { return newEmailChangeToken; }
+
+    public void setNewEmailChangeToken(String newEmailChangeToken) { this.newEmailChangeToken = newEmailChangeToken; }
+
+    public LocalDateTime getNewEmailChangeTokenExpiresAt() { return newEmailChangeTokenExpiresAt; }
+
+    public void setNewEmailChangeTokenExpiresAt(LocalDateTime newEmailChangeTokenExpiresAt) { this.newEmailChangeTokenExpiresAt = newEmailChangeTokenExpiresAt; }
+
+    public Boolean getEmailChangeStatus() { return emailChangeStatus; }
+
+    public void setEmailChangeStatus(Boolean emailChangeStatus) { this.emailChangeStatus = emailChangeStatus; }
+
 }

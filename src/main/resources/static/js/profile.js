@@ -1,3 +1,5 @@
+import { showLoader, hideLoader } from './loader.js';
+
 document.addEventListener("DOMContentLoaded", () => {
     const changeEmailBtn = document.querySelector('a[href="/profile/change-email"]');
     const profileContainer = document.querySelector(".profile-container");
@@ -38,7 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
 
         const newEmail = document.querySelector('input[name="newEmail"]').value; // Получаем значение нового email
-
+        const saveButton = this.querySelector('button[type="submit"]');
+        saveButton.disabled = true;
+        showLoader();
         // Отправляем запрос с новым email
         fetch("/profile/change-email", {
             method: "POST",
@@ -49,8 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify({ newEmail })    // Отправляем новый email в теле запроса
         })
         .then(response => {
+            hideLoader();
+            saveButton.disabled = false;
             if (response.ok) {
-                alert("Email успешно обновлён");
+                alert("На оба адреса электронной почты были отправлены ссылки для подтверждения.");
                 location.reload(); // Перезагружаем страницу, чтобы отобразить новый email
             } else {
                 return response.text().then(text => {
@@ -59,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(error => {
+            saveButton.disabled = false;
             alert(error.message); // Показываем ошибку, если запрос не удался
         });
     });

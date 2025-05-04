@@ -6,7 +6,7 @@
         <meta name="csrf-token" content="${_csrf.token}">
         <link rel="stylesheet" href="/css/style.css">
         <link rel="stylesheet" href="/css/profile.css">
-        <script src="/js/profile.js"></script>
+        <script type="module" src="/js/profile.js"></script>
         <title>Профиль</title>
     </head>
     <body>

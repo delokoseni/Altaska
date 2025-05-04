@@ -3,8 +3,10 @@ package com.example.Altaska.controller;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.security.CustomUserDetails;
+import com.example.Altaska.services.EmailService;
 import com.example.Altaska.validators.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,7 +16,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 
@@ -23,6 +28,9 @@ public class ProfileController {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/profile")
     public String getProfile(Model model, Principal principal) {
@@ -36,31 +44,122 @@ public class ProfileController {
     @PostMapping("/profile/change-email")
     public ResponseEntity<?> changeEmail(@RequestBody Map<String, String> requestBody, Principal principal) {
         String newEmail = requestBody.get("newEmail");
+
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не авторизован");
         }
+
         CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
         Long userId = userDetails.GetUserId();
         Users user = usersRepository.findById(userId).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователь не найден");
         }
+
         if (newEmail == null || newEmail.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Email не может быть пустым");
         }
+
         newEmail = newEmail.trim();
+
         if (!EmailValidator.isValidLength(newEmail)) {
-            return ResponseEntity.badRequest().body("Email слишком длинный (максимум " + EmailValidator.getMaxEmailLength() + " символов)");
+            return ResponseEntity.badRequest().body("Email слишком длинный");
         }
+
         if (!EmailValidator.isValidFormat(newEmail)) {
             return ResponseEntity.badRequest().body("Неверный формат email");
         }
+
         if (newEmail.equalsIgnoreCase(user.getEmail())) {
             return ResponseEntity.badRequest().body("Новый email совпадает с текущим");
         }
-        user.setEmail(newEmail);
+
+        // Генерация токенов
+        String oldToken = java.util.UUID.randomUUID().toString();
+        String newToken = java.util.UUID.randomUUID().toString();
+        LocalDateTime expiresAt = LocalDateTime.now().plusHours(1);
+
+        user.setNewEmail(newEmail);
+        user.setOldEmailChangeToken(oldToken);
+        user.setOldEmailChangeTokenExpiresAt(expiresAt);
+        user.setNewEmailChangeToken(newToken);
+        user.setNewEmailChangeTokenExpiresAt(expiresAt);
+        user.setEmailChangeStatus(null);
+
         usersRepository.save(user);
-        return ResponseEntity.ok().build();
+
+        // Отправка писем
+        String confirmOldUrl = "http://localhost:8080/confirm-old?token=" + oldToken;
+        String confirmNewUrl = "http://localhost:8080/confirm-new?token=" + newToken;
+
+        emailService.sendEmail(user.getEmail(), "Подтверждение смены email (старый)",
+                "Перейдите по ссылке, чтобы подтвердить смену email: " + confirmOldUrl);
+        emailService.sendEmail(newEmail, "Подтверждение смены email (новый)",
+                "Перейдите по ссылке, чтобы подтвердить смену email: " + confirmNewUrl);
+
+        return ResponseEntity.ok("Письма отправлены на оба адреса");
+    }
+
+    @GetMapping("/confirm-old")
+    public ResponseEntity<Map<String, String>> confirmOldEmail(@RequestParam("token") String token) {
+        Users user = usersRepository.findByOldEmailChangeToken(token).orElse(null);
+
+        if (user == null || user.getOldEmailChangeTokenExpiresAt().isBefore(LocalDateTime.now())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "Ссылка недействительна или устарела."));
+        }
+
+        if (user.getEmailChangeStatus() == null) {
+            user.setEmailChangeStatus(false);
+        } else if (!user.getEmailChangeStatus()) {
+            try {
+                completeEmailChange(user);
+            } catch (DataIntegrityViolationException e) {
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(Map.of("error", "Такой email уже существует."));
+            }
+        }
+
+        usersRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Старый email подтверждён."));
+    }
+
+    @GetMapping("/confirm-new")
+    public ResponseEntity<Map<String, String>> confirmNewEmail(@RequestParam("token") String token) {
+        Users user = usersRepository.findByNewEmailChangeToken(token).orElse(null);
+
+        if (user == null || user.getNewEmailChangeTokenExpiresAt().isBefore(LocalDateTime.now())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "Ссылка недействительна или устарела."));
+        }
+
+        if (user.getEmailChangeStatus() == null) {
+            user.setEmailChangeStatus(false);
+        } else if (!user.getEmailChangeStatus()) {
+            try {
+                completeEmailChange(user);
+            } catch (DataIntegrityViolationException e) {
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(Map.of("error", "Такой email уже существует."));
+            }
+        }
+
+        usersRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Новый email подтверждён."));
+    }
+
+    private void completeEmailChange(Users user) {
+        user.setEmail(user.getNewEmail());
+        user.setNewEmail(null);
+        user.setOldEmailChangeToken(null);
+        user.setOldEmailChangeTokenExpiresAt(null);
+        user.setNewEmailChangeToken(null);
+        user.setNewEmailChangeTokenExpiresAt(null);
+        user.setEmailChangeStatus(null);
     }
 
 }
