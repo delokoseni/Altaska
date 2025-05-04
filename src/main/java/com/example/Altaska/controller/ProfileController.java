@@ -5,8 +5,10 @@ import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.security.CustomUserDetails;
 import com.example.Altaska.services.EmailService;
 import com.example.Altaska.validators.EmailValidator;
+import com.example.Altaska.validators.PasswordValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -176,5 +178,66 @@ public class ProfileController {
         user.setNewEmail(null);
         user.setEmailChangeStatus(null);
     }
+
+    @PostMapping("/profile/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> requestBody, Principal principal) {
+        System.out.println("Запрос на смену пароля получен");
+
+        String oldPassword = requestBody.get("oldPassword");
+        String newPassword = requestBody.get("newPassword");
+        String repeatPassword = requestBody.get("repeatPassword");
+
+        System.out.println("oldPassword: " + oldPassword);
+        System.out.println("newPassword: " + newPassword);
+        System.out.println("repeatPassword: " + repeatPassword);
+
+        if (principal == null) {
+            System.out.println("Пользователь не авторизован");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не авторизован");
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
+        Long userId = userDetails.GetUserId();
+        Users user = usersRepository.findById(userId).orElse(null);
+        if (user == null) {
+            System.out.println("Пользователь не найден в базе");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователь не найден");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        if (!encoder.matches(oldPassword, user.getPassword())) {
+            System.out.println("Старый пароль не совпадает");
+            return ResponseEntity.badRequest().body("Неверный старый пароль");
+        }
+
+        if (newPassword == null || repeatPassword == null) {
+            System.out.println("Один из новых паролей null");
+            return ResponseEntity.badRequest().body("Новые пароли не могут быть пустыми");
+        }
+
+        if (!newPassword.equals(repeatPassword)) {
+            System.out.println("Новые пароли не совпадают");
+            return ResponseEntity.badRequest().body("Новые пароли не совпадают");
+        }
+
+        if (encoder.matches(newPassword, user.getPassword())) {
+            System.out.println("Новый пароль совпадает со старым");
+            return ResponseEntity.badRequest().body("Новый пароль совпадает со старым");
+        }
+
+        String validationError = PasswordValidator.validatePassword(newPassword);
+        if (validationError != null) {
+            System.out.println("Ошибка валидации нового пароля: " + validationError);
+            return ResponseEntity.badRequest().body(validationError);
+        }
+
+        user.setPassword(encoder.encode(newPassword));
+        usersRepository.save(user);
+
+        System.out.println("Пароль успешно изменён");
+        return ResponseEntity.ok("Пароль успешно изменён");
+    }
+
 
 }
