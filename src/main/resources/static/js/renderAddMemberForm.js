@@ -1,6 +1,10 @@
 import { showLoader, hideLoader } from './loader.js';
 
 export function renderAddMemberForm(container, projectId, roles, previousContentBackup, loadProjectInfoView) {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
     if (!previousContentBackup) {
         previousContentBackup = container.innerHTML;
     }
@@ -14,6 +18,7 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
     const emailInput = document.createElement('input');
     emailInput.type = 'email';
     emailInput.required = true;
+    emailInput.classList.add('member-email-input');
 
     const roleLabel = document.createElement('label');
     roleLabel.textContent = 'Выберите роль:';
