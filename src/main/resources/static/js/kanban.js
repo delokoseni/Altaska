@@ -1,6 +1,6 @@
 // Функция для получения всех задач проекта
 function getAllTasksForProject(projectId) {
-    return fetch(`/api/tasks/project/${projectId}`)
+    return fetch(`/api/tasks/project/dto/${projectId}`)
         .then(response => response.json())
         .catch(error => console.error('Ошибка загрузки задач:', error));
 }
@@ -132,7 +132,7 @@ export function renderKanbanFiltersAndBoard(projectId) {
             };
 
             const filteredTasks = filterTasks(tasks, filters);
-            renderKanbanBoard(kanbanBoard, groupBySelect.value, filteredTasks /*, tags */);
+            renderKanbanBoard(kanbanBoard, groupBySelect.value, filteredTasks, statuses, priorities);
         }
 
         groupBySelect.addEventListener('change', updateBoard);
@@ -153,21 +153,28 @@ function filterTasks(tasks, filters) {
     });
 }
 
-// Группировка задач
-function groupTasksByFilter(tasks, groupBy) {
+function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
     const groups = {};
 
+    if (groupBy === 'status') {
+        statuses.forEach(status => {
+            groups[status.name] = [];
+        });
+    } else if (groupBy === 'priority') {
+        priorities.forEach(priority => {
+            groups[priority.name] = [];
+        });
+        groups['Без приоритета'] = [];
+    }
+
     tasks.forEach(task => {
-        let groupKey = 'Без значения';
+        let groupKey = '';
 
         if (groupBy === 'status') {
-            groupKey = task.status?.name || 'Без статуса';
+            groupKey = task.status;
         } else if (groupBy === 'priority') {
-            groupKey = task.priority?.name || 'Без приоритета';
+            groupKey = task.priority || 'Без приоритета';
         }
-        // else if (groupBy === 'tag') {
-        //     groupKey = (task.tags && task.tags.length > 0) ? task.tags[0].name : 'Без тега';
-        // }
 
         if (!groups[groupKey]) {
             groups[groupKey] = [];
@@ -179,9 +186,9 @@ function groupTasksByFilter(tasks, groupBy) {
 }
 
 // Отображение канбан-доски
-function renderKanbanBoard(container, groupBy, tasks /*, tags */) {
+function renderKanbanBoard(container, groupBy, tasks, statuses, priorities) {
     container.innerHTML = '';
-    const groupedTasks = groupTasksByFilter(tasks, groupBy);
+    const groupedTasks = groupTasksByFilter(tasks, groupBy, statuses, priorities);
 
     for (const group in groupedTasks) {
         const groupColumn = document.createElement('div');
@@ -201,3 +208,4 @@ function renderKanbanBoard(container, groupBy, tasks /*, tags */) {
         container.appendChild(groupColumn);
     }
 }
+

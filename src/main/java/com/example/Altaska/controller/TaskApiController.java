@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -283,11 +284,45 @@ public class TaskApiController {
     }
 
     // API эндпоинт для получения всех задач для проекта
-    @GetMapping("/api/tasks/project/{projectId}")
-    public List<Tasks> getAllTasksForProject(@PathVariable Long projectId) {
-        return tasksRepository.findByIdProject_Id(projectId);
+    @GetMapping("/project/dto/{projectId}")
+    public List<TaskDto> getAllTasksForProject(@PathVariable Long projectId) {
+        List<Tasks> tasks = tasksRepository.findByIdProject_Id(projectId);
+        return tasks.stream().map(TaskDto::new).collect(Collectors.toList());
     }
 
+
+    public class TaskDto {
+        private Long id;
+        private String name;
+        private String description;
+        private String status; // status.name
+        private String priority; // priority.name
+
+        public TaskDto(Tasks task) {
+            this.id = task.getId();
+            this.name = task.getName();
+            this.description = task.getDescription();
+
+            if (task.getIdStatus() != null && task.getIdStatus().getName() != null) {
+                this.status = task.getIdStatus().getName();
+            } else {
+                this.status = "Без статуса";
+            }
+
+            if (task.getIdPriority() != null && task.getIdPriority().getName() != null) {
+                this.priority = task.getIdPriority().getName();
+            } else {
+                this.priority = "Без приоритета";
+            }
+        }
+
+        // Геттеры
+        public Long getId() { return id; }
+        public String getName() { return name; }
+        public String getDescription() { return description; }
+        public String getStatus() { return status; }
+        public String getPriority() { return priority; }
+    }
 
 }
 
