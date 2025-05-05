@@ -10,6 +10,15 @@
     padding: 20px;
 }
 
+.change-email-form,
+.change-password-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
 .profile-title {
     font-size: 32px;
     font-weight: bold;
@@ -42,6 +51,7 @@
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.2s;
+    font-family: 'Nunito', sans-serif;
 }
 
 .profile-button:hover {
@@ -92,4 +102,49 @@
 .back-button:hover {
     background-color: var(--hover-button-color);
     transform: scale(1.03);
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="email"] {
+    font-family: 'Nunito', sans-serif;
+    padding: 12px;
+    border: 2px solid var(--button-color);
+    border-radius: 10px;
+    background-color: var(--text-color);
+    color: black;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Эффект при фокусе */
+form input:focus {
+    outline: none;
+    border-color: var(--hover-button-color);
+    box-shadow: 0 0 5px var(--hover-button-color);
+}
+
+/* Контейнер с паролями (глаз) */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Глазик */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* Иконка */
+.eye-icon {
+    width: 20px;
+    height: 20px;
 }
