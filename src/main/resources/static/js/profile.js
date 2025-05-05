@@ -78,14 +78,44 @@ document.addEventListener("DOMContentLoaded", () => {
     changePasswordFormWrapper.innerHTML = `
         <h2 class="profile-title">Сменить пароль</h2>
         <form id="changePasswordForm" class="profile-buttons">
-            <input type="password" name="oldPassword" placeholder="Старый пароль" required class="profile-input">
-            <input type="password" name="newPassword" placeholder="Новый пароль" required class="profile-input">
-            <input type="password" name="repeatNewPassword" placeholder="Повторите новый пароль" required class="profile-input">
+            <div class="password-container">
+                <input type="password" id="passwordOld" name="oldPassword" placeholder="Старый пароль" required class="profile-input">
+                <span class="toggle-password" title="Показать/Скрыть пароль">
+                    <img id="eye-icon-passwordOld" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
+                </span>
+            </div>
+            <div class="password-container">
+                <input type="password" id="passwordNew" name="newPassword" placeholder="Новый пароль" required class="profile-input">
+                <span class="toggle-password" title="Показать/Скрыть пароль">
+                    <img id="eye-icon-passwordNew" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
+                </span>
+            </div>
+            <div class="password-container">
+                <input type="password" id="passwordNewRepeat" name="repeatNewPassword" placeholder="Повторите новый пароль" required class="profile-input">
+                <span class="toggle-password" title="Показать/Скрыть пароль">
+                    <img id="eye-icon-passwordNewRepeat" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
+                </span>
+            </div>
             <button type="submit" class="profile-button">Сменить пароль</button>
             <button type="button" class="profile-button" id="cancelChangePassword">Отмена</button>
         </form>
     `;
     profileContainer.parentNode.insertBefore(changePasswordFormWrapper, changeEmailFormWrapper.nextSibling);
+
+    document.querySelectorAll('.toggle-password').forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const input = toggle.previousElementSibling;
+            const icon = toggle.querySelector('img');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.src = '/icons/EyeOpen.svg';
+            } else {
+                input.type = 'password';
+                icon.src = '/icons/EyeSlashed.svg';
+            }
+        });
+    });
 
     changePasswordBtn.addEventListener("click", (e) => {
         e.preventDefault();

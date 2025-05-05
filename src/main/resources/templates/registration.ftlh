@@ -35,7 +35,7 @@
             <input type="password" id="password" name="password" placeholder="Пароль" required>
             <span class="toggle-password" onclick="togglePasswordVisibility('password')" title="Показать/Скрыть пароль">
                     <img id="eye-icon-password" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
-                </span>
+            </span>
         </div>
         <label>Повторите пароль <span class="required" title="Поле обязательно для заполнения">*</span></label>
         <div class="password-container">
