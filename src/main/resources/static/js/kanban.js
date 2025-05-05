@@ -147,7 +147,8 @@ export function renderKanbanFiltersAndBoard(projectId) {
 function filterTasks(tasks, filters) {
     return tasks.filter(task => {
         if (filters.memberId) {
-            return task.performers?.some(p => p.userId === parseInt(filters.memberId));
+            return Array.isArray(task.performers) &&
+                   task.performers.some(p => String(p.userId) === filters.memberId);
         }
         return true;
     });
@@ -201,7 +202,11 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities) {
         groupedTasks[group].forEach(task => {
             const taskCard = document.createElement('div');
             taskCard.classList.add('kanban-task');
-            taskCard.textContent = task.name;
+
+            const taskTitle = document.createElement('div');
+            taskTitle.textContent = task.name;
+            taskCard.appendChild(taskTitle);
+
             groupColumn.appendChild(taskCard);
         });
 

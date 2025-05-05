@@ -16,10 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,6 +52,9 @@ public class TaskApiController {
 
     @Autowired
     private TaskCleanupService taskCleanupService;
+
+    @Autowired
+    private TaskPerformersRepository taskPerformersRepository;
 
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
@@ -287,9 +287,41 @@ public class TaskApiController {
     @GetMapping("/project/dto/{projectId}")
     public List<TaskDto> getAllTasksForProject(@PathVariable Long projectId) {
         List<Tasks> tasks = tasksRepository.findByIdProject_Id(projectId);
-        return tasks.stream().map(TaskDto::new).collect(Collectors.toList());
+
+        return tasks.stream().map(task -> {
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(task.getId());
+
+            System.out.println("Задача: " + task.getName() + " (ID: " + task.getId() + ")");
+            if (performers.isEmpty()) {
+                System.out.println("  Исполнителей нет");
+            } else {
+                for (TaskPerformers tp : performers) {
+                    System.out.println("  Исполнитель: " + tp.getIdUser().getEmail());
+                }
+            }
+
+            List<PerformerDto> performerDtos = performers.stream()
+                    .map(tp -> new PerformerDto(tp.getIdUser().getId(), tp.getIdUser().getEmail()))
+                    .collect(Collectors.toList());
+
+            return new TaskDto(task, performerDtos);
+        }).collect(Collectors.toList());
     }
 
+    public class PerformerDto {
+        private Long userId;
+        private String email;
+
+        public PerformerDto(Long userId, String email) {
+            this.userId = userId;
+            this.email = email;
+        }
+
+        public Long getUserId() { return userId; }
+        public String getEmail() { return email; }
+        public void setUserId(Long userId) { this.userId = userId; }
+        public void setEmail(String email) { this.email = email; }
+    }
 
     public class TaskDto {
         private Long id;
@@ -297,23 +329,15 @@ public class TaskApiController {
         private String description;
         private String status; // status.name
         private String priority; // priority.name
+        private List<PerformerDto> performers;
 
-        public TaskDto(Tasks task) {
+        public TaskDto(Tasks task, List<PerformerDto> performers) {
             this.id = task.getId();
             this.name = task.getName();
             this.description = task.getDescription();
-
-            if (task.getIdStatus() != null && task.getIdStatus().getName() != null) {
-                this.status = task.getIdStatus().getName();
-            } else {
-                this.status = "Без статуса";
-            }
-
-            if (task.getIdPriority() != null && task.getIdPriority().getName() != null) {
-                this.priority = task.getIdPriority().getName();
-            } else {
-                this.priority = "Без приоритета";
-            }
+            this.status = task.getIdStatus() != null ? task.getIdStatus().getName() : "Без статуса";
+            this.priority = task.getIdPriority() != null ? task.getIdPriority().getName() : "Без приоритета";
+            this.performers = performers;
         }
 
         // Геттеры
@@ -322,6 +346,10 @@ public class TaskApiController {
         public String getDescription() { return description; }
         public String getStatus() { return status; }
         public String getPriority() { return priority; }
+        public List<PerformerDto> getPerformers() {
+            return performers;
+        }
+
     }
 
 }
