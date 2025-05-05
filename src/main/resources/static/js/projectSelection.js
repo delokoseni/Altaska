@@ -4,6 +4,7 @@ import { deleteProject } from './projectActions.js';
 import { createSubtasksSection } from './subTasks.js';
 import { addPerformer } from './taskPerformers.js';
 import { deleteTask } from './deleteTask.js';
+import { renderKanbanFiltersAndBoard } from './kanban.js';
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -103,7 +104,9 @@ function loadView(view, projectId) {
                 console.error('Ошибка загрузки задач:', error);
             });
     }
-    if (view === 'канбан') { }
+    if (view === 'канбан') {
+        renderKanbanFiltersAndBoard(projectId);
+    }
     if (view === 'гант') { }
     if (view === 'о проекте')
     {

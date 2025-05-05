@@ -282,5 +282,12 @@ public class TaskApiController {
         return ResponseEntity.ok(Map.of("message", "Задача успешно удалена"));
     }
 
+    // API эндпоинт для получения всех задач для проекта
+    @GetMapping("/api/tasks/project/{projectId}")
+    public List<Tasks> getAllTasksForProject(@PathVariable Long projectId) {
+        return tasksRepository.findByIdProject_Id(projectId);
+    }
+
+
 }
 
