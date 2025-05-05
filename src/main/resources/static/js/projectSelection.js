@@ -545,17 +545,31 @@ function createTagElement(tag, projectId) {
 }
 
 function showAddTagForm(container, projectId) {
-    const form = document.createElement('div');
+    // Не добавлять форму повторно
+    if (container.querySelector('.add-tag-form-wrapper')) return;
+
+    const formWrapper = document.createElement('div');
+    formWrapper.className = 'add-tag-form-wrapper';
 
     const input = document.createElement('input');
+    input.type = 'text';
     input.placeholder = 'Введите тэг';
+    input.classList.add('add-tag');
 
     const saveBtn = document.createElement('button');
     saveBtn.textContent = 'Сохранить';
+    saveBtn.classList.add('save-tag-button');
 
-    saveBtn.onclick = () => {
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Отмена';
+    cancelBtn.classList.add('cancel-tag-button');
+    cancelBtn.onclick = () => formWrapper.remove();
+
+    const submitHandler = () => {
+        if (!input.value.trim()) return;
+
         const formData = new FormData();
-        formData.append('name', input.value);
+        formData.append('name', input.value.trim());
         formData.append(csrfParam, csrfToken);
 
         fetch(`/api/tags/create/${projectId}`, {
@@ -564,9 +578,19 @@ function showAddTagForm(container, projectId) {
         }).then(() => loadProjectInfoView(projectId));
     };
 
-    form.appendChild(input);
-    form.appendChild(saveBtn);
-    container.appendChild(form);
+    saveBtn.onclick = submitHandler;
+
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitHandler();
+        }
+    });
+
+    formWrapper.appendChild(input);
+    formWrapper.appendChild(saveBtn);
+    formWrapper.appendChild(cancelBtn);
+    container.appendChild(formWrapper);
 }
 
 function editTag(tagId, currentName, projectId) {
