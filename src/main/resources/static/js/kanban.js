@@ -244,6 +244,12 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
             taskTitle.textContent = task.name;
             taskCard.appendChild(taskTitle);
 
+            taskCard.addEventListener('click', () => {
+                console.log(task);
+                console.log(task.id);
+                showTaskDetails(task); // Вызываем функцию для отображения подробной информации о задаче
+            });
+
             taskCard.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('taskId', task.id); // Сохраняем ID задачи в dataTransfer
             });

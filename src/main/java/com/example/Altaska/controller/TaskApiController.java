@@ -378,6 +378,15 @@ public class TaskApiController {
         public void setEmail(String email) { this.email = email; }
     }
 
+    public class ProjectDto {
+        private Long id;
+        public ProjectDto(Long id) {
+            this.id = id;
+        }
+
+        public Long getId() { return id; }
+    }
+
     public class TaskDto {
         private Long id;
         private String name;
@@ -386,6 +395,7 @@ public class TaskApiController {
         private String priority; // priority.name
         private List<PerformerDto> performers;
         private List<String> tags;
+        private ProjectDto idProject; // Используем ProjectDto
 
         public TaskDto(Tasks task, List<PerformerDto> performers, List<String> tags) {
             this.id = task.getId();
@@ -395,6 +405,7 @@ public class TaskApiController {
             this.priority = task.getIdPriority() != null ? task.getIdPriority().getName() : "Без приоритета";
             this.performers = performers;
             this.tags = tags;
+            this.idProject = new ProjectDto(task.getIdProject().getId()); // Передаем ProjectDto с id
         }
 
         // Геттеры
@@ -403,11 +414,10 @@ public class TaskApiController {
         public String getDescription() { return description; }
         public String getStatus() { return status; }
         public String getPriority() { return priority; }
-        public List<PerformerDto> getPerformers() {
-            return performers;
-        }
-
+        public List<PerformerDto> getPerformers() { return performers; }
+        public ProjectDto getIdProject() { return idProject; } // Возвращаем объект ProjectDto
     }
+
 
 }
 
