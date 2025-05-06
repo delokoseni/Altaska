@@ -3,7 +3,7 @@ import { createPerformersSection, assignTask, unassignTask } from './taskPerform
 import { initTaskCommentsSection, initCommentInputSection } from './comments.js';
 import { initTaskFilesSection } from './attachments.js';
 
-function showTaskDetails(task) {
+function showTaskDetails(task, view = 'список') {
     const existing = document.querySelector('.task-details-sidebar');
     if (existing) existing.remove();
 
@@ -204,7 +204,7 @@ function showTaskDetails(task) {
                         })
                         .then(updatedTask => {
                             console.log(`Поле "${target}" обновлено успешно`, updatedTask);
-                            loadView('список', task.idProject.id);
+                            loadView(view, task.idProject.id);
                         })
                         .catch(err => {
                             alert(`Не удалось обновить ${target}: ${err.message}`);

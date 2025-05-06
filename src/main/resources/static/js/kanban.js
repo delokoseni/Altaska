@@ -254,7 +254,7 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
             taskCard.appendChild(taskTitle);
 
             taskCard.addEventListener('click', () => {
-                showTaskDetails(task);
+                showTaskDetails(task, 'канбан');
             });
 
             taskCard.addEventListener('dragstart', (e) => {
