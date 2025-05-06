@@ -11,5 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface StatusesRepository extends JpaRepository<Statuses, Long> {
+
     Optional<Statuses> findById(long id);
+
+    Optional<Statuses> findByName(String name);
 }

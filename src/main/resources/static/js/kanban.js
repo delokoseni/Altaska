@@ -224,12 +224,11 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
                 // Обновляем статус или приоритет задачи в зависимости от фильтра
                 if (groupBy === 'status') {
                     task.status = group; // Обновляем статус задачи
+                    updateTaskStatus(task.id, task.status);
                 } else if (groupBy === 'priority') {
                     task.priority = group; // Обновляем приоритет задачи
+                    updateTaskPriority(task.id, task.priority);
                 }
-                // Отправляем обновленный статус или приоритет на сервер
-                // updateTaskStatus(task.id, task.status); // Для статуса
-                // updateTaskPriority(task.id, task.priority); // Для приоритета
             }
             groupColumn.classList.remove('drag-over');
             updateBoard(); // Обновляем доску
@@ -258,12 +257,14 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
 
 // Функция для обновления статуса задачи на сервере
 function updateTaskStatus(taskId, newStatus) {
-    fetch(`/api/tasks/${taskId}/status`, {
-        method: 'PATCH',
+    const csrfToken = getCsrfToken();
+    fetch(`/api/tasks/${taskId}/statusByName`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ statusName: newStatus }),
     })
     .then(response => response.json())
     .then(updatedTask => {
@@ -274,16 +275,22 @@ function updateTaskStatus(taskId, newStatus) {
 
 // Функция для обновления приоритета задачи на сервере
 function updateTaskPriority(taskId, newPriority) {
-    fetch(`/api/tasks/${taskId}/priority`, {
-        method: 'PATCH',
+    const csrfToken = getCsrfToken();
+    fetch(`/api/tasks/${taskId}/priorityByName`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
         },
-        body: JSON.stringify({ priority: newPriority }),
+        body: JSON.stringify({ priorityName: newPriority }),
     })
     .then(response => response.json())
     .then(updatedTask => {
         console.log('Приоритет задачи обновлен:', updatedTask);
     })
     .catch(error => console.error('Ошибка обновления приоритета задачи:', error));
+}
+
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }

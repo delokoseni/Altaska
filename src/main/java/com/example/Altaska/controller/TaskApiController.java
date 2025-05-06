@@ -219,9 +219,67 @@ public class TaskApiController {
         entityManager.createNativeQuery("SET LOCAL myapp.user_id = " + user.getId())
                 .executeUpdate();
 
-
         Statuses status = statusesRepository.findById(statusId)
                 .orElseThrow(() -> new RuntimeException("Статус не найден"));
+
+        task.setIdStatus(status);
+        task.setStatusChangeAtServer(LocalDateTime.now());
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
+    @PutMapping("/{taskId}/priorityByName")
+    public Tasks updateTaskPriorityByName(@PathVariable Long taskId,
+                                          @RequestBody Map<String, String> requestBody,  // Принимаем данные из тела запроса
+                                          Principal principal) {
+        String priorityName = requestBody.get("priorityName");
+
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+        permissionService.checkIfProjectArchived(task.getIdProject());
+
+        Priorities priority = prioritiesRepository.findByName(priorityName)
+                .orElseThrow(() -> new RuntimeException("Приоритет с таким названием не найден"));
+        task.setIdPriority(priority);
+
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
+    @PutMapping("/{taskId}/statusByName")
+    @Transactional
+    public Tasks updateTaskStatusByName(@PathVariable Long taskId,
+                                        @RequestBody Map<String, String> requestBody,  // Принимаем данные из тела запроса
+                                        Principal principal) {
+        String statusName = requestBody.get("statusName");
+
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+        permissionService.checkIfProjectArchived(task.getIdProject());
+
+        entityManager.createNativeQuery("SET LOCAL myapp.user_id = " + user.getId())
+                .executeUpdate();
+
+        Statuses status = statusesRepository.findByName(statusName)
+                .orElseThrow(() -> new RuntimeException("Статус с таким названием не найден"));
 
         task.setIdStatus(status);
         task.setStatusChangeAtServer(LocalDateTime.now());
