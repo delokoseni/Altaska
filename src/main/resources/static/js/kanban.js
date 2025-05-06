@@ -1,7 +1,16 @@
 // Функция для получения всех задач проекта
 function getAllTasksForProject(projectId) {
-    return fetch(`/api/tasks/project/dto/${projectId}`)
-        .then(response => response.json())
+    return fetch(`/api/tasks/project/${projectId}/withperformers`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при получении задач');
+            }
+            return response.json();
+        })
+        .then(tasks => {
+            console.log('Полученные задачи:', tasks);
+            return tasks;
+        })
         .catch(error => console.error('Ошибка загрузки задач:', error));
 }
 
@@ -153,7 +162,7 @@ function filterTasks(tasks, filters) {
             }
 
             return Array.isArray(task.performers) &&
-                   task.performers.some(p => String(p.userId) === filters.memberId);
+                   task.performers.some(p => String(p.id) === filters.memberId);
         }
         return true;
     });
@@ -177,9 +186,9 @@ function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
         let groupKey = '';
 
         if (groupBy === 'status') {
-            groupKey = task.status;
+            groupKey = task.idStatus.name;
         } else if (groupBy === 'priority') {
-            groupKey = task.priority ? task.priority : 'Без приоритета';
+            groupKey = task.idPriority?.name || 'Без приоритета';
         }
 
         if (!groups[groupKey]) {
@@ -191,6 +200,7 @@ function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
     return groups;
 }
 
+
 // Отображение канбан-доски с поддержкой перетаскивания
 function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, updateBoard) {
     container.innerHTML = '';
@@ -199,59 +209,56 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
     for (const group in groupedTasks) {
         const groupColumn = document.createElement('div');
         groupColumn.classList.add('kanban-group');
-        groupColumn.setAttribute('data-status', group); // Добавляем статус в атрибут
+        groupColumn.setAttribute('data-status', group);
 
         const header = document.createElement('h3');
         header.textContent = group;
         groupColumn.appendChild(header);
 
-        // Разрешаем перетаскивание на этот контейнер
         groupColumn.addEventListener('dragover', (e) => {
-            e.preventDefault(); // Нужно, чтобы элемент мог быть перетащен
-            groupColumn.classList.add('drag-over'); // Стили для визуализации
+            e.preventDefault();
+            groupColumn.classList.add('drag-over');
         });
 
         groupColumn.addEventListener('dragleave', () => {
-            groupColumn.classList.remove('drag-over'); // Убираем стили, когда перетаскивание завершено
+            groupColumn.classList.remove('drag-over');
         });
 
         groupColumn.addEventListener('drop', (e) => {
             e.preventDefault();
-            const taskId = e.dataTransfer.getData('taskId'); // Получаем ID задачи
+            const taskId = e.dataTransfer.getData('taskId');
             const task = tasks.find(t => t.id === parseInt(taskId));
 
             if (task) {
-                // Обновляем статус или приоритет задачи в зависимости от фильтра
                 if (groupBy === 'status') {
-                    task.status = group; // Обновляем статус задачи
-                    updateTaskStatus(task.id, task.status);
+                    task.idStatus = statuses.find(s => s.name === group) || null;
+                    updateTaskStatus(task.id, group);
                 } else if (groupBy === 'priority') {
-                    task.priority = group; // Обновляем приоритет задачи
-                    updateTaskPriority(task.id, task.priority);
+                    task.idPriority = priorities.find(p => p.name === group) || null;
+                    updateTaskPriority(task.id, group);
                 }
             }
+
             groupColumn.classList.remove('drag-over');
-            updateBoard(); // Обновляем доску
+            updateBoard();
         });
 
         groupedTasks[group].forEach(task => {
             const taskCard = document.createElement('div');
             taskCard.classList.add('kanban-task');
-            taskCard.setAttribute('draggable', 'true'); // Делаем задачу перетаскиваемой
-            taskCard.setAttribute('data-task-id', task.id); // Добавляем ID задачи как data-атрибут
+            taskCard.setAttribute('draggable', 'true');
+            taskCard.setAttribute('data-task-id', task.id);
 
             const taskTitle = document.createElement('div');
             taskTitle.textContent = task.name;
             taskCard.appendChild(taskTitle);
 
             taskCard.addEventListener('click', () => {
-                console.log(task);
-                console.log(task.id);
-                showTaskDetails(task); // Вызываем функцию для отображения подробной информации о задаче
+                showTaskDetails(task);
             });
 
             taskCard.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('taskId', task.id); // Сохраняем ID задачи в dataTransfer
+                e.dataTransfer.setData('taskId', task.id);
             });
 
             groupColumn.appendChild(taskCard);

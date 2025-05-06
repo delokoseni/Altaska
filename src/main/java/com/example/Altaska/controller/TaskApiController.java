@@ -341,6 +341,61 @@ public class TaskApiController {
         return ResponseEntity.ok(Map.of("message", "Задача успешно удалена"));
     }
 
+    @GetMapping("/project/{projectId}/withperformers")
+    public List<Map<String, Object>> getTasksWithPerformersByProject(@PathVariable Long projectId) {
+        List<Tasks> tasks = tasksRepository.findByIdProject_Id(projectId);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Tasks task : tasks) {
+            Map<String, Object> taskMap = new HashMap<>();
+            taskMap.put("id", task.getId());
+            taskMap.put("name", task.getName());
+            taskMap.put("description", task.getDescription());
+            taskMap.put("createdAt", task.getCreatedAt());
+            taskMap.put("updatedAt", task.getUpdatedAt());
+            taskMap.put("updatedBy", task.getUpdatedBy());
+            taskMap.put("timeSpent", task.getTimeSpent());
+            taskMap.put("deadlineServer", task.getDeadlineServer());
+            taskMap.put("statusChangeAtServer", task.getStatusChangeAtServer());
+
+            // ВАЖНО: ключи должны быть idStatus и idPriority, как ожидает клиент
+            if (task.getIdStatus() != null) {
+                Map<String, Object> status = new HashMap<>();
+                status.put("id", task.getIdStatus().getId());
+                status.put("name", task.getIdStatus().getName());
+                taskMap.put("idStatus", status);
+            }
+
+            if (task.getIdPriority() != null) {
+                Map<String, Object> priority = new HashMap<>();
+                priority.put("id", task.getIdPriority().getId());
+                priority.put("name", task.getIdPriority().getName());
+                priority.put("level", task.getIdPriority().getLevel());
+                taskMap.put("idPriority", priority);
+            }
+
+            if (task.getIdProject() != null) {
+                Map<String, Object> project = new HashMap<>();
+                project.put("id", task.getIdProject().getId());
+                taskMap.put("idProject", project);
+            }
+
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(task.getId());
+            List<Map<String, Object>> performerList = performers.stream().map(tp -> {
+                Map<String, Object> p = new HashMap<>();
+                p.put("id", tp.getIdUser().getId());
+                p.put("email", tp.getIdUser().getEmail());
+                return p;
+            }).collect(Collectors.toList());
+
+            taskMap.put("performers", performerList);
+
+            result.add(taskMap);
+        }
+
+        return result;
+    }
+
     // API эндпоинт для получения всех задач для проекта
     @GetMapping("/project/dto/{projectId}")
     public List<TaskDto> getAllTasksForProject(@PathVariable Long projectId) {
