@@ -26,13 +26,6 @@ function getConfirmedMembers(projectId) {
         .catch(error => console.error('Ошибка загрузки участников:', error));
 }
 
-// Функция для получения всех тэгов проекта (пока не используется)
-// function getTagsForProject(projectId) {
-//     return fetch(`/api/tags/project/${projectId}`)
-//         .then(response => response.json())
-//         .catch(error => console.error('Ошибка загрузки тэгов:', error));
-// }
-
 // Функция для создания фильтра (select)
 function createFilter(label, options, filterType) {
     const filterContainer = document.createElement('div');
@@ -50,19 +43,26 @@ function createFilter(label, options, filterType) {
     defaultOption.textContent = `Все ${label.toLowerCase()}`;
     select.appendChild(defaultOption);
 
-    options.forEach(option => {
-        const optionElement = document.createElement('option');
+    if (filterType === 'member') {
+        const noneOption = document.createElement('option');
+        noneOption.value = 'none';
+        noneOption.textContent = 'Без исполнителя';
+        select.appendChild(noneOption);
 
-        if (filterType === 'member') {
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
             optionElement.value = option.userId;
             optionElement.textContent = option.email;
-        } else {
+            select.appendChild(optionElement);
+        });
+    } else {
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
             optionElement.value = option.id;
             optionElement.textContent = option.name || option.title || 'Неизвестно';
-        }
-
-        select.appendChild(optionElement);
-    });
+            select.appendChild(optionElement);
+        });
+    }
 
     filterContainer.appendChild(select);
     return filterContainer;
@@ -83,7 +83,6 @@ function createGroupBySelector() {
     const groupOptions = [
         { value: 'status', label: 'Статусы' },
         { value: 'priority', label: 'Приоритеты' },
-        // { value: 'tag', label: 'Тэги' } // Пока закомментировано
     ];
 
     groupOptions.forEach(opt => {
@@ -104,9 +103,8 @@ export function renderKanbanFiltersAndBoard(projectId) {
         getAllPriorities(),
         getAllStatuses(),
         getConfirmedMembers(projectId),
-        // getTagsForProject(projectId) // пока отключено
     ])
-    .then(([tasks, priorities, statuses, members /*, tags */]) => {
+    .then(([tasks, priorities, statuses, members ]) => {
         const viewContent = document.querySelector('.view-content');
         viewContent.innerHTML = '';
 
@@ -147,12 +145,17 @@ export function renderKanbanFiltersAndBoard(projectId) {
 function filterTasks(tasks, filters) {
     return tasks.filter(task => {
         if (filters.memberId) {
+            if (filters.memberId === 'none') {
+                return !Array.isArray(task.performers) || task.performers.length === 0;
+            }
+
             return Array.isArray(task.performers) &&
                    task.performers.some(p => String(p.userId) === filters.memberId);
         }
         return true;
     });
 }
+
 
 function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
     const groups = {};

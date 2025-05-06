@@ -291,20 +291,17 @@ public class TaskApiController {
         return tasks.stream().map(task -> {
             List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(task.getId());
 
-            System.out.println("Задача: " + task.getName() + " (ID: " + task.getId() + ")");
-            if (performers.isEmpty()) {
-                System.out.println("  Исполнителей нет");
-            } else {
-                for (TaskPerformers tp : performers) {
-                    System.out.println("  Исполнитель: " + tp.getIdUser().getEmail());
-                }
-            }
-
             List<PerformerDto> performerDtos = performers.stream()
                     .map(tp -> new PerformerDto(tp.getIdUser().getId(), tp.getIdUser().getEmail()))
                     .collect(Collectors.toList());
 
-            return new TaskDto(task, performerDtos);
+            // Получение тегов задачи
+            List<String> tagNames = tasksTagsRepository.findByIdTask(task)
+                    .stream()
+                    .map(tasksTags -> tasksTags.getIdTag().getName())
+                    .toList();
+
+            return new TaskDto(task, performerDtos, tagNames);
         }).collect(Collectors.toList());
     }
 
@@ -330,14 +327,16 @@ public class TaskApiController {
         private String status; // status.name
         private String priority; // priority.name
         private List<PerformerDto> performers;
+        private List<String> tags;
 
-        public TaskDto(Tasks task, List<PerformerDto> performers) {
+        public TaskDto(Tasks task, List<PerformerDto> performers, List<String> tags) {
             this.id = task.getId();
             this.name = task.getName();
             this.description = task.getDescription();
             this.status = task.getIdStatus() != null ? task.getIdStatus().getName() : "Без статуса";
             this.priority = task.getIdPriority() != null ? task.getIdPriority().getName() : "Без приоритета";
             this.performers = performers;
+            this.tags = tags;
         }
 
         // Геттеры
