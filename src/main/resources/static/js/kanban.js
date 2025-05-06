@@ -29,14 +29,15 @@ function getConfirmedMembers(projectId) {
 // Функция для создания фильтра (select)
 function createFilter(label, options, filterType) {
     const filterContainer = document.createElement('div');
-    filterContainer.className = 'filter-container';
+    filterContainer.className = 'kanban-filter-container';
 
     const filterLabel = document.createElement('span');
     filterLabel.textContent = label;
+    filterLabel.className = 'kanban-filter-label';
     filterContainer.appendChild(filterLabel);
 
     const select = document.createElement('select');
-    select.className = `${filterType}-filter`;
+    select.className = `kanban-filter-select ${filterType}-filter`;
 
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
@@ -71,14 +72,15 @@ function createFilter(label, options, filterType) {
 // Селектор группировки
 function createGroupBySelector() {
     const container = document.createElement('div');
-    container.className = 'filter-container';
+    container.className = 'kanban-filter-container';
 
     const label = document.createElement('span');
     label.textContent = 'Группировать по:';
+    label.className = 'kanban-filter-label';
     container.appendChild(label);
 
     const select = document.createElement('select');
-    select.className = 'group-by-selector';
+    select.className = 'kanban-filter-select group-by-selector';
 
     const groupOptions = [
         { value: 'status', label: 'Статусы' },
@@ -104,7 +106,7 @@ export function renderKanbanFiltersAndBoard(projectId) {
         getAllStatuses(),
         getConfirmedMembers(projectId),
     ])
-    .then(([tasks, priorities, statuses, members ]) => {
+    .then(([tasks, priorities, statuses, members]) => {
         const viewContent = document.querySelector('.view-content');
         viewContent.innerHTML = '';
 
@@ -155,7 +157,6 @@ function filterTasks(tasks, filters) {
         return true;
     });
 }
-
 
 function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
     const groups = {};
@@ -216,4 +217,3 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities) {
         container.appendChild(groupColumn);
     }
 }
-

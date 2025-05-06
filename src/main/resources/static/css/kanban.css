@@ -20,3 +20,47 @@
     font-size: 14px;
     cursor: pointer;
 }
+
+.kanban-board {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 16px;
+    scroll-snap-type: x mandatory;
+}
+
+.kanban-group {
+    min-width: 250px;
+    background-color: var(--second-text-color);
+    border-radius: 16px;
+    padding: 12px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    scroll-snap-align: start;
+}
+
+.kanban-group h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.kanban-task {
+    background-color: var(--background-color);
+    border: 2px solid var(--button-color);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.kanban-task:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
