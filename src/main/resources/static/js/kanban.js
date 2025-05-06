@@ -179,7 +179,7 @@ function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
         if (groupBy === 'status') {
             groupKey = task.status;
         } else if (groupBy === 'priority') {
-            groupKey = task.priority || 'Без приоритета';
+            groupKey = task.priority ? task.priority : 'Без приоритета';
         }
 
         if (!groups[groupKey]) {
@@ -217,14 +217,19 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
 
         groupColumn.addEventListener('drop', (e) => {
             e.preventDefault();
-            const taskId = e.dataTransfer.getData('taskId'); // Получаем id задачи
+            const taskId = e.dataTransfer.getData('taskId'); // Получаем ID задачи
             const task = tasks.find(t => t.id === parseInt(taskId));
 
             if (task) {
-                // Обновляем статус задачи
-                task.status = group;
-                // Отправляем обновленный статус на сервер
-                //updateTaskStatus(task.id, task.status);
+                // Обновляем статус или приоритет задачи в зависимости от фильтра
+                if (groupBy === 'status') {
+                    task.status = group; // Обновляем статус задачи
+                } else if (groupBy === 'priority') {
+                    task.priority = group; // Обновляем приоритет задачи
+                }
+                // Отправляем обновленный статус или приоритет на сервер
+                // updateTaskStatus(task.id, task.status); // Для статуса
+                // updateTaskPriority(task.id, task.priority); // Для приоритета
             }
             groupColumn.classList.remove('drag-over');
             updateBoard(); // Обновляем доску
@@ -267,3 +272,18 @@ function updateTaskStatus(taskId, newStatus) {
     .catch(error => console.error('Ошибка обновления статуса задачи:', error));
 }
 
+// Функция для обновления приоритета задачи на сервере
+function updateTaskPriority(taskId, newPriority) {
+    fetch(`/api/tasks/${taskId}/priority`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ priority: newPriority }),
+    })
+    .then(response => response.json())
+    .then(updatedTask => {
+        console.log('Приоритет задачи обновлен:', updatedTask);
+    })
+    .catch(error => console.error('Ошибка обновления приоритета задачи:', error));
+}
