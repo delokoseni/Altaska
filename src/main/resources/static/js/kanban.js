@@ -99,6 +99,7 @@ function createGroupBySelector() {
 }
 
 // Основная функция отображения фильтров и канбан-доски
+// Основная функция отображения фильтров и канбан-доски
 export function renderKanbanFiltersAndBoard(projectId) {
     Promise.all([
         getAllTasksForProject(projectId),
@@ -132,7 +133,7 @@ export function renderKanbanFiltersAndBoard(projectId) {
             };
 
             const filteredTasks = filterTasks(tasks, filters);
-            renderKanbanBoard(kanbanBoard, groupBySelect.value, filteredTasks, statuses, priorities);
+            renderKanbanBoard(kanbanBoard, groupBySelect.value, filteredTasks, statuses, priorities, updateBoard);
         }
 
         groupBySelect.addEventListener('change', updateBoard);
@@ -190,26 +191,58 @@ function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
     return groups;
 }
 
-// Отображение канбан-доски
-function renderKanbanBoard(container, groupBy, tasks, statuses, priorities) {
+// Отображение канбан-доски с поддержкой перетаскивания
+function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, updateBoard) {
     container.innerHTML = '';
     const groupedTasks = groupTasksByFilter(tasks, groupBy, statuses, priorities);
 
     for (const group in groupedTasks) {
         const groupColumn = document.createElement('div');
         groupColumn.classList.add('kanban-group');
+        groupColumn.setAttribute('data-status', group); // Добавляем статус в атрибут
 
         const header = document.createElement('h3');
         header.textContent = group;
         groupColumn.appendChild(header);
 
+        // Разрешаем перетаскивание на этот контейнер
+        groupColumn.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Нужно, чтобы элемент мог быть перетащен
+            groupColumn.classList.add('drag-over'); // Стили для визуализации
+        });
+
+        groupColumn.addEventListener('dragleave', () => {
+            groupColumn.classList.remove('drag-over'); // Убираем стили, когда перетаскивание завершено
+        });
+
+        groupColumn.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const taskId = e.dataTransfer.getData('taskId'); // Получаем id задачи
+            const task = tasks.find(t => t.id === parseInt(taskId));
+
+            if (task) {
+                // Обновляем статус задачи
+                task.status = group;
+                // Отправляем обновленный статус на сервер
+                //updateTaskStatus(task.id, task.status);
+            }
+            groupColumn.classList.remove('drag-over');
+            updateBoard(); // Обновляем доску
+        });
+
         groupedTasks[group].forEach(task => {
             const taskCard = document.createElement('div');
             taskCard.classList.add('kanban-task');
+            taskCard.setAttribute('draggable', 'true'); // Делаем задачу перетаскиваемой
+            taskCard.setAttribute('data-task-id', task.id); // Добавляем ID задачи как data-атрибут
 
             const taskTitle = document.createElement('div');
             taskTitle.textContent = task.name;
             taskCard.appendChild(taskTitle);
+
+            taskCard.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('taskId', task.id); // Сохраняем ID задачи в dataTransfer
+            });
 
             groupColumn.appendChild(taskCard);
         });
@@ -217,3 +250,20 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities) {
         container.appendChild(groupColumn);
     }
 }
+
+// Функция для обновления статуса задачи на сервере
+function updateTaskStatus(taskId, newStatus) {
+    fetch(`/api/tasks/${taskId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+    })
+    .then(response => response.json())
+    .then(updatedTask => {
+        console.log('Статус задачи обновлен:', updatedTask);
+    })
+    .catch(error => console.error('Ошибка обновления статуса задачи:', error));
+}
+
