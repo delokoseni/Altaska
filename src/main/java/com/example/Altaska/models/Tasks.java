@@ -59,6 +59,9 @@ public class Tasks {
     @Column(name = "status_change_at_server", nullable = false)
     private LocalDateTime statusChangeAtServer;
 
+    @Column(name = "start_time_server")
+    private LocalDateTime startTimeServer;
+
     public Long getId() {
         return id;
     }
@@ -119,6 +122,10 @@ public class Tasks {
         return statusChangeAtServer;
     }
 
+    public LocalDateTime getStartTimeServer() {
+        return startTimeServer;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -173,5 +180,9 @@ public class Tasks {
 
     public void setStatusChangeAtServer(LocalDateTime statusChangeAtServer) {
         this.statusChangeAtServer = statusChangeAtServer;
+    }
+
+    public void setStartTimeServer(LocalDateTime startTimeServer) {
+        this.startTimeServer = startTimeServer;
     }
 }

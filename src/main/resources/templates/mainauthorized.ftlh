@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="${_csrf.token}">
+    <link rel="stylesheet" href="https://unpkg.com/frappe-gantt/dist/frappe-gantt.css">
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.js"></script>
     <link rel="stylesheet" href="/css/mainAuthorized.css">
     <link rel="stylesheet" href="/css/createTask.css">
     <link rel="stylesheet" href="/css/createProject.css">
@@ -11,6 +13,7 @@
     <link rel="stylesheet" href="/css/taskdetailssidebar.css">
     <link rel="stylesheet" href="/css/loadProjectInfoView.css">
     <link rel="stylesheet" href="/css/kanban.css">
+    <link rel="stylesheet" href="/css/gantt.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/sidebar.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>

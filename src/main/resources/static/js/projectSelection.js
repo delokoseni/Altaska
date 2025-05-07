@@ -5,6 +5,7 @@ import { createSubtasksSection } from './subTasks.js';
 import { addPerformer } from './taskPerformers.js';
 import { deleteTask } from './deleteTask.js';
 import { renderKanbanFiltersAndBoard } from './kanban.js';
+import { renderGanttChart } from './gantt.js';
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -107,7 +108,9 @@ function loadView(view, projectId) {
     if (view === 'канбан') {
         renderKanbanFiltersAndBoard(projectId);
     }
-    if (view === 'гант') { }
+    if (view === 'гант') {
+        renderGanttChart(projectId);
+    }
     if (view === 'о проекте')
     {
         loadProjectInfoView(projectId);

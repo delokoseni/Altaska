@@ -198,6 +198,11 @@
     text-align: left; /* чтобы текст не был по центру */
 }
 
+/*.project-button.active {
+    background-color: var(--button-color);
+    color: white;
+}*/
+
 .profile-button {
     position: absolute;
     top: 10px;
