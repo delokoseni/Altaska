@@ -37,6 +37,8 @@ public class MainAuthorizedController {
                 Users currentUser = currentUserOpt.get();
                 List<Projects> projects = projectService.getAllUserProjects(currentUser);
                 model.addAttribute("projects", projects);
+                model.addAttribute("SYNCFUSION_LICENSE", System.getProperty("SYNCFUSION_LICENSE"));
+
             }
         }
         return "mainauthorized";

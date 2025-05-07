@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="${_csrf.token}">
-    <link rel="stylesheet" href="https://unpkg.com/frappe-gantt/dist/frappe-gantt.css">
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.js"></script>
+    <link href="https://cdn.syncfusion.com/ej2/29.1.33/material.css" rel="stylesheet" />
+    <script src="https://cdn.syncfusion.com/ej2/29.1.33/dist/ej2.min.js"></script>
+    <script>
+        ej.base.registerLicense('${SYNCFUSION_LICENSE}');
+    </script>
     <link rel="stylesheet" href="/css/mainAuthorized.css">
     <link rel="stylesheet" href="/css/createTask.css">
     <link rel="stylesheet" href="/css/createProject.css">
