@@ -1,5 +1,6 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.TasksDependencies;
 import com.example.Altaska.repositories.TaskDependenciesRepository;
@@ -35,24 +36,27 @@ public class GanttController {
     @PostMapping("/save")
     public ResponseEntity<?> saveGanttData(@RequestBody GanttDataDTO data) {
         for (TaskDTO dto : data.getTasks()) {
-            // Найти и обновить задачу
             Tasks task = tasksRepository.findById(dto.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
+
+            // Обновление сроков и прогресса
             task.setStartTimeServer(dto.getStartTime());
             task.setDeadlineServer(dto.getDeadline());
             task.setUpdatedAtServer(LocalDateTime.now());
             tasksRepository.save(task);
 
-            // Удалить все зависимости, где задача участвует как источник
+            // Удаление старых зависимостей
             taskDependenciesRepository.deleteByIdFromTask_Id(task.getId());
 
+            // Сохранение новых зависимостей
             if (dto.getDependencies() != null && !dto.getDependencies().isBlank()) {
                 String[] deps = dto.getDependencies().split(",");
                 for (String dep : deps) {
-                    Matcher m = Pattern.compile("(\\d+)([A-Z]{2})").matcher(dep);
+                    Matcher m = Pattern.compile("(\\d+)([A-Z]{2})", Pattern.CASE_INSENSITIVE).matcher(dep.trim());
                     if (m.matches()) {
                         Long toTaskId = Long.parseLong(m.group(1));
-                        String type = m.group(2);
+                        String type = m.group(2).toUpperCase(); // Приводим к верхнему регистру: FS, SS, FF, SF
+
                         Tasks toTask = tasksRepository.findById(toTaskId)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task dep not found"));
 
@@ -61,6 +65,9 @@ public class GanttController {
                         dependency.setIdToTask(toTask);
                         dependency.setType(type);
                         taskDependenciesRepository.save(dependency);
+                    } else {
+                        // Можно залогировать некорректный формат, если нужно
+                        System.out.println("Неверный формат зависимости: " + dep);
                     }
                 }
             }
@@ -69,10 +76,26 @@ public class GanttController {
         return ResponseEntity.ok("Сохранено");
     }
 
+
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
         return tasksRepository.findByIdProject_Id(projectId);
     }
+
+    @GetMapping("/project/{projectId}/dependencies")
+    public List<Map<String, String>> getDependenciesByProject(@PathVariable Long projectId) {
+        List<TasksDependencies> dependencies = taskDependenciesRepository
+                .findByIdFromTask_IdProject_Id(projectId);
+
+        return dependencies.stream()
+                .map(dep -> Map.of(
+                        "from", dep.getIdFromTask().getId().toString(),
+                        "to", dep.getIdToTask().getId().toString(),
+                        "type", dep.getType() // Пример: "FS", "SS"
+                ))
+                .collect(Collectors.toList());
+    }
+
 
     @Data
     public static class GanttDataDTO {
@@ -90,9 +113,9 @@ public class GanttController {
     @Data
     public static class TaskDTO {
         private Long id;
+        private String name;
         private LocalDateTime startTime;
         private LocalDateTime deadline;
-        private Integer progress;
         private String dependencies; // строка вида "1FS,3SS"
 
         public Long getId() {
@@ -101,6 +124,14 @@ public class GanttController {
 
         public void setId(Long id) {
             this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
 
         public LocalDateTime getStartTime() {
@@ -117,14 +148,6 @@ public class GanttController {
 
         public void setDeadline(LocalDateTime deadline) {
             this.deadline = deadline;
-        }
-
-        public Integer getProgress() {
-            return progress;
-        }
-
-        public void setProgress(Integer progress) {
-            this.progress = progress;
         }
 
         public String getDependencies() {

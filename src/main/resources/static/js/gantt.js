@@ -42,16 +42,33 @@ export async function renderGanttChart(projectId) {
     viewContent.innerHTML = '<div id="Gantt" style="min-height: 400px;"></div>';
 
     try {
-        const response = await fetch(`/api/gantt/project/${projectId}`);
-        if (!response.ok) throw new Error('Ошибка загрузки задач');
+        // Параллельно получаем задачи и зависимости
+        const [tasksResponse, dependenciesResponse] = await Promise.all([
+            fetch(`/api/gantt/project/${projectId}`),
+            fetch(`/api/gantt/project/${projectId}/dependencies`)
+        ]);
 
-        const tasks = await response.json();
+        if (!tasksResponse.ok || !dependenciesResponse.ok) throw new Error('Ошибка загрузки данных');
+
+        const tasks = await tasksResponse.json();
+        const dependencies = await dependenciesResponse.json();
+
         if (tasks.length === 0) {
             viewContent.innerHTML = '<p>Задачи не найдены для этого проекта.</p>';
             return;
         }
 
-        // Преобразуем задачи под формат Syncfusion
+        // Преобразование зависимостей: создаём карту taskId -> зависимости
+        const dependencyMap = {};
+        dependencies.forEach(dep => {
+            const to = dep.to;
+            const from = dep.from;
+            const type = dep.type;
+
+            if (!dependencyMap[to]) dependencyMap[to] = [];
+            dependencyMap[to].push(`${from}${type}`);
+        });
+
         const parsedTasks = tasks.map(task => {
             const start = new Date(task.startTimeServer || task.createdAtServer);
             let end = new Date(task.deadlineServer || task.createdAtServer);
@@ -63,7 +80,7 @@ export async function renderGanttChart(projectId) {
                 StartDate: start,
                 EndDate: end,
                 Progress: 0,
-                Predecessor: task.dependencies || '', // строка типа "1FS,2SS" если есть
+                Predecessor: (dependencyMap[task.id] || []).join(','),
             };
         });
 
@@ -82,12 +99,12 @@ export async function renderGanttChart(projectId) {
                 dependency: 'Predecessor',
             },
             columns: [
-                    { field: 'TaskID', headerText: 'Идентификатор', isPrimaryKey: true, width: '140' },
-                    { field: 'TaskName', headerText: 'Название задачи'},
-                    { field: 'StartDate', headerText: 'Дата начала', format: { type: 'date', format: 'dd.MM.yyyy' }},
-                    { field: 'EndDate', headerText: 'Дата окончания', format: { type: 'date', format: 'dd.MM.yyyy' }},
-                    { field: 'Predecessor', headerText: 'Зависимости'}
-                ],
+                { field: 'TaskID', headerText: 'Идентификатор', isPrimaryKey: true, width: 140 },
+                { field: 'TaskName', headerText: 'Название задачи' },
+                { field: 'StartDate', headerText: 'Дата начала', format: { type: 'date', format: 'dd.MM.yyyy' } },
+                { field: 'EndDate', headerText: 'Дата окончания', format: { type: 'date', format: 'dd.MM.yyyy' } },
+                { field: 'Predecessor', headerText: 'Зависимости' }
+            ],
             timelineSettings: {
                 timelineUnitSize: 60,
                 topTier: {
@@ -110,13 +127,14 @@ export async function renderGanttChart(projectId) {
                 showDeleteConfirmDialog: true
             }
         });
+
         window.ganttObj.appendTo('#Gantt');
         createSaveButton();
+
     } catch (error) {
         console.error('Ошибка при загрузке Ганта:', error);
         viewContent.innerHTML = '<p>Не удалось загрузить график Ганта. Попробуйте позже.</p>';
     }
-
 }
 
 function createSaveButton() {
