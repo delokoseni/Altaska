@@ -1,3 +1,5 @@
+import { getCsrfToken } from './kanban.js';
+
 export async function renderGanttChart(projectId) {
     const viewContent = document.querySelector('.view-content');
     viewContent.innerHTML = '<div id="Gantt" style="min-height: 400px;"></div>';
@@ -57,9 +59,46 @@ export async function renderGanttChart(projectId) {
             }
         });
         window.ganttObj.appendTo('#Gantt');
-
+        createSaveButton();
     } catch (error) {
         console.error('Ошибка при загрузке Ганта:', error);
         viewContent.innerHTML = '<p>Не удалось загрузить график Ганта. Попробуйте позже.</p>';
     }
+
+}
+
+function createSaveButton() {
+    const button = document.createElement('button');
+    button.textContent = 'Сохранить';
+    button.classList.add('gantt-save-button');
+    button.addEventListener('click', async () => {
+        if (!window.ganttObj) return;
+
+        const tasks = window.ganttObj.flatData.map(task => ({
+            id: task.TaskID,
+            startTime: task.StartDate,
+            deadline: task.EndDate,
+            progress: task.Progress,
+            dependencies: task.Predecessor // строка типа "1FS,2SS"
+        }));
+
+        try {
+            const response = await fetch('/api/gantt/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken() // если CSRF включён
+                },
+                body: JSON.stringify({ tasks })
+            });
+
+            if (!response.ok) throw new Error('Ошибка сохранения');
+            alert('Сохранено!');
+        } catch (e) {
+            console.error('Ошибка при сохранении диаграммы Ганта:', e);
+            alert('Не удалось сохранить изменения.');
+        }
+    });
+
+    document.querySelector('.view-content').prepend(button);
 }

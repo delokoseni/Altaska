@@ -304,6 +304,6 @@ function updateTaskPriority(taskId, newPriority) {
     .catch(error => console.error('Ошибка обновления приоритета задачи:', error));
 }
 
-function getCsrfToken() {
+export function getCsrfToken() {
     return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }
