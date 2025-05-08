@@ -70,7 +70,7 @@ public class GanttController {
     }
 
     @GetMapping("/project/{projectId}")
-    public List<Tasks> getGanttData(@PathVariable Long projectId) {
+    public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
         return tasksRepository.findByIdProject_Id(projectId);
     }
 

@@ -5,7 +5,7 @@ export async function renderGanttChart(projectId) {
     viewContent.innerHTML = '<div id="Gantt" style="min-height: 400px;"></div>';
 
     try {
-        const response = await fetch(`/api/tasks/project/${projectId}`);
+        const response = await fetch(`/api/gantt/project/${projectId}`);
         if (!response.ok) throw new Error('Ошибка загрузки задач');
 
         const tasks = await response.json();
