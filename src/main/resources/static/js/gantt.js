@@ -1,5 +1,42 @@
 import { getCsrfToken } from './kanban.js';
 
+ej.base.L10n.load({
+    'ru': {
+        'gantt': {
+            emptyRecord: "Нет записей для отображения",
+            id: "ID",
+            name: "Имя задачи",
+            startDate: "Дата начала",
+            endDate: "Дата окончания",
+            duration: "Длительность",
+            progress: "Прогресс",
+            dependency: "Зависимости",
+            add: "Добавить",
+            edit: "Редактировать",
+            update: "Обновить",
+            delete: "Удалить",
+            cancel: "Отмена",
+            expandAll: "Развернуть все",
+            collapseAll: "Свернуть все",
+            taskInformation: "Информация о задаче",
+            generalTab: "Общее",
+            type: "Тип",
+            offset: "Смещение",
+            saveButton: "Сохранить",
+        },
+        'treegrid': {
+            EmptyRecord: "Нет записей для отображения",
+        },
+        'grid': {
+             EmptyRecord: "Нет записей для отображения",
+        },
+        'datepicker': {
+            placeholder: "Выберите дату",
+            today: "Сегодня"
+        }
+    }
+});
+
 export async function renderGanttChart(projectId) {
     const viewContent = document.querySelector('.view-content');
     viewContent.innerHTML = '<div id="Gantt" style="min-height: 400px;"></div>';
@@ -25,27 +62,42 @@ export async function renderGanttChart(projectId) {
                 TaskName: task.name,
                 StartDate: start,
                 EndDate: end,
-                Progress: task.progress || 0,
+                Progress: 0,
                 Predecessor: task.dependencies || '', // строка типа "1FS,2SS" если есть
-                // Subtasks можно добавить, если есть иерархия
             };
         });
 
-        // Очищаем предыдущий Gantt, если был
         if (window.ganttObj) window.ganttObj.destroy();
 
-        // Создаём Gantt
         window.ganttObj = new ej.gantt.Gantt({
             dataSource: parsedTasks,
             height: '450px',
+            locale: 'ru',
+            includeWeekend: true,
             taskFields: {
                 id: 'TaskID',
                 name: 'TaskName',
                 startDate: 'StartDate',
                 endDate: 'EndDate',
-                progress: 'Progress',
                 dependency: 'Predecessor',
-                // child: 'subtasks' // если есть подзадачи
+            },
+            columns: [
+                    { field: 'TaskID', headerText: 'Идентификатор', isPrimaryKey: true, width: '140' },
+                    { field: 'TaskName', headerText: 'Название задачи'},
+                    { field: 'StartDate', headerText: 'Дата начала', format: { type: 'date', format: 'dd.MM.yyyy' }},
+                    { field: 'EndDate', headerText: 'Дата окончания', format: { type: 'date', format: 'dd.MM.yyyy' }},
+                    { field: 'Predecessor', headerText: 'Зависимости'}
+                ],
+            timelineSettings: {
+                timelineUnitSize: 60,
+                topTier: {
+                    unit: 'Month',
+                    format: 'MMMM yyyy'
+                },
+                bottomTier: {
+                    unit: 'Day',
+                    format: 'dd.MM'
+                }
             },
             allowTaskbarEditing: true,
             allowSelection: true,
