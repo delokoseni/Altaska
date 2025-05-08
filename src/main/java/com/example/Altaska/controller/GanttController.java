@@ -61,8 +61,8 @@ public class GanttController {
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task dep not found"));
 
                         TasksDependencies dependency = new TasksDependencies();
-                        dependency.setIdFromTask(task);
-                        dependency.setIdToTask(toTask);
+                        dependency.setIdFromTask(toTask);
+                        dependency.setIdToTask(task);
                         dependency.setType(type);
                         taskDependenciesRepository.save(dependency);
                     } else {
