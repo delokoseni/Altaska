@@ -14,4 +14,6 @@ public interface TaskDependenciesRepository extends JpaRepository<TasksDependenc
     void deleteByIdToTask_Id(Long taskId);
 
     List<TasksDependencies> findByIdFromTask_IdProject_Id(Long projectId);
+
+    List<TasksDependencies> findByIdToTask_IdProject_Id(Long projectId);
 }

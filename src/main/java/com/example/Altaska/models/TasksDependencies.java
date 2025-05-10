@@ -20,8 +20,8 @@ public class TasksDependencies {
     @JoinColumn(name = "id_to_task", referencedColumnName = "id")
     private Tasks idToTask;
 
-    @Column(name = "sort_order")
-    private Integer sortOrder;
+    @Column(name = "lag")
+    private Double lag;
 
     public Long getId() {
         return id;
@@ -39,8 +39,8 @@ public class TasksDependencies {
         return idToTask;
     }
 
-    public Integer getSortOrder() {
-        return sortOrder;
+    public Double getLag() {
+        return lag;
     }
 
     public void setType(String type) {
@@ -55,7 +55,7 @@ public class TasksDependencies {
         this.idToTask = idToTask;
     }
 
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
+    public void setLag(Double lag) {
+        this.lag = lag;
     }
 }

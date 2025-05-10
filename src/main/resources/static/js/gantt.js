@@ -64,9 +64,15 @@ export async function renderGanttChart(projectId) {
             const to = dep.to;
             const from = dep.from;
             const type = dep.type;
+            const lag = dep.lag;
+
+            let depStr = `${from}${type}`;
+            if (lag !== null && lag !== undefined && !isNaN(lag)) {
+                depStr += (lag >= 0 ? '+' : '') + lag + 'd';
+            }
 
             if (!dependencyMap[to]) dependencyMap[to] = [];
-            dependencyMap[to].push(`${from}${type}`);
+            dependencyMap[to].push(depStr);
         });
 
         const parsedTasks = tasks.map(task => {
@@ -151,7 +157,11 @@ function createSaveButton() {
             progress: task.Progress,
             dependencies: task.Predecessor // строка типа "1FS,2SS"
         }));
-
+        console.log('Связи между задачами (dependencies):');
+                tasks.forEach(task => {
+                    console.log(`Задача ${task.id}: ${task.dependencies || 'нет связей'}`);
+                });
+                console.log('Данные для сохранения:', tasks);
         try {
             const response = await fetch('/api/gantt/save', {
                 method: 'POST',
