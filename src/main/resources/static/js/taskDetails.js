@@ -2,6 +2,7 @@ import { initSubtasksSection } from './subTasks.js';
 import { createPerformersSection, assignTask, unassignTask } from './taskPerformers.js';
 import { initTaskCommentsSection, initCommentInputSection } from './comments.js';
 import { initTaskFilesSection } from './attachments.js';
+import { startTimer, pauseTimer, resetTimer, updateTimerDisplay } from './timer.js';
 
 function showTaskDetails(task, view = 'список') {
     const existing = document.querySelector('.task-details-sidebar');
@@ -73,6 +74,14 @@ function showTaskDetails(task, view = 'список') {
             content.className = 'task-details-content';
 
             content.innerHTML = `
+                <label class="field-label">Таймер:</label>
+                <div class="task-timer">
+                    <span id="timer-${task.id}">00:00:00</span>
+                    <button class="timer-btn" data-action="start">▶</button>
+                    <button class="timer-btn" data-action="pause">⏸</button>
+                    <button class="timer-btn" data-action="reset">⟲</button>
+                </div>
+
                 <h2>Задача</h2>
 
                 <label class="field-label">Название:</label>
@@ -113,6 +122,12 @@ function showTaskDetails(task, view = 'список') {
 
             const subtasksSection = initSubtasksSection(task, csrfToken);
             content.appendChild(subtasksSection);
+
+            const timerDiv = content.querySelector('.task-timer');
+            timerDiv.querySelector('[data-action="start"]').onclick = () => startTimer(task.id);
+            timerDiv.querySelector('[data-action="pause"]').onclick = () => pauseTimer(task.id);
+            timerDiv.querySelector('[data-action="reset"]').onclick = () => resetTimer(task.id);
+
 
             // Проверка, является ли текущий пользователь исполнителем задачи
             fetch(`/api/task-performers/${task.id}/is-assigned`)
@@ -243,6 +258,11 @@ function showTaskDetails(task, view = 'список') {
         .catch(error => {
             console.error('Ошибка загрузки приоритетов или статусов:', error);
         });
+
+        const timerData = JSON.parse(localStorage.getItem(`timer_${task.id}`));
+        if (timerData && !timerData.running) {
+            updateTimerDisplay(task.id, timerData.timeSpent || 0);
+        }
 }
 
 function createTagsSection() {
