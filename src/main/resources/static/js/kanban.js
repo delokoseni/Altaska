@@ -108,8 +108,7 @@ function createGroupBySelector() {
 }
 
 // Основная функция отображения фильтров и канбан-доски
-// Основная функция отображения фильтров и канбан-доски
-export function renderKanbanFiltersAndBoard(projectId) {
+export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
     Promise.all([
         getAllTasksForProject(projectId),
         getAllPriorities(),
@@ -131,6 +130,23 @@ export function renderKanbanFiltersAndBoard(projectId) {
         const memberFilterContainer = createFilter('Исполнители', members, 'member');
         const memberSelect = memberFilterContainer.querySelector('select');
         filterContainer.appendChild(memberFilterContainer);
+
+        const header = document.createElement('div');
+        header.className = 'task-header';
+        const title = document.createElement('span');
+        title.textContent = tasks.length === 0 ? 'Нет задач' : 'Задачи';
+        header.appendChild(title);
+        const addBtn = document.createElement('button');
+        addBtn.className = 'add-project-button';
+        const plusText = document.createTextNode('+');
+        addBtn.appendChild(plusText);
+        const addLabel = document.createElement('span');
+        addLabel.className = 'add-label';
+        addLabel.textContent = 'Добавить';
+        addBtn.appendChild(addLabel);
+        addBtn.onclick = () => showTaskForm(projectId, viewContent);
+        header.appendChild(addBtn);
+        viewContent.appendChild(header);
 
         const kanbanBoard = document.createElement('div');
         kanbanBoard.className = 'kanban-board';

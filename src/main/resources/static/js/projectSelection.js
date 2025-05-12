@@ -106,7 +106,7 @@ function loadView(view, projectId) {
             });
     }
     if (view === 'канбан') {
-        renderKanbanFiltersAndBoard(projectId);
+        renderKanbanFiltersAndBoard(projectId, showTaskForm);
     }
     if (view === 'гант') {
         renderGanttChart(projectId);
