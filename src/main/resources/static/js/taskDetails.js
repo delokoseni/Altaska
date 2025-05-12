@@ -113,6 +113,12 @@ function showTaskDetails(task, view = 'список') {
             sidebar.appendChild(content);
             document.body.appendChild(sidebar);
 
+            const timerData = JSON.parse(localStorage.getItem(`timer_${task.id}`));
+            if (timerData) {
+                updateTimerDisplay(task.id, timerData.timeSpent || 0);
+                console.log("timerData.timeSpent", timerData.timeSpent);
+            }
+
             const performersSection = document.createElement('div');
             performersSection.className = 'task-performers-section';
             content.appendChild(performersSection);
@@ -258,11 +264,6 @@ function showTaskDetails(task, view = 'список') {
         .catch(error => {
             console.error('Ошибка загрузки приоритетов или статусов:', error);
         });
-
-        const timerData = JSON.parse(localStorage.getItem(`timer_${task.id}`));
-        if (timerData && !timerData.running) {
-            updateTimerDisplay(task.id, timerData.timeSpent || 0);
-        }
 }
 
 function createTagsSection() {
