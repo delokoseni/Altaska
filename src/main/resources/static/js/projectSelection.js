@@ -117,7 +117,7 @@ function loadView(view, projectId) {
     }
 }
 
-function showTaskForm(projectId, container) {
+function showTaskForm(projectId, container, from = 'список') {
     const existingForm = container.querySelector('.task-form');
     const previousContent = container.innerHTML;
     if (existingForm) return;
@@ -222,7 +222,7 @@ function showTaskForm(projectId, container) {
             backButton.type = 'button';
             backButton.className = 'back-button';
             backButton.onclick = () => {
-                container.innerHTML = previousContent;
+                loadView(from, projectId);
             };
 
             form.append(
@@ -321,6 +321,7 @@ function showTaskForm(projectId, container) {
                 })
                 .then(() => {
                     loadView('список', projectId);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);

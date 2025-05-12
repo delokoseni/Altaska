@@ -144,7 +144,7 @@ export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
         addLabel.className = 'add-label';
         addLabel.textContent = 'Добавить';
         addBtn.appendChild(addLabel);
-        addBtn.onclick = () => showTaskForm(projectId, viewContent);
+        addBtn.onclick = () => showTaskForm(projectId, viewContent, 'канбан');
         header.appendChild(addBtn);
         viewContent.appendChild(header);
 
