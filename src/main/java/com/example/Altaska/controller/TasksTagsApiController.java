@@ -62,7 +62,6 @@ public class TasksTagsApiController {
         tasksTagsRepository.save(tasksTags);
     }
 
-
     @DeleteMapping("/{taskId}/{tagId}")
     @Transactional
     public void removeTagFromTask(@PathVariable Long taskId,

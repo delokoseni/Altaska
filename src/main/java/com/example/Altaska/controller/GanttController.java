@@ -119,8 +119,6 @@ public class GanttController {
                 .collect(Collectors.toList());
     }
 
-
-
     @Data
     public static class GanttDataDTO {
         private List<TaskDTO> tasks;

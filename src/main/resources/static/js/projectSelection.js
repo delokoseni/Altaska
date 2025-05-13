@@ -786,7 +786,7 @@ function renderRolesSection(container, projectId) {
             console.error('Ошибка загрузки ролей:', error);
         });
 }
-
+/*
 function renderCreateRoleView(container, projectId, previousSection) {
     // Скрываем предыдущую секцию
     previousSection.style.display = 'none';
@@ -911,6 +911,139 @@ function renderCreateRoleView(container, projectId, previousSection) {
 
     createSection.appendChild(createButton);
     container.appendChild(createSection);
+}*/
+
+/* Редактирование ролей еще поправить нужно*/
+function renderCreateRoleView(container, projectId, previousSection) {
+    previousSection.style.display = 'none';
+
+    const createSection = document.createElement('div');
+    createSection.className = 'create-role-section';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Создание кастомной роли';
+    createSection.appendChild(title);
+
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Имя роли:';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    createSection.appendChild(nameLabel);
+    createSection.appendChild(nameInput);
+
+    // Соответствие прав: английский => русский
+    const permissionLabels = {
+        "add_task_tags": "Добавление тегов к задаче",
+        "remove_task_tags": "Удаление тегов из задачи",
+        "add_task_performers": "Назначение исполнителей задачи",
+        "remove_task_performers": "Удаление исполнителей задачи",
+        "accept_tasks": "Взятие задачи в работу",
+        "reject_tasks": "Отказ от выполнения задачи",
+        "create_tasks": "Создание задач",
+        "edit_task_title": "Редактирование названия задачи",
+        "edit_task_description": "Редактирование описания задачи",
+        "edit_task_priority": "Изменение приоритета задачи",
+        "edit_task_status": "Изменение статуса задачи",
+        "edit_task_deadline": "Изменение срока выполнения",
+        "edit_task_start_date": "Изменение даты начала задачи",
+        "delete_tasks": "Удаление задач",
+        "attach_task_files": "Прикрепление файлов к задаче",
+        "download_task_files": "Загрузка файлов из задачи",
+        "delete_task_files": "Удаление прикреплённых файлов",
+        "write_task_comments": "Написание комментариев",
+        "edit_task_comments": "Редактирование комментариев",
+        "delete_task_comments": "Удаление комментариев",
+        "create_gantt_chart": "Создание диаграммы Ганта",
+        "edit_project_title_description": "Редактирование названия и описания проекта",
+        "archive_project": "Архивирование проекта",
+        "change_user_roles": "Назначение ролей участникам",
+        "invite_project_members": "Приглашение участников в проект",
+        "remove_project_members": "Удаление участников из проекта",
+        "delete_project": "Удаление проекта",
+        "create_roles": "Создание ролей",
+        "delete_roles": "Удаление ролей",
+        "edit_roles": "Редактирование ролей",
+        "create_subtasks": "Создание подзадач",
+        "edit_subtasks": "Редактирование подзадач",
+        "delete_subtasks": "Удаление подзадач",
+        "create_tags": "Создание тегов проекта",
+        "delete_tags": "Удаление тегов проекта",
+        "edit_tags": "Редактирование тегов проекта"
+    };
+
+    const permissionsList = document.createElement('div');
+    permissionsList.className = 'permissions-list';
+
+    Object.entries(permissionLabels).forEach(([permissionKey, permissionLabel]) => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = permissionKey;
+        checkbox.name = permissionKey;
+        checkbox.value = permissionKey;
+
+        const label = document.createElement('label');
+        label.htmlFor = permissionKey;
+        label.textContent = permissionLabel;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'permission-item';
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(label);
+
+        permissionsList.appendChild(wrapper);
+    });
+
+    createSection.appendChild(permissionsList);
+
+    const createButton = document.createElement('button');
+    createButton.textContent = 'Создать';
+    createButton.onclick = () => {
+        const name = nameInput.value.trim();
+        if (!name) {
+            alert('Имя роли не может быть пустым');
+            return;
+        }
+
+        // Собираем объект прав
+        const permissions = {};
+        Object.keys(permissionLabels).forEach(key => {
+            const checkbox = document.getElementById(key);
+            permissions[key] = checkbox.checked;
+        });
+
+        console.log("Права перед отправкой на сервер:", permissions);
+
+        fetch(`/api/projects/${projectId}/roles`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                name: name,
+                permissions: permissions
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Роль создана!');
+                container.removeChild(createSection);
+                previousSection.remove();
+                renderRolesSection(container, projectId);
+            } else {
+                response.text().then(errorMessage => {
+                    alert(`Ошибка при создании роли: ${errorMessage}`);
+                });
+            }
+        })
+        .catch(err => {
+            console.error('Ошибка при отправке данных:', err);
+            alert('Произошла ошибка при отправке данных на сервер');
+        });
+    };
+
+    createSection.appendChild(createButton);
+    container.appendChild(createSection);
 }
 
 function deleteRole(roleId, projectId, container) {
@@ -954,45 +1087,57 @@ function renderEditRoleView(container, projectId, role, previousSection) {
     editSection.appendChild(nameLabel);
     editSection.appendChild(nameInput);
 
+    const permissionLabels = {
+            "add_task_tags": "Добавление тегов к задаче",
+            "remove_task_tags": "Удаление тегов из задачи",
+            "add_task_performers": "Назначение исполнителей задачи",
+            "remove_task_performers": "Удаление исполнителей задачи",
+            "accept_tasks": "Взятие задачи в работу",
+            "reject_tasks": "Отказ от выполнения задачи",
+            "create_tasks": "Создание задач",
+            "edit_task_title": "Редактирование названия задачи",
+            "edit_task_description": "Редактирование описания задачи",
+            "edit_task_priority": "Изменение приоритета задачи",
+            "edit_task_status": "Изменение статуса задачи",
+            "edit_task_deadline": "Изменение срока выполнения",
+            "edit_task_start_date": "Изменение даты начала задачи",
+            "delete_tasks": "Удаление задач",
+            "attach_task_files": "Прикрепление файлов к задаче",
+            "download_task_files": "Загрузка файлов из задачи",
+            "delete_task_files": "Удаление прикреплённых файлов",
+            "write_task_comments": "Написание комментариев",
+            "edit_task_comments": "Редактирование комментариев",
+            "delete_task_comments": "Удаление комментариев",
+            "create_gantt_chart": "Создание диаграммы Ганта",
+            "edit_project_title_description": "Редактирование названия и описания проекта",
+            "archive_project": "Архивирование проекта",
+            "change_user_roles": "Назначение ролей участникам",
+            "invite_project_members": "Приглашение участников в проект",
+            "remove_project_members": "Удаление участников из проекта",
+            "delete_project": "Удаление проекта",
+            "create_roles": "Создание ролей",
+            "delete_roles": "Удаление ролей",
+            "edit_roles": "Редактирование ролей",
+            "create_subtasks": "Создание подзадач",
+            "edit_subtasks": "Редактирование подзадач",
+            "delete_subtasks": "Удаление подзадач",
+            "create_tags": "Создание тегов проекта",
+            "delete_tags": "Удаление тегов проекта",
+            "edit_tags": "Редактирование тегов проекта"
+        };
     const permissionsList = document.createElement('div');
     permissionsList.className = 'permissions-list';
 
-    const allPermissions = [
-        "add_roles", "edit_roles", "delete_roles",
-        "add_project_members", "delete_project_members",
-        "rename_project", "edit_project_description",
-        "add_task_lists", "rename_task_lists", "edit_task_lists_description", "delete_task_lists",
-        "add_tasks_yourself", "add_tasks_another",
-        "rename_tasks_yourself", "rename_tasks_another",
-        "edit_tasks_description_yourself", "edit_tasks_description_another",
-        "delete_tasks_yourself", "delete_tasks_another",
-        "add_attachments_yourself", "add_attachments_another",
-        "delete_attachments_yourself", "delete_attachments_another",
-        "change_task_priority_yourself", "change_task_priority_another",
-        "add_priorities", "edit_priorities", "delete_priorities",
-        "add_statuses", "edit_statuses", "delete_statuses",
-        "add_comments_yourself", "add_comments_another",
-        "edit_comments", "delete_comments", "delete_other_comments",
-        "add_tags", "edit_tags", "delete_tags",
-        "set_tags_yourself", "set_tags_another",
-        "delete_tags_yourself", "delete_tags_another",
-        "add_subtasks_yourself", "add_subtasks_another",
-        "rename_subtasks_yourself", "rename_subtasks_another",
-        "edit_subtasks_description_yourself", "edit_subtasks_description_another",
-        "make_edit_gantt", "take_tasks", "change_task_assignee", "cancel_tasks",
-        "change_roles_another"
-    ];
-
-    allPermissions.forEach(permission => {
+    Object.entries(permissionLabels).forEach(([permissionKey, permissionLabel]) => {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = 'edit_' + permission;
-        checkbox.name = permission;
-        checkbox.checked = role.permissions?.[permission] || false;
+        checkbox.id = 'edit_' + permissionKey;
+        checkbox.name = permissionKey;
+        checkbox.checked = role.permissions?.[permissionKey] || false;
 
         const label = document.createElement('label');
-        label.htmlFor = 'edit_' + permission;
-        label.textContent = permission;
+        label.htmlFor = 'edit_' + permissionKey;
+        label.textContent = permissionLabel;
 
         const wrapper = document.createElement('div');
         wrapper.className = 'permission-item';
@@ -1014,9 +1159,11 @@ function renderEditRoleView(container, projectId, role, previousSection) {
         }
 
         const updatedPermissions = {};
-        allPermissions.forEach(p => {
-            updatedPermissions[p] = document.getElementById('edit_' + p).checked;
+        Object.keys(permissionLabels).forEach(key => {
+            updatedPermissions[key] = document.getElementById('edit_' + key).checked;
         });
+
+        console.log("Обновлённые права:", updatedPermissions);
 
         const updatedRole = await updateRole(projectId, role.id, {
             name: newName,
