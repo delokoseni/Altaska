@@ -68,6 +68,7 @@ public class TaskApiController {
                             @RequestParam String createdAt,
                             @RequestParam String updatedAt,
                             @RequestParam(required = false) Long priorityId,
+                            @RequestParam(required = false) String startTime,
                             @RequestParam(required = false) String deadline,
                             @RequestParam(required = false) List<Long> tagIds,
                             Principal principal) {
@@ -102,6 +103,16 @@ public class TaskApiController {
             task.setTimeSpent(0L);
             Statuses status = statusesRepository.findById(1L).orElseThrow(() -> new RuntimeException("Статус не найден"));
             task.setIdStatus(status);
+
+            LocalDateTime startTimeDateTime = null;
+            if (startTime != null && !startTime.isEmpty()) {
+                LocalDateTime localDateTime = LocalDateTime.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                ZoneId serverZoneId = ZoneId.of(TimeZone.getDefault().getID());
+                ZonedDateTime zonedDateTime = localDateTime.atZone(serverZoneId);
+                startTimeDateTime = zonedDateTime.toLocalDateTime();
+            }
+            task.setStartTimeServer(startTimeDateTime);
+
             LocalDateTime deadlineDateTime = null;
             if (deadline != null && !deadline.isEmpty()) {
                 LocalDateTime localDateTime = LocalDateTime.parse(deadline, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
@@ -310,6 +321,35 @@ public class TaskApiController {
             task.setDeadlineServer(zonedDateTime.toLocalDateTime());
         } else {
             task.setDeadlineServer(null);
+        }
+
+        task.setUpdatedBy(principal.getName());
+        task.setUpdatedAtServer(LocalDateTime.now());
+        task.setUpdatedAt(OffsetDateTime.now());
+        return tasksRepository.save(task);
+    }
+
+    @PutMapping("/{taskId}/startTime")
+    public Tasks updateTaskStartTime(@PathVariable Long taskId,
+                                    @RequestParam(required = false) String startTime,
+                                    Principal principal) {
+        Tasks task = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        permissionService.checkIfProjectArchived(task.getIdProject());
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        }
+
+        if (startTime != null && !startTime.isEmpty()) {
+            LocalDateTime localDateTime = LocalDateTime.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            ZoneId serverZoneId = ZoneId.of(TimeZone.getDefault().getID());
+            ZonedDateTime zonedDateTime = localDateTime.atZone(serverZoneId);
+            task.setStartTimeServer(zonedDateTime.toLocalDateTime());
+        } else {
+            task.setStartTimeServer(null);
         }
 
         task.setUpdatedBy(principal.getName());

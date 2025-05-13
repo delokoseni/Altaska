@@ -11,7 +11,8 @@ function showTaskDetails(task, view = 'список') {
     const sidebar = document.createElement('div');
     sidebar.className = 'task-details-sidebar slide-in';
 
-    const formatDeadline = task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '';
+    const formatStartTime = task.startTimeServer ? new Date(task.startTimeServer).toISOString().slice(0, 16) : '';
+    const formatDeadline = task.deadlineServer ? new Date(task.deadlineServer).toISOString().slice(0, 16) : '';
 
     fetch('/api/priorities')
         .then(response => response.json())
@@ -100,6 +101,10 @@ function showTaskDetails(task, view = 'список') {
                 <div class="priority-container"></div>
                 <button class="edit-button" data-target="priority">Изменить</button>
 
+                <label class="field-label">Дата начала:</label>
+                <input class="editable-field task-start-time" type="datetime-local" value="${formatStartTime}" disabled />
+                <button class="edit-button" data-target="startTime">Изменить</button>
+
                 <label class="field-label">Срок:</label>
                 <input class="editable-field task-deadline" type="datetime-local" value="${formatDeadline}" disabled />
                 <button class="edit-button" data-target="deadline">Изменить</button>
@@ -185,6 +190,7 @@ function showTaskDetails(task, view = 'список') {
                     const targetClass = {
                         name: '.task-name',
                         description: '.task-description',
+                        startTime: '.task-start-time',
                         deadline: '.task-deadline',
                         priority: '.task-priority',
                         status: '.task-status'
@@ -207,6 +213,8 @@ function showTaskDetails(task, view = 'список') {
                             formData.append('priorityId', field.value || '');
                         } else if (target === 'status') {
                             formData.append('statusId', field.value);
+                        } else if (target === 'startTime') {
+                            formData.append('startTime', field.value); //???
                         } else if (target === 'deadline') {
                             formData.append('deadline', field.value);
                         }
@@ -264,6 +272,14 @@ function showTaskDetails(task, view = 'список') {
         .catch(error => {
             console.error('Ошибка загрузки приоритетов или статусов:', error);
         });
+}
+
+function formatDateTimeLocal(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+    return localDate.toISOString().slice(0, 16);
 }
 
 function createTagsSection() {

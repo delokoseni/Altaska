@@ -163,6 +163,15 @@ function showTaskForm(projectId, container, from = 'список') {
             descriptionInput.placeholder = 'Описание задачи';
             descriptionInput.name = 'description';
 
+            const startTimeLabel = document.createElement('h3');
+            startTimeLabel.textContent = 'Дата начала';
+            const startTimeInput = document.createElement('input');
+            startTimeInput.type = 'datetime-local';
+            startTimeInput.name = 'startTime';
+            startTimeInput.placeholder = 'Начало выполнения';
+
+            const deadlineLabel = document.createElement('h3');
+            deadlineLabel.textContent = 'Срок выполнения';
             const deadlineInput = document.createElement('input');
             deadlineInput.type = 'datetime-local';
             deadlineInput.name = 'deadline';
@@ -229,6 +238,9 @@ function showTaskForm(projectId, container, from = 'список') {
                 backButton,
                 nameInput,
                 descriptionInput,
+                startTimeLabel,
+                startTimeInput,
+                deadlineLabel,
                 deadlineInput,
                 prioritySelect,
                 tagSelector,
