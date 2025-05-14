@@ -1,15 +1,18 @@
 package com.example.Altaska.controller;
 
 import com.example.Altaska.models.Comments;
+import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.CommentsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.OffsetDateTime;
@@ -30,6 +33,9 @@ public class CommentApiController {
     private TasksRepository tasksRepository;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     public CommentApiController(CommentsRepository commentsRepository) {
         this.commentsRepository = commentsRepository;
     }
@@ -37,8 +43,6 @@ public class CommentApiController {
     @GetMapping("/task/{taskId}")
     public List<CommentDto> getCommentsByTask(@PathVariable Long taskId) {
         List<Comments> comments = commentsRepository.findByIdTask_Id(taskId);
-
-        // Сортируем комментарии по времени создания (createdAt) по возрастанию
         return comments.stream()
                 .sorted(Comparator.comparing(Comments::getCreatedAtServer))  // Сортировка по возрастанию
                 .map(comment -> new CommentDto(
@@ -65,6 +69,12 @@ public class CommentApiController {
             return ResponseEntity.badRequest().body("Задача не найдена");
         }
 
+        Projects project = task.getIdProject();
+        permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "write_task_comments")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
+
         Comments comment = new Comments();
         comment.setContent(commentRequest.getContent());
         comment.setCreatedAt(OffsetDateTime.now()); //TODO Изменить
@@ -77,7 +87,6 @@ public class CommentApiController {
         return ResponseEntity.ok().build();
     }
 
-    // Редактирование комментария
     @PutMapping("/edit-comment/{commentId}")
     public ResponseEntity<?> editComment(@PathVariable Long commentId, @RequestBody String content, Principal principal) {
         if (principal == null) {
@@ -93,6 +102,12 @@ public class CommentApiController {
         if (comment == null || !comment.getIdUser().equals(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Можно редактировать только свои комментарии
         }
+        Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
+        Projects project = task.getIdProject();
+        permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_task_comments")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         if (content.startsWith("\"") && content.endsWith("\"")) {
             content = content.substring(1, content.length() - 1);
         }
@@ -102,7 +117,6 @@ public class CommentApiController {
         return ResponseEntity.ok().build();
     }
 
-    // Удаление комментария
     @DeleteMapping("/delete-comment/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Long commentId, Principal principal) {
         if (principal == null) {
@@ -117,6 +131,12 @@ public class CommentApiController {
         Comments comment = commentsRepository.findById(commentId).orElse(null);
         if (comment == null || !comment.getIdUser().equals(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Можно удалять только свои комментарии
+        }
+        Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
+        Projects project = task.getIdProject();
+        permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_task_comments")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         commentsRepository.delete(comment);

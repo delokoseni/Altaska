@@ -11,7 +11,9 @@ import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -51,8 +53,8 @@ public class TasksTagsApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new RuntimeException("Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "add_task_tags")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
         TasksTags tasksTags = new TasksTags();
@@ -71,8 +73,8 @@ public class TasksTagsApiController {
         Tags tag = tagsRepository.findById(tagId).orElseThrow();
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new RuntimeException("Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "remove_task_tags")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
         tasksTagsRepository.deleteByIdTaskAndIdTag(task, tag);

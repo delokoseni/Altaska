@@ -1,10 +1,12 @@
 package com.example.Altaska.controller;
 
-import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tasks;
+import com.example.Altaska.models.Users;
 import com.example.Altaska.models.TasksDependencies;
 import com.example.Altaska.repositories.TaskDependenciesRepository;
 import com.example.Altaska.repositories.TasksRepository;
+import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Timestamp;
+import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,20 +34,35 @@ public class GanttController {
     @Autowired
     private TaskDependenciesRepository taskDependenciesRepository;
 
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
     @Transactional
     @PostMapping("/save")
-    public ResponseEntity<?> saveGanttData(@RequestBody GanttDataDTO data) {
+    public ResponseEntity<?> saveGanttData(@RequestBody GanttDataDTO data, Principal principal) {
+        Users user = usersRepository.findByEmail(principal.getName()).orElse(null);
+        if(user  == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден.");
+        }
+        Tasks tasks = tasksRepository.findById(data.getTasks().getFirst().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
+
+        permissionService.checkIfProjectArchived(tasks.getIdProject());
+        if (!permissionService.hasPermission(user.getId(), tasks.getIdProject().getId(), "create_gantt_chart")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         for (TaskDTO dto : data.getTasks()) {
             Tasks task = tasksRepository.findById(dto.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
 
-            // Обновление сроков и прогресса
             task.setStartTimeServer(dto.getStartTime());
             task.setDeadlineServer(dto.getDeadline());
             task.setUpdatedAtServer(LocalDateTime.now());
             tasksRepository.save(task);
 
-            // Удаление старых входящих зависимостей
             taskDependenciesRepository.deleteByIdToTask_Id(task.getId());
 
             if (dto.getDependencies() != null && !dto.getDependencies().isBlank()) {
@@ -64,11 +80,11 @@ public class GanttController {
 
                         Double lag = null;
                         if (matcher.group(3) != null) {
-                            lag = Double.parseDouble(matcher.group(3)); // с плюсом или минусом
+                            lag = Double.parseDouble(matcher.group(3));
                         }
 
                         Tasks fromTask = tasksRepository.findById(fromTaskId)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task dep not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена."));
 
                         TasksDependencies dependency = new TasksDependencies();
                         dependency.setIdFromTask(fromTask);

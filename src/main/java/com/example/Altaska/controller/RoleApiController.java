@@ -64,13 +64,20 @@ public class RoleApiController {
 
     @PostMapping
     @Transactional
-    public RoleDto createCustomRole(
-            @PathVariable Long projectId,
-            @RequestBody RoleRequest request
-    ) {
+    public RoleDto createCustomRole(@PathVariable Long projectId, @RequestBody RoleRequest request, Principal principal) {
         Optional<Projects> projectOpt = projectsRepository.findById(projectId);
         if (projectOpt.isEmpty()) {
             throw new RuntimeException("Проект не найден");
+        }
+
+        permissionService.checkIfProjectArchived(projectOpt.get());
+
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        boolean hasPermission = permissionService.hasPermission(user.getId(), projectOpt.get().getId(), "delete_roles");
+        if (!hasPermission) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         Roles newRole = new Roles();
@@ -111,9 +118,9 @@ public class RoleApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
-        boolean hasPermission = permissionService.hasPermission(user.getId(), project.getId(), "EDIT_ROLE");
+        boolean hasPermission = permissionService.hasPermission(user.getId(), project.getId(), "delete_roles");
         if (!hasPermission) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав для удаления роли");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         rolesRepository.delete(role);
@@ -143,8 +150,8 @@ public class RoleApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
-        if (!permissionService.hasPermission(user.getId(), projectId, "EDIT_ROLE")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав");
+        if (!permissionService.hasPermission(user.getId(), projectId, "edit_roles")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         role.setName(request.name);

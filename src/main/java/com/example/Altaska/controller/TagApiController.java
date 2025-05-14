@@ -2,14 +2,18 @@ package com.example.Altaska.controller;
 
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tags;
+import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.ProjectsRepository;
 import com.example.Altaska.repositories.TagsRepository;
+import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -25,42 +29,58 @@ public class TagApiController {
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private UsersRepository usersRepository;
+
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<Tags>> getTagsByProject(@PathVariable Long projectId) {
         return ResponseEntity.ok(tagsRepository.findByIdProjectId(projectId));
     }
 
     @PostMapping("/create/{projectId}")
-    public ResponseEntity<Tags> createTag(@PathVariable Long projectId, @RequestParam String name) {
+    public ResponseEntity<Tags> createTag(@PathVariable Long projectId, @RequestParam String name, Principal principal) {
         Projects project = projectsRepository.findById(projectId).orElse(null);
         if (project == null) return ResponseEntity.notFound().build();
-
         Tags tag = new Tags();
         tag.setName(name);
         tag.setIdProject(project);
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
         permissionService.checkIfProjectArchived(tag.getIdProject());
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "create_tags")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         return ResponseEntity.ok(tagsRepository.save(tag));
     }
 
     @DeleteMapping("/{tagId}")
-    public ResponseEntity<Void> deleteTag(@PathVariable Long tagId) {
+    public ResponseEntity<Void> deleteTag(@PathVariable Long tagId, Principal principal) {
         Tags tag = tagsRepository.findById(tagId)
                 .orElse(null);
         if (tag == null) return ResponseEntity.notFound().build();
         Projects project = tag.getIdProject();
         if (project == null) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
         permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_tags")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         tagsRepository.deleteById(tagId);
         return ResponseEntity.ok().build();
     }
 
-
     @PostMapping("/update/{tagId}")
-    public ResponseEntity<Tags> updateTag(@PathVariable Long tagId, @RequestParam String name) {
+    public ResponseEntity<Tags> updateTag(@PathVariable Long tagId, @RequestParam String name, Principal principal) {
         Tags tag = tagsRepository.findById(tagId).orElse(null);
         if (tag == null) return ResponseEntity.notFound().build();
         tag.setName(name);
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
         permissionService.checkIfProjectArchived(tag.getIdProject());
+        if (!permissionService.hasPermission(user.getId(), tag.getIdProject().getId(), "edit_tags")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         return ResponseEntity.ok(tagsRepository.save(tag));
     }
 }

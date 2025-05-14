@@ -75,6 +75,18 @@ public class TaskApiController {
         Optional<Projects> projectOpt = projectsRepository.findById(projectId);
         Optional<Users> userOpt = usersRepository.findByEmail(principal.getName());
 
+        if (projectOpt.isEmpty() || userOpt.isEmpty()) {
+            throw new RuntimeException("Проект или пользователь не найден");
+        }
+
+        Projects project = projectOpt.get();
+        Users user = userOpt.get();
+
+        permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(user.getId(), projectId, "create_tasks")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
+
         if (projectOpt.isPresent() && userOpt.isPresent()) {
             Tasks task = new Tasks();
             task.setName(name);
@@ -151,8 +163,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new RuntimeException("Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_title")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         task.setName(name);
@@ -172,8 +184,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_description")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         task.setDescription(description);
@@ -193,8 +205,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_priority")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
         if (priorityId != null) {
@@ -222,8 +234,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_status")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
 
@@ -243,7 +255,7 @@ public class TaskApiController {
 
     @PutMapping("/{taskId}/priorityByName")
     public Tasks updateTaskPriorityByName(@PathVariable Long taskId,
-                                          @RequestBody Map<String, String> requestBody,  // Принимаем данные из тела запроса
+                                          @RequestBody Map<String, String> requestBody,
                                           Principal principal) {
         String priorityName = requestBody.get("priorityName");
 
@@ -253,8 +265,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_priority")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
 
@@ -281,8 +293,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_status")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
 
@@ -310,8 +322,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_deadline")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         if (deadline != null && !deadline.isEmpty()) {
@@ -339,8 +351,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_start_date")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         if (startTime != null && !startTime.isEmpty()) {
@@ -367,8 +379,8 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         permissionService.checkIfProjectArchived(task.getIdProject());
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete_tasks")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         taskCleanupService.deleteTaskDependencies(taskId);

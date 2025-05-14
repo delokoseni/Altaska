@@ -4,8 +4,11 @@ import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.security.Principal;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -53,8 +56,8 @@ public class TaskPerformerApiController {
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
-        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "edit")) {
-            return ResponseEntity.status(403).body("Нет прав для добавления исполнителя");
+        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "add_task_performers")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         if (taskPerformersRepository.existsByIdTaskAndIdUser(task, performer)) {
@@ -81,8 +84,8 @@ public class TaskPerformerApiController {
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
-        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "edit")) {
-            return ResponseEntity.status(403).body("Нет прав для удаления исполнителя");
+        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "remove_task_performers")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         taskPerformersRepository.deleteByIdTaskIdAndIdUserId(taskId, userId);
@@ -97,8 +100,8 @@ public class TaskPerformerApiController {
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
-        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "edit")) {
-            return ResponseEntity.status(403).body("Нет прав для назначения исполнителя");
+        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "accept_tasks")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         if (taskPerformersRepository.existsByIdTaskAndIdUser(task, currentUser)) {
@@ -123,8 +126,8 @@ public class TaskPerformerApiController {
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
-        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "edit")) {
-            return ResponseEntity.status(403).body("Нет прав для удаления исполнителя");
+        if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "reject_tasks")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         TaskPerformers performer = taskPerformersRepository.findByIdTaskAndIdUser(task, currentUser)
@@ -137,16 +140,10 @@ public class TaskPerformerApiController {
 
     @GetMapping("/{taskId}/is-assigned")
     public ResponseEntity<?> isAssigned(@PathVariable Long taskId, Principal principal) {
-        // Получаем задачу
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
-
-        // Получаем текущего пользователя
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
-
-        // Проверяем, является ли текущий пользователь исполнителем задачи
         boolean isAssigned = taskPerformersRepository.existsByIdTaskAndIdUser(task, currentUser);
-
         return ResponseEntity.ok(isAssigned);
     }
 }

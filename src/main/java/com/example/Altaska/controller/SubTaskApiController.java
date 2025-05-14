@@ -51,8 +51,8 @@ public class SubTaskApiController {
 
         permissionService.checkIfProjectArchived(task.getIdProject());
 
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "create_subtasks")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         List<SubTasks> saved = new ArrayList<>();
@@ -76,11 +76,6 @@ public class SubTaskApiController {
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
-
-        if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "view")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
-        }
-
         return subTasksRepository.findByIdTask_Id(taskId);
     }
 
@@ -104,8 +99,8 @@ public class SubTaskApiController {
 
         permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
 
-        if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit_subtasks")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         subTask.setName(dto.getName());
@@ -123,8 +118,8 @@ public class SubTaskApiController {
 
         permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
 
-        if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "delete_subtasks")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         subTasksRepository.delete(subTask);

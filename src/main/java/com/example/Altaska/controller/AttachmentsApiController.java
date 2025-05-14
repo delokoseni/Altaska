@@ -1,12 +1,14 @@
 package com.example.Altaska.controller;
 
 import com.example.Altaska.models.Attachments;
+import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.AttachmentsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.security.CustomUserDetails;
+import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -35,12 +38,13 @@ public class AttachmentsApiController {
     @Autowired
     private TasksRepository tasksRepository;
 
-    // Получить список файлов для задачи
+    @Autowired
+    private PermissionService permissionService;
+
     @GetMapping("/task/{taskId}")
     public ResponseEntity<?> getFilesByTask(@PathVariable Long taskId) {
         List<Attachments> files = attachmentsRepository.findByIdTask_Id(taskId);
         if (files.isEmpty()) {
-            // Возвращаем пустой массив, а не текст!
             return ResponseEntity.ok(List.of());
         }
 
@@ -55,7 +59,6 @@ public class AttachmentsApiController {
                 .toList());
     }
 
-    // Загрузка файла
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file,
                                         @RequestParam("taskId") Long taskId,
@@ -63,17 +66,22 @@ public class AttachmentsApiController {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         Users user = usersRepository.findByEmail(principal.getName()).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         Tasks task = tasksRepository.findById(taskId).orElse(null);
         if (task == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Задача не найдена");
         }
-
+        Projects project = task.getIdProject();
+        if (project == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("У задачи не указан проект");
+        }
+        permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "attach_task_files")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         try {
             Attachments attachment = new Attachments();
             attachment.setUploadedAt(OffsetDateTime.now());
@@ -94,12 +102,27 @@ public class AttachmentsApiController {
     }
 
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long fileId) {
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long fileId, Principal principal) {
         Attachments attachment = attachmentsRepository.findById(fileId).orElse(null);
         if (attachment == null) {
             return ResponseEntity.notFound().build();
         }
-
+        Users user = usersRepository.findByEmail(principal.getName()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Tasks task = tasksRepository.findById(attachment.getIdTask().getId()).orElse(null);
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+        Projects project = task.getIdProject();
+        if (project == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+        permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "download_task_files")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + attachment.getFileName() + "\"")
                 .header("Content-Type", attachment.getFileType())
@@ -112,27 +135,30 @@ public class AttachmentsApiController {
         if (optionalAttachment.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         Attachments file = optionalAttachment.get();
-
-        // Получаем ID текущего пользователя
         Object principal = authentication.getPrincipal();
         if (!(principal instanceof CustomUserDetails userDetails)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не аутентифицирован.");
         }
-
         Long currentUserId = userDetails.GetUserId();
-
-        // Проверка: только тот, кто загрузил файл, может его удалить
         if (!file.getIdUser().getId().equals(currentUserId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не можете удалить этот файл.");
         }
-
+        Tasks task = file.getIdTask();
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Файл не привязан к задаче.");
+        }
+        Projects project = task.getIdProject();
+        if (project == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Задача не привязана к проекту.");
+        }
+        permissionService.checkIfProjectArchived(project);
+        if (!permissionService.hasPermission(currentUserId, project.getId(), "delete_task_files")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+        }
         attachmentsRepository.delete(file);
         return ResponseEntity.ok("Файл удален.");
     }
-
-
 
     // DTO для ответа на запрос о файлах
     public static class FileDto {

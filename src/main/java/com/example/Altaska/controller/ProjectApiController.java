@@ -74,8 +74,8 @@ public class ProjectApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), project.getId(), "edit")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_project_title_description")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         permissionService.checkIfProjectArchived(project);
@@ -145,8 +145,8 @@ public class ProjectApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), project.getId(), "edit")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет доступа");
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "archive_project")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         boolean newStatus = payload.getOrDefault("archived", false);
@@ -169,8 +169,8 @@ public class ProjectApiController {
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(currentUser.getId(), project.getId(), "EDIT_ROLE")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав");
+        if (!permissionService.hasPermission(currentUser.getId(), project.getId(), "change_user_roles")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         permissionService.checkIfProjectArchived(project);
@@ -210,8 +210,8 @@ public class ProjectApiController {
         Users inviter = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(inviter.getId(), projectId, "invite")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет прав для приглашения");
+        if (!permissionService.hasPermission(inviter.getId(), projectId, "invite_project_members")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         permissionService.checkIfProjectArchived(project);
@@ -295,8 +295,8 @@ public class ProjectApiController {
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(currentUser.getId(), projectId, "edit")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав для удаления участника");
+        if (!permissionService.hasPermission(currentUser.getId(), projectId, "remove_project_members")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         permissionService.checkIfProjectArchived(project);
@@ -319,8 +319,8 @@ public class ProjectApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        if (!permissionService.hasPermission(user.getId(), project.getId(), "edit")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Нет доступа"));
+        if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_project")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
         permissionService.checkIfProjectArchived(project);
