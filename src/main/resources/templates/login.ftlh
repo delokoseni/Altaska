@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/css/mainstyle.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/registrationlogin.css">
+    <link rel="stylesheet" href="/css/toast.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/passwordToggle.js"></script>
     <title>Вход</title>
@@ -21,8 +22,11 @@
 <main>
     <div class="container">
         <h1>Вход</h1>
-        <#if error??>
-            <div class="error-message" style="color: red;">${error}</div>
+        <#if request.getParameter("error")??>
+            <script type="module">
+                import { showToast } from '/js/toast.js';
+                showToast("Неверный логин или пароль.", "error");
+            </script>
         </#if>
     <form action="/login" method="post">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
