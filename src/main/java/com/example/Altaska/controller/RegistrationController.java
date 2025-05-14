@@ -90,10 +90,9 @@ public class RegistrationController {
 
         try {
             usersRepository.save(newUser);
-
-        }catch (Exception e) {
-            model.addAttribute("error", "Не удалось сохранить данные в базе данных: "
-                    + e.getMessage());
+            model.addAttribute("success", "Регистрация прошла успешно!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Не удалось зарегистрироваться: " + e.getMessage());
         }
         return "registration";
     }
