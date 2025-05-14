@@ -154,7 +154,7 @@ public class TaskApiController {
     }
 
     @PutMapping("/{taskId}/name")
-    public Tasks updateTaskName(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskName(@PathVariable Long taskId,
                                 @RequestParam String name,
                                 Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -164,18 +164,18 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_title")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         task.setName(name);
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @PutMapping("/{taskId}/description")
-    public Tasks updateTaskDescription(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskDescription(@PathVariable Long taskId,
                                        @RequestParam String description,
                                        Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -185,18 +185,18 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_description")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         task.setDescription(description);
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @PutMapping("/{taskId}/priority")
-    public Tasks updateTaskPriority(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskPriority(@PathVariable Long taskId,
                                     @RequestParam(required = false) Long priorityId,
                                     Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -206,7 +206,7 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_priority")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
         if (priorityId != null) {
@@ -220,12 +220,12 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @PutMapping("/{taskId}/status")
     @Transactional
-    public Tasks updateTaskStatus(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskStatus(@PathVariable Long taskId,
                                   @RequestParam Long statusId,
                                   Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -235,7 +235,7 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_status")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
 
@@ -250,11 +250,11 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @PutMapping("/{taskId}/priorityByName")
-    public Tasks updateTaskPriorityByName(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskPriorityByName(@PathVariable Long taskId,
                                           @RequestBody Map<String, String> requestBody,
                                           Principal principal) {
         String priorityName = requestBody.get("priorityName");
@@ -266,7 +266,7 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_priority")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
 
@@ -277,12 +277,12 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @PutMapping("/{taskId}/statusByName")
     @Transactional
-    public Tasks updateTaskStatusByName(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskStatusByName(@PathVariable Long taskId,
                                         @RequestBody Map<String, String> requestBody,  // Принимаем данные из тела запроса
                                         Principal principal) {
         String statusName = requestBody.get("statusName");
@@ -294,7 +294,7 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_status")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
 
@@ -309,11 +309,11 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @PutMapping("/{taskId}/deadline")
-    public Tasks updateTaskDeadline(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskDeadline(@PathVariable Long taskId,
                                     @RequestParam(required = false) String deadline,
                                     Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -323,7 +323,7 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_deadline")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         if (deadline != null && !deadline.isEmpty()) {
@@ -338,11 +338,11 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @PutMapping("/{taskId}/startTime")
-    public Tasks updateTaskStartTime(@PathVariable Long taskId,
+    public ResponseEntity<?> updateTaskStartTime(@PathVariable Long taskId,
                                     @RequestParam(required = false) String startTime,
                                     Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -352,7 +352,7 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_start_date")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         if (startTime != null && !startTime.isEmpty()) {
@@ -367,7 +367,7 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        return ResponseEntity.ok(tasksRepository.save(task));
     }
 
     @DeleteMapping("/{taskId}/delete")
@@ -380,7 +380,7 @@ public class TaskApiController {
 
         permissionService.checkIfProjectArchived(task.getIdProject());
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete_tasks")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         taskCleanupService.deleteTaskDependencies(taskId);

@@ -3,6 +3,16 @@ import { createPerformersSection, assignTask, unassignTask } from './taskPerform
 import { initTaskCommentsSection, initCommentInputSection } from './comments.js';
 import { initTaskFilesSection } from './attachments.js';
 import { startTimer, pauseTimer, resetTimer, updateTimerDisplay } from './timer.js';
+import { showToast } from './toast.js';
+
+const targetLabels = {
+    name: 'Название',
+    description: 'Описание',
+    startTime: 'Дата начала',
+    deadline: 'Дедлайн',
+    priority: 'Приоритет',
+    status: 'Статус'
+};
 
 function showTaskDetails(task, view = 'список') {
     const existing = document.querySelector('.task-details-sidebar');
@@ -214,7 +224,7 @@ function showTaskDetails(task, view = 'список') {
                         } else if (target === 'status') {
                             formData.append('statusId', field.value);
                         } else if (target === 'startTime') {
-                            formData.append('startTime', field.value); //???
+                            formData.append('startTime', field.value);
                         } else if (target === 'deadline') {
                             formData.append('deadline', field.value);
                         }
@@ -227,16 +237,20 @@ function showTaskDetails(task, view = 'список') {
                             },
                             body: formData
                         })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Ошибка при сохранении');
+                        .then(async response => {
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                throw new Error(errorText || 'Ошибка при сохранении');
+                            }
                             return response.json();
                         })
                         .then(updatedTask => {
                             console.log(`Поле "${target}" обновлено успешно`, updatedTask);
+                            showToast(`Поле "${targetLabels[target]}" успешно обновлено`, "success");
                             loadView(view, task.idProject.id);
                         })
                         .catch(err => {
-                            alert(`Не удалось обновить ${target}: ${err.message}`);
+                            showToast(`Не удалось обновить "${targetLabels[target]}": ${err.message}`, "error");
                             field.disabled = false;
                             button.textContent = 'Сохранить';
                         });
