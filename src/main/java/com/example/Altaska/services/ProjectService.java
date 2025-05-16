@@ -41,7 +41,7 @@ public class ProjectService {
     }
 
 
-    public void createProject(String name, String description, Users owner, LocalDate createdAt,
+    public Projects createProject(String name, String description, Users owner, LocalDate createdAt,
                               OffsetDateTime updatedAt) {
         Projects project = new Projects();
         project.setName(name);
@@ -54,7 +54,7 @@ public class ProjectService {
         project.setUpdatedAtServer(OffsetTime.now());
         project.setUpdatedBy(owner.getEmail());
 
-        projectsRepo.save(project);
+        return projectsRepo.save(project);
     }
 
 }

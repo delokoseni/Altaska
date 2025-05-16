@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
 
 @Entity
 @Table(name = "activity_log")

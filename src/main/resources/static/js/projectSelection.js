@@ -6,6 +6,7 @@ import { addPerformer } from './taskPerformers.js';
 import { deleteTask } from './deleteTask.js';
 import { renderKanbanFiltersAndBoard } from './kanban.js';
 import { renderGanttChart } from './gantt.js';
+import { loadProjectLogsView } from './projectLogs.js';
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -20,7 +21,7 @@ function selectProject(projectId, projectName) {
     const menu = document.createElement('div');
     menu.className = 'project-menu';
 
-    const views = ['Список', 'Канбан', 'Гант', 'О проекте'];
+    const views = ['Список', 'Канбан', 'Гант', 'О проекте', 'История'];
     views.forEach(view => {
         const button = document.createElement('button');
         button.textContent = view;
@@ -114,6 +115,10 @@ function loadView(view, projectId) {
     if (view === 'о проекте')
     {
         loadProjectInfoView(projectId);
+    }
+    if (view === 'история')
+    {
+        loadProjectLogsView(projectId);
     }
 }
 

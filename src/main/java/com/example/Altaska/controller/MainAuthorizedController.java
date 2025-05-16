@@ -3,6 +3,7 @@ package com.example.Altaska.controller;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,10 @@ public class MainAuthorizedController {
 
     @Autowired
     private UsersRepository userRepository;
+
+    @Autowired
+    private ActivityLogService activityLogService;
+
 
     @GetMapping("/mainauthorized")
     public String ShowLogin(Model model, Principal principal) {
@@ -58,7 +63,16 @@ public class MainAuthorizedController {
             OffsetDateTime clientUpdatedAt = OffsetDateTime.parse(updatedAt);
             if (currentUserOpt.isPresent()) {
                 Users user = currentUserOpt.get();
-                projectService.createProject(name, description, user, clientCreatedAt, clientUpdatedAt);
+                Projects newProject = projectService.createProject(name, description, user, clientCreatedAt, clientUpdatedAt);
+                activityLogService.logActivity(
+                        user,
+                        newProject,
+                        "create",
+                        "project",
+                        newProject.getId(),
+                        null,
+                        "Создан проект с названием: " + name
+                );
                 redirectAttributes.addFlashAttribute("message", "Проект создан!");
             }
         }
@@ -69,8 +83,8 @@ public class MainAuthorizedController {
     @ResponseBody
     public String getCurrentUserEmail(Principal principal) {
         if (principal != null) {
-            return principal.getName();  // Возвращаем email пользователя
+            return principal.getName();  
         }
-        return "";  // Если пользователь не авторизован, возвращаем пустую строку
+        return "";
     }
 }
