@@ -1,5 +1,6 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.Attachments;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tasks;
@@ -8,6 +9,7 @@ import com.example.Altaska.repositories.AttachmentsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.security.CustomUserDetails;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,6 +42,9 @@ public class AttachmentsApiController {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @GetMapping("/task/{taskId}")
     public ResponseEntity<?> getFilesByTask(@PathVariable Long taskId) {
@@ -93,6 +98,15 @@ public class AttachmentsApiController {
             attachment.setIdUser(user);
 
             attachmentsRepository.save(attachment);
+            activityLogService.logActivity(
+                    user,
+                    project,
+                    "create",
+                    "task_attachment",
+                    attachment.getId(),
+                    null,
+                    "Файл \"" + file.getOriginalFilename() + "\" прикреплён к задаче: \"" + task.getName() + "\""
+            );
 
             return ResponseEntity.ok(Map.of("message", "Файл успешно загружен"));
 
@@ -123,6 +137,16 @@ public class AttachmentsApiController {
         if (!permissionService.hasPermission(user.getId(), project.getId(), "download_task_files")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
+        activityLogService.logActivity(
+                user,
+                project,
+                "read",
+                "task_attachment",
+                attachment.getId(),
+                null,
+                "Файл \"" + attachment.getFileName() + "\" скачан из задачи: \"" + task.getName() + "\""
+        );
+
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + attachment.getFileName() + "\"")
                 .header("Content-Type", attachment.getFileType())
@@ -157,6 +181,18 @@ public class AttachmentsApiController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         attachmentsRepository.delete(file);
+        Users currentUser = usersRepository.findById(currentUserId).orElse(null);
+        if (currentUser != null) {
+            activityLogService.logActivity(
+                    currentUser,
+                    project,
+                    "delete",
+                    "task_attachment",
+                    file.getId(),
+                    null,
+                    "Файл \"" + file.getFileName() + "\" удалён из задачи: \"" + task.getName() + "\""
+            );
+        }
         return ResponseEntity.ok("Файл удален.");
     }
 

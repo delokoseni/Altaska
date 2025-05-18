@@ -1,11 +1,13 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.ProjectMembers;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.repositories.*;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.EmailService;
 import com.example.Altaska.services.PermissionService;
 import com.example.Altaska.services.TaskCleanupService;
@@ -57,6 +59,12 @@ public class ProjectApiController {
     @Autowired
     private TaskCleanupService taskCleanupService;
 
+    @Autowired
+    private ActivityLogService activityLogService;
+
+    @Autowired
+    private ActivityLogRepository activityLogRepository;
+
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
         return projectsRepository.findById(id)
@@ -70,19 +78,33 @@ public class ProjectApiController {
                                            @RequestParam(required = false) String description,
                                            Principal principal) {
         Projects project = projectsRepository.findById(id).orElseThrow(() -> new RuntimeException("Проект не найден"));
-
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
         if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_project_title_description")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
         permissionService.checkIfProjectArchived(project);
-
-        if (name != null) project.setName(name);
-        if (description != null) project.setDescription(description);
+        List<Change> changes = new ArrayList<>();
+        if (name != null && !name.equals(project.getName())) {
+            changes.add(new Change("name", project.getName(), name));
+            project.setName(name);
+        }
+        if (description != null && !description.equals(project.getDescription())) {
+            changes.add(new Change("description", project.getDescription(), description));
+            project.setDescription(description);
+        }
         projectsRepository.save(project);
+        if (!changes.isEmpty()) {
+            activityLogService.logActivity(
+                    user,
+                    project,
+                    "update",
+                    "project",
+                    project.getId(),
+                    changes,
+                    "Обновлены поля проекта"
+            );
+        }
         return ResponseEntity.ok(project);
     }
 
@@ -150,8 +172,23 @@ public class ProjectApiController {
         }
 
         boolean newStatus = payload.getOrDefault("archived", false);
-        project.setIsArchived(newStatus);
-        projectsRepository.save(project);
+        boolean oldStatus = project.getIsArchived();
+
+        if (newStatus != oldStatus) {
+            List<Change> changes = List.of(new Change("archived", oldStatus, newStatus));
+            project.setIsArchived(newStatus);
+            projectsRepository.save(project);
+
+            activityLogService.logActivity(
+                    user,
+                    project,
+                    "update",
+                    "project",
+                    project.getId(),
+                    changes,
+                    newStatus ? "Проект был архивирован" : "Проект был разархивирован"
+            );
+        }
         return ResponseEntity.ok(project);
     }
 
@@ -178,11 +215,31 @@ public class ProjectApiController {
         ProjectMembers member = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, userId)
                 .orElseThrow(() -> new RuntimeException("Участник не найден"));
 
+        Roles oldRole = member.getIdRole();
+
         Roles newRole = rolesRepository.findById(newRoleId)
                 .orElseThrow(() -> new RuntimeException("Роль не найдена"));
 
-        member.setIdRole(newRole);
-        projectMembersRepository.save(member);
+        if (!oldRole.getId().equals(newRole.getId())) {
+            member.setIdRole(newRole);
+            projectMembersRepository.save(member);
+
+            List<Change> changes = List.of(new Change(
+                    "role",
+                    oldRole.getName(),
+                    newRole.getName()
+            ));
+
+            activityLogService.logActivity(
+                    currentUser,
+                    project,
+                    "update",
+                    "project_member",
+                    member.getIdUser().getId(),
+                    changes,
+                    String.format("Изменена роль участника %s", member.getIdUser().getEmail())
+            );
+        }
 
         return ResponseEntity.ok("Роль обновлена");
     }
@@ -258,13 +315,26 @@ public class ProjectApiController {
         String body = "Вас пригласили в проект \"" + project.getName() + "\". Подтвердите участие, перейдя по ссылке:\n" + link;
 
         emailService.sendEmail(email, subject, body);
-
+        activityLogService.logActivity(
+                inviter,
+                project,
+                "create",
+                "project_member",
+                invitee.getId(),
+                List.of(new Change(
+                        "invitation",
+                        null,
+                        "Приглашён пользователь с email " + email + " с ролью " + role.getName()
+                )),
+                "Пользователь " + email + " был приглашён в проект"
+        );
         return ResponseEntity.ok("Приглашение отправлено");
     }
 
-
+    /*
     @GetMapping("/confirm-invite")
     public String confirmInvite(@RequestParam String token, Model model) {
+        System.out.println("Получаем участника по токену: " + token);
         Optional<ProjectMembers> memberOpt = projectMembersRepository.findByConfirmationToken(token);
 
         if (memberOpt.isEmpty()) {
@@ -272,11 +342,38 @@ public class ProjectApiController {
             model.addAttribute("statusMessage", "Недействительный или просроченный токен.");
             return "confirmInvite";
         }
-
+        System.out.println("Участник найден, подтверждаем участие");
         ProjectMembers member = memberOpt.get();
         member.setConfirmed(true);
         member.setConfirmationToken(null);
         projectMembersRepository.save(member);
+
+        System.out.println("member: " + member);
+        System.out.println("idUser: " + member.getIdUser());
+        System.out.println("idProject: " + member.getIdProject());
+
+
+        try {
+            System.out.println("ЛОГИРУЕМ");
+            activityLogService.logActivity(
+                    member.getIdUser(),
+                    member.getIdProject(),
+                    "update",
+                    "project_member",
+                    member.getIdUser().getId(),
+                    List.of(new Change(
+                            "confirmed",
+                            false,
+                            true
+                    )),
+                    "Пользователь присоединился к проекту"
+            );
+            System.out.println("ЗАЛОГИРОВАЛИ");
+        } catch (Exception e) {
+            System.err.println("Ошибка при логировании: " + e.getMessage());
+            e.printStackTrace();
+        }
+
 
         model.addAttribute("statusTitle", "Приглашение подтверждено");
         model.addAttribute("statusMessage", "Вы успешно присоединились к проекту \"" + member.getIdProject().getName() + "\"!");
@@ -284,7 +381,7 @@ public class ProjectApiController {
 
         return "confirmInvite";
     }
-
+    */
     @DeleteMapping("/{projectId}/members/{userId}")
     public ResponseEntity<?> removeMember(@PathVariable Long projectId,
                                           @PathVariable Long userId,
@@ -307,6 +404,20 @@ public class ProjectApiController {
         }
 
         projectMembersRepository.delete(memberOpt.get());
+        Users removedUser = memberOpt.get().getIdUser();
+
+        activityLogService.logActivity(
+                currentUser,
+                project,
+                "delete",
+                "project_member",
+                removedUser.getId(),
+                List.of(
+                        new Change("deleted", false, true)
+                ),
+                "Пользователь " + removedUser.getEmail() + " был удалён из проекта"
+        );
+
         return ResponseEntity.ok("Участник удалён");
     }
 
@@ -338,6 +449,7 @@ public class ProjectApiController {
         List<Roles> roles = rolesRepository.findByIdProject_IdOrIdProjectIsNull(id);
         roles.removeIf(role -> role.getIdProject() == null);
         rolesRepository.deleteAll(roles);
+        activityLogRepository.deleteByIdProject_Id(project.getId());
 
         projectsRepository.delete(project);
 

@@ -1,7 +1,9 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,9 @@ public class TaskPerformerApiController {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @GetMapping("/{taskId}")
     public ResponseEntity<?> getTaskPerformers(@PathVariable Long taskId) {
@@ -69,8 +74,16 @@ public class TaskPerformerApiController {
         newPerformer.setIdUser(performer);
         newPerformer.setAddedAtServer(OffsetDateTime.now());
 
-        taskPerformersRepository.save(newPerformer);
-
+        TaskPerformers savedPerformer = taskPerformersRepository.save(newPerformer);
+        activityLogService.logActivity(
+                currentUser,
+                task.getIdProject(),
+                "create",
+                "task_performer",
+                savedPerformer.getId(),
+                null,
+                "К задаче \"" + task.getName() + "\" добавлен исполнитель \"" + performer.getEmail() + "\""
+        );
         return ResponseEntity.ok().build();
     }
 
@@ -87,6 +100,17 @@ public class TaskPerformerApiController {
         if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "remove_task_performers")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
+        Users performer = usersRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        activityLogService.logActivity(
+                currentUser,
+                task.getIdProject(),
+                "delete",
+                "task_performer",
+                null, // Возможно нужно добавить id
+                null,
+                "Из задачи \"" + task.getName() + "\" удалён исполнитель \"" + performer.getEmail() + "\""
+        );
 
         taskPerformersRepository.deleteByIdTaskIdAndIdUserId(taskId, userId);
         return ResponseEntity.ok().build();
@@ -113,7 +137,17 @@ public class TaskPerformerApiController {
         newPerformer.setIdUser(currentUser);
         newPerformer.setAddedAtServer(OffsetDateTime.now());
 
-        taskPerformersRepository.save(newPerformer);
+        TaskPerformers savedPerformer = taskPerformersRepository.save(newPerformer);
+
+        activityLogService.logActivity(
+                currentUser,
+                task.getIdProject(),
+                "create",
+                "task_performer",
+                savedPerformer.getId(),
+                null,
+                "Пользователь \"" + currentUser.getEmail() + "\" взял задачу \"" + task.getName() + "\""
+        );
 
         return ResponseEntity.ok().build();
     }
@@ -132,7 +166,15 @@ public class TaskPerformerApiController {
 
         TaskPerformers performer = taskPerformersRepository.findByIdTaskAndIdUser(task, currentUser)
                 .orElseThrow(() -> new RuntimeException("Вы не являетесь исполнителем этой задачи"));
-
+        activityLogService.logActivity(
+                currentUser,
+                task.getIdProject(),
+                "delete",
+                "task_performer",
+                performer.getId(),
+                null,
+                "Пользователь \"" + currentUser.getEmail() + "\" отказался от задачи \"" + task.getName() + "\""
+        );
         taskPerformersRepository.delete(performer);
 
         return ResponseEntity.ok().build();

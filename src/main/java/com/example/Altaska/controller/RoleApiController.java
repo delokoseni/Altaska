@@ -1,11 +1,13 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.RolesRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.transaction.Transactional;
@@ -34,6 +36,9 @@ public class RoleApiController {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     public record RoleDto(
             Long id,
@@ -87,7 +92,17 @@ public class RoleApiController {
         newRole.setIdProject(projectOpt.get());
 
         Roles savedRole = rolesRepository.save(newRole);
-
+        activityLogService.logActivity(
+                user,
+                projectOpt.get(),
+                "create",
+                "role",
+                savedRole.getId(),
+                List.of(
+                        new Change("permissions", null, savedRole.getPermissions())
+                ),
+                "Создана кастомная роль \"" + savedRole.getName() + "\" в проекте \"" + projectOpt.get().getName() + "\""
+        );
         return new RoleDto(
                 savedRole.getId(),
                 savedRole.getName(),
@@ -122,7 +137,15 @@ public class RoleApiController {
         if (!hasPermission) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        activityLogService.logActivity(
+                user,
+                project,
+                "delete",
+                "role",
+                role.getId(),
+                null,
+                "Удалена роль \"" + role.getName() + "\" из проекта \"" + project.getName() + "\""
+        );
         rolesRepository.delete(role);
         return ResponseEntity.noContent().build();
     }

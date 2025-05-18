@@ -30,17 +30,59 @@ export function loadProjectLogsView(projectId) {
                 const user = log.idUser?.email || 'Неизвестный пользователь';
                 const details = log.details;
 
-                let text = `[${date}] ${user} - ${details.action || 'действие'}`;
+                const summary = document.createElement('div');
+                summary.className = 'activity-log-summary';
+                summary.textContent = `[${date}] ${user} - ${details.action || 'действие'}${details.message ? `: ${details.message}` : ''}`;
+                item.appendChild(summary);
 
-                if (details.message) {
-                    text += `: ${details.message}`;
+                const detailsSection = document.createElement('div');
+                detailsSection.className = 'activity-log-details';
+
+                if (details.changes && Array.isArray(details.changes) && details.changes.length > 0) {
+                    details.changes.forEach(change => {
+                        const changeBlock = document.createElement('div');
+                        changeBlock.className = 'log-change-block';
+
+                        const field = document.createElement('div');
+                        field.className = 'log-change-field';
+                        field.textContent = `Поле: ${change.field}`;
+
+                        const oldPre = document.createElement('pre');
+                        oldPre.textContent = 'Было:\n' + JSON.stringify(change.old, null, 2);
+                        oldPre.className = 'log-block-old';
+
+                        const newPre = document.createElement('pre');
+                        newPre.textContent = 'Стало:\n' + JSON.stringify(change.new, null, 2);
+                        newPre.className = 'log-block-new';
+
+                        changeBlock.appendChild(field);
+                        changeBlock.appendChild(oldPre);
+                        changeBlock.appendChild(newPre);
+                        detailsSection.appendChild(changeBlock);
+                    });
+                } else {
+                    detailsSection.textContent = 'Нет дополнительной информации.';
                 }
 
-                item.textContent = text;
+                item.appendChild(detailsSection);
                 logList.appendChild(item);
+
+                summary.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    item.classList.toggle('expanded');
+                });
             });
 
             wrapper.appendChild(logList);
+
+            // Скрытие при клике вне
+            document.addEventListener('click', (e) => {
+                document.querySelectorAll('.activity-log-item.expanded').forEach(el => {
+                    if (!el.contains(e.target)) {
+                        el.classList.remove('expanded');
+                    }
+                });
+            });
         })
         .catch(error => {
             console.error('Ошибка загрузки логов:', error);

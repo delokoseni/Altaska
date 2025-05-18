@@ -1,5 +1,7 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
+import com.example.Altaska.services.ActivityLogService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +38,9 @@ public class SubTaskApiController {
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private ActivityLogService activityLogService;
+
     @PostMapping
     public List<SubTasks> createSubtasks(@PathVariable Long taskId,
                                          @RequestBody List<SubTaskDTO> subtasks,
@@ -60,7 +65,20 @@ public class SubTaskApiController {
             subTask.setDescription(dto.getDescription());
             subTask.setCreatedAt(LocalDate.now()); //TODO заменить на время пользователя
             subTask.setCreatedAtServer(LocalDate.now());
-            saved.add(subTasksRepository.save(subTask));
+            SubTasks savedSubTask = subTasksRepository.save(subTask);
+            saved.add(savedSubTask);
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "create",
+                    "sub_task",
+                    savedSubTask.getId(),
+                    List.of(
+                            new Change("name", null, savedSubTask.getName()),
+                            new Change("description", null, savedSubTask.getDescription())
+                    ),
+                    "Создана подзадача \"" + savedSubTask.getName() + "\" для задачи \"" + task.getName() + "\""
+            );
         }
 
         return saved;
@@ -100,9 +118,35 @@ public class SubTaskApiController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
 
+        String oldName = subTask.getName();
+        String oldDescription = subTask.getDescription();
         subTask.setName(dto.getName());
         subTask.setDescription(dto.getDescription());
-        return subTasksRepository.save(subTask);
+        SubTasks updatedSubTask = subTasksRepository.save(subTask);
+
+        // Формируем список изменений
+        List<Change> changes = new ArrayList<>();
+        if (!oldName.equals(dto.getName())) {
+            changes.add(new Change("name", oldName, dto.getName()));
+        }
+        if (!oldDescription.equals(dto.getDescription())) {
+            changes.add(new Change("description", oldDescription, dto.getDescription()));
+        }
+
+        // Логируем активность, если есть изменения
+        if (!changes.isEmpty()) {
+            activityLogService.logActivity(
+                    user,
+                    subTask.getIdTask().getIdProject(),
+                    "edit",
+                    "sub_task",
+                    updatedSubTask.getId(),
+                    changes,
+                    "Подзадача \"" + updatedSubTask.getName() + "\" обновлена"
+            );
+        }
+
+        return updatedSubTask;
     }
 
     @DeleteMapping("/{subtaskId}")
@@ -118,7 +162,15 @@ public class SubTaskApiController {
         if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "delete_subtasks")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        activityLogService.logActivity(
+                user,
+                subTask.getIdTask().getIdProject(),
+                "delete",
+                "sub_task",
+                subTask.getId(),
+                null,
+                "Удалена подзадача \"" + subTask.getName() + "\" из задачи \"" + subTask.getIdTask().getName() + "\""
+        );
         subTasksRepository.delete(subTask);
         return ResponseEntity.ok().build();
     }

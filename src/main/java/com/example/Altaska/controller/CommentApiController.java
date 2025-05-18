@@ -1,5 +1,6 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.Comments;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tasks;
@@ -7,6 +8,7 @@ import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.CommentsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +19,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -34,6 +38,9 @@ public class CommentApiController {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @Autowired
     public CommentApiController(CommentsRepository commentsRepository) {
@@ -83,7 +90,19 @@ public class CommentApiController {
         comment.setIdUser(user);
 
         commentsRepository.save(comment);
+        List<Change> changes = List.of(
+                new Change("content", null, comment.getContent())
+        );
 
+        activityLogService.logActivity(
+                user,
+                project,
+                "add",
+                "task_comment",
+                comment.getId(),
+                changes,
+                "Добавлен комментарий к задаче: \"" + task.getName() + "\""
+        );
         return ResponseEntity.ok().build();
     }
 
@@ -111,9 +130,21 @@ public class CommentApiController {
         if (content.startsWith("\"") && content.endsWith("\"")) {
             content = content.substring(1, content.length() - 1);
         }
+        String oldContent = comment.getContent();
         comment.setContent(content);
         commentsRepository.save(comment);
+        Map<String, Object> before = new LinkedHashMap<>();
+        before.put("content", oldContent);
 
+        activityLogService.logActivity(
+                user,
+                project,
+                "edit",
+                "task_comment",
+                comment.getId(),
+                List.of(new Change("content", oldContent, content)),
+                "Комментарий к задаче \"" + task.getName() + "\" изменён"
+        );
         return ResponseEntity.ok().build();
     }
 
@@ -138,9 +169,21 @@ public class CommentApiController {
         if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_task_comments")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        String oldContent = comment.getContent();
         commentsRepository.delete(comment);
+        List<Change> changes = List.of(
+                new Change("content", oldContent, null)
+        );
 
+        activityLogService.logActivity(
+                user,
+                project,
+                "delete",
+                "task_comment",
+                comment.getId(),
+                changes,
+                "Комментарий удалён из задачи: \"" + task.getName() + "\""
+        );
         return ResponseEntity.ok().build();
     }
 

@@ -1,7 +1,9 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import com.example.Altaska.services.TaskCleanupService;
 import jakarta.persistence.EntityManager;
@@ -55,6 +57,9 @@ public class TaskApiController {
 
     @Autowired
     private TaskPerformersRepository taskPerformersRepository;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
@@ -147,6 +152,22 @@ public class TaskApiController {
                 }
             }
 
+            activityLogService.logActivity(
+                    user,
+                    project,
+                    "create",
+                    "task",
+                    savedTask.getId(),
+                    List.of(
+                            new Change("name", null, savedTask.getName()),
+                            new Change("description", null, savedTask.getDescription()),
+                            new Change("priority", null, savedTask.getIdPriority() != null ? savedTask.getIdPriority().getName() : null),
+                            new Change("startTime", null, savedTask.getStartTimeServer() != null ? savedTask.getStartTimeServer().toString() : null),
+                            new Change("deadline", null, savedTask.getDeadlineServer() != null ? savedTask.getDeadlineServer().toString() : null)
+                    ),
+                    "Создана задача \"" + savedTask.getName() + "\" в проекте \"" + project.getName() + "\""
+            );
+
             return savedTask;
         } else {
             throw new RuntimeException("Проект или пользователь не найден");
@@ -166,12 +187,25 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_title")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        String oldName = task.getName();
         task.setName(name);
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        Tasks updatedTask = tasksRepository.save(task);
+
+        if (!oldName.equals(name)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("name", oldName, name)),
+                    "Название задачи изменено с \"" + oldName + "\" на \"" + name + "\""
+            );
+        }
+        return updatedTask;
     }
 
     @PutMapping("/{taskId}/description")
@@ -187,12 +221,27 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_description")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        String oldDescription = task.getDescription();
         task.setDescription(description);
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+
+        Tasks updatedTask = tasksRepository.save(task);
+
+        if (!Objects.equals(oldDescription, description)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("description", oldDescription, description)),
+                    "Описание задачи " + task.getName() + " изменено"
+            );
+        }
+
+        return updatedTask;
     }
 
     @PutMapping("/{taskId}/priority")
@@ -209,6 +258,9 @@ public class TaskApiController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
+
+        String oldPriorityName = task.getIdPriority() != null ? task.getIdPriority().getName() : null;
+
         if (priorityId != null) {
             Priorities priority = prioritiesRepository.findById(priorityId)
                     .orElseThrow(() -> new RuntimeException("Приоритет не найден"));
@@ -220,7 +272,24 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+
+        Tasks updatedTask = tasksRepository.save(task);
+
+        String newPriorityName = updatedTask.getIdPriority() != null ? updatedTask.getIdPriority().getName() : null;
+
+        if (!Objects.equals(oldPriorityName, newPriorityName)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("priority", oldPriorityName, newPriorityName)),
+                    "Приоритет задачи " + task.getName() + " изменён с \"" + (oldPriorityName != null ? oldPriorityName : "нет") + "\" на \"" + (newPriorityName != null ? newPriorityName : "нет") + "\""
+            );
+        }
+
+        return updatedTask;
     }
 
     @PutMapping("/{taskId}/status")
@@ -242,6 +311,8 @@ public class TaskApiController {
         entityManager.createNativeQuery("SET LOCAL myapp.user_id = " + user.getId())
                 .executeUpdate();
 
+        String oldStatusName = task.getIdStatus() != null ? task.getIdStatus().getName() : null;
+
         Statuses status = statusesRepository.findById(statusId)
                 .orElseThrow(() -> new RuntimeException("Статус не найден"));
 
@@ -250,7 +321,24 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+
+        Tasks updatedTask = tasksRepository.save(task);
+
+        String newStatusName = updatedTask.getIdStatus() != null ? updatedTask.getIdStatus().getName() : null;
+
+        if (!Objects.equals(oldStatusName, newStatusName)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("status", oldStatusName, newStatusName)),
+                    "Статус задачи " + task.getName() + " изменён с \"" + (oldStatusName != null ? oldStatusName : "нет") + "\" на \"" + (newStatusName != null ? newStatusName : "нет") + "\""
+            );
+        }
+
+        return updatedTask;
     }
 
     @PutMapping("/{taskId}/priorityByName")
@@ -272,11 +360,27 @@ public class TaskApiController {
 
         Priorities priority = prioritiesRepository.findByName(priorityName)
                 .orElseThrow(() -> new RuntimeException("Приоритет с таким названием не найден"));
+        String oldPriorityName = task.getIdPriority() != null ? task.getIdPriority().getName() : null;
         task.setIdPriority(priority);
-
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
+        Tasks updatedTask = tasksRepository.save(task);
+
+        String newPriorityName = updatedTask.getIdPriority() != null ? updatedTask.getIdPriority().getName() : null;
+
+        if (!Objects.equals(oldPriorityName, newPriorityName)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("priority", oldPriorityName, newPriorityName)),
+                    "Приоритет " + task.getName() + " задачи изменён с \"" + (oldPriorityName != null ? oldPriorityName : "нет") +
+                            "\" на \"" + (newPriorityName != null ? newPriorityName : "нет") + "\""
+            );
+        }
         return tasksRepository.save(task);
     }
 
@@ -300,7 +404,7 @@ public class TaskApiController {
 
         entityManager.createNativeQuery("SET LOCAL myapp.user_id = " + user.getId())
                 .executeUpdate();
-
+        String oldStatusName = task.getIdStatus() != null ? task.getIdStatus().getName() : null;
         Statuses status = statusesRepository.findByName(statusName)
                 .orElseThrow(() -> new RuntimeException("Статус с таким названием не найден"));
 
@@ -309,6 +413,23 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
+
+        Tasks updatedTask = tasksRepository.save(task);
+
+        String newStatusName = updatedTask.getIdStatus() != null ? updatedTask.getIdStatus().getName() : null;
+
+        if (!Objects.equals(oldStatusName, newStatusName)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("status", oldStatusName, newStatusName)),
+                    "Статус задачи " + task.getName() + " изменён с \"" + (oldStatusName != null ? oldStatusName : "нет") +
+                            "\" на \"" + (newStatusName != null ? newStatusName : "нет") + "\""
+            );
+        }
         return tasksRepository.save(task);
     }
 
@@ -325,6 +446,9 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_deadline")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
+        String oldDeadline = task.getDeadlineServer() != null
+                ? task.getDeadlineServer().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                : null;
 
         if (deadline != null && !deadline.isEmpty()) {
             LocalDateTime localDateTime = LocalDateTime.parse(deadline, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
@@ -338,7 +462,24 @@ public class TaskApiController {
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        Tasks updatedTask = tasksRepository.save(task);
+        String newDeadline = updatedTask.getDeadlineServer() != null
+                ? updatedTask.getDeadlineServer().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                : null;
+        if (!Objects.equals(oldDeadline, newDeadline)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("deadline", oldDeadline, newDeadline)),
+                    "Срок задачи \"" + task.getName() + "\" изменён с \"" +
+                            (oldDeadline != null ? oldDeadline : "не задан") + "\" на \"" +
+                            (newDeadline != null ? newDeadline : "не задан") + "\""
+            );
+        }
+        return updatedTask;
     }
 
     @PutMapping("/{taskId}/startTime")
@@ -354,7 +495,9 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_start_date")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        String oldStartTime = task.getStartTimeServer() != null
+                ? task.getStartTimeServer().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                : null;
         if (startTime != null && !startTime.isEmpty()) {
             LocalDateTime localDateTime = LocalDateTime.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
             ZoneId serverZoneId = ZoneId.of(TimeZone.getDefault().getID());
@@ -364,10 +507,27 @@ public class TaskApiController {
             task.setStartTimeServer(null);
         }
 
-        task.setUpdatedBy(principal.getName());
-        task.setUpdatedAtServer(LocalDateTime.now());
-        task.setUpdatedAt(OffsetDateTime.now());
-        return tasksRepository.save(task);
+        Tasks updatedTask = tasksRepository.save(task);
+
+        String newStartTime = updatedTask.getStartTimeServer() != null
+                ? updatedTask.getStartTimeServer().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                : null;
+
+        if (!Objects.equals(oldStartTime, newStartTime)) {
+            activityLogService.logActivity(
+                    user,
+                    task.getIdProject(),
+                    "edit",
+                    "task",
+                    updatedTask.getId(),
+                    List.of(new Change("start_time", oldStartTime, newStartTime)),
+                    "Дата начала задачи \"" + task.getName() + "\" изменена с \"" +
+                            (oldStartTime != null ? oldStartTime : "не задана") + "\" на \"" +
+                            (newStartTime != null ? newStartTime : "не задана") + "\""
+            );
+        }
+
+        return updatedTask;
     }
 
     @DeleteMapping("/{taskId}/delete")
@@ -382,14 +542,20 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete_tasks")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        String taskName = task.getName();
         taskCleanupService.deleteTaskDependencies(taskId);
         taskCleanupService.deleteComments(taskId);
         taskCleanupService.deleteSubtasks(taskId);
-
         tasksRepository.delete(task);
-
-        // Отправляем JSON-ответ
+        activityLogService.logActivity(
+                user,
+                task.getIdProject(),
+                "delete",
+                "task",
+                taskId,
+                null,
+                "Задача \"" + taskName + "\" была удалена"
+        );
         return ResponseEntity.ok(Map.of("message", "Задача успешно удалена"));
     }
 
@@ -448,7 +614,6 @@ public class TaskApiController {
         return result;
     }
 
-    // API эндпоинт для получения всех задач для проекта
     @GetMapping("/project/dto/{projectId}")
     public List<TaskDto> getAllTasksForProject(@PathVariable Long projectId) {
         List<Tasks> tasks = tasksRepository.findByIdProject_Id(projectId);
@@ -460,7 +625,6 @@ public class TaskApiController {
                     .map(tp -> new PerformerDto(tp.getIdUser().getId(), tp.getIdUser().getEmail()))
                     .collect(Collectors.toList());
 
-            // Получение тегов задачи
             List<String> tagNames = tasksTagsRepository.findByIdTask(task)
                     .stream()
                     .map(tasksTags -> tasksTags.getIdTag().getName())

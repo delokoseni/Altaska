@@ -1,11 +1,13 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.models.TasksDependencies;
 import com.example.Altaska.repositories.TaskDependenciesRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
 import lombok.Data;
@@ -39,6 +41,9 @@ public class GanttController {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @Transactional
     @PostMapping("/save")
@@ -99,7 +104,16 @@ public class GanttController {
                 }
             }
         }
-
+        Projects project = tasks.getIdProject();
+        activityLogService.logActivity(
+                user,
+                project,
+                "edit",
+                "gantt_chart",
+                project.getId(),
+                null,
+                "Внесены изменения в диаграмму Ганта проекта"
+        );
         return ResponseEntity.ok("Сохранено");
     }
 

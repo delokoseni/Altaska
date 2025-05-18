@@ -1,5 +1,6 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.Tags;
 import com.example.Altaska.models.TasksTags;
@@ -8,6 +9,7 @@ import com.example.Altaska.repositories.TagsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.TasksTagsRepository;
 import com.example.Altaska.repositories.UsersRepository;
+import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,9 @@ public class TasksTagsApiController {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private ActivityLogService activityLogService;
+
     @GetMapping("/task/{taskId}")
     public List<Tags> getTagsByTask(@PathVariable Long taskId) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow();
@@ -62,6 +67,15 @@ public class TasksTagsApiController {
         tasksTags.setIdTag(tag);
         tasksTags.setAddedAtServer(LocalDateTime.now());
         tasksTagsRepository.save(tasksTags);
+        activityLogService.logActivity(
+                user,
+                task.getIdProject(),
+                "create",
+                "task_tag",
+                tasksTags.getId(),
+                null,
+                "К задаче \"" + task.getName() + "\" добавлен тег \"" + tag.getName() + "\""
+        );
     }
 
     @DeleteMapping("/{taskId}/{tagId}")
@@ -77,6 +91,15 @@ public class TasksTagsApiController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
+        activityLogService.logActivity(
+                user,
+                task.getIdProject(),
+                "delete",
+                "task_tag",
+                null, //Возможно тут нужен id
+                null,
+                "Из задачи \"" + task.getName() + "\" удалён тег \"" + tag.getName() + "\""
+        );
         tasksTagsRepository.deleteByIdTaskAndIdTag(task, tag);
     }
 
