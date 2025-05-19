@@ -88,13 +88,15 @@ public class TaskPerformerApiController {
                 null,
                 "К задаче \"" + task.getName() + "\" добавлен исполнитель \"" + performer.getEmail() + "\""
         );
+        String message = currentUser.getEmail() + " назначил вас на задачу \"" + task.getName() + "\"";
         if (!performer.getId().equals(task.getIdCreator().getId())) {
             notificationService.notifyUsers(
                     Set.of(performer),
                     "add_task_performer",
                     "tasks",
                     task.getId(),
-                    currentUser
+                    currentUser,
+                    message
             );
         }
         return ResponseEntity.ok().build();
@@ -120,12 +122,22 @@ public class TaskPerformerApiController {
                 task.getIdProject(),
                 "delete",
                 "task_performer",
-                null, // Возможно нужно добавить id
+                task.getId(),
                 null,
                 "Из задачи \"" + task.getName() + "\" удалён исполнитель \"" + performer.getEmail() + "\""
         );
-
         taskPerformersRepository.deleteByIdTaskIdAndIdUserId(taskId, userId);
+        String message = currentUser.getEmail() + " снял вас с задачи \"" + task.getName() + "\"";
+        if (!performer.getId().equals(task.getIdCreator().getId())) {
+            notificationService.notifyUsers(
+                    Set.of(performer),
+                    "remove_task_performer",
+                    "tasks",
+                    task.getId(),
+                    currentUser,
+                    message
+            );
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -161,7 +173,18 @@ public class TaskPerformerApiController {
                 null,
                 "Пользователь \"" + currentUser.getEmail() + "\" взял задачу \"" + task.getName() + "\""
         );
-
+        Users creator = task.getIdCreator();
+        String message = currentUser.getEmail() + " взял в работу задачу \"" + task.getName() + "\"";
+        if (!creator.getId().equals(currentUser.getId())) {
+            notificationService.notifyUsers(
+                    Set.of(creator),
+                    "assign_task_performer",
+                    "tasks",
+                    task.getId(),
+                    currentUser,
+                    message
+            );
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -189,7 +212,18 @@ public class TaskPerformerApiController {
                 "Пользователь \"" + currentUser.getEmail() + "\" отказался от задачи \"" + task.getName() + "\""
         );
         taskPerformersRepository.delete(performer);
-
+        Users creator = task.getIdCreator();
+        String message = currentUser.getEmail() + " отказался от задачи \"" + task.getName() + "\"";
+        if (!creator.getId().equals(currentUser.getId())) {
+            notificationService.notifyUsers(
+                    Set.of(creator),
+                    "unassign_task_performer",
+                    "tasks",
+                    task.getId(),
+                    currentUser,
+                    message
+            );
+        }
         return ResponseEntity.ok().build();
     }
 

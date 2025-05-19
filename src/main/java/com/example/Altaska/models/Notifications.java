@@ -33,6 +33,9 @@ public class Notifications {
     @Column(name = "created_at_server", nullable = false)
     private OffsetDateTime createdAtServer;
 
+    @Column(name = "content", nullable = false)
+    private String content;
+
     public Long getId() {
         return id;
     }
@@ -65,6 +68,8 @@ public class Notifications {
         return createdAtServer;
     }
 
+    public  String  getContent() { return content; }
+
     public void setType(String type) {
         this.type = type;
     }
@@ -92,4 +97,6 @@ public class Notifications {
     public void setCreatedAtServer(OffsetDateTime createdAtServer) {
         this.createdAtServer = createdAtServer;
     }
+
+    public void setContent(String content) { this.content = content; }
 }

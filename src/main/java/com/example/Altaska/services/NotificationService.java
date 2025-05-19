@@ -17,7 +17,7 @@ public class NotificationService {
     @Autowired
     private NotificationsRepository notificationsRepository;
 
-    public void notifyUsers(Set<Users> recipients, String type, String relatedEntityType, Long relatedEntityId, Users initiator) {
+    public void notifyUsers(Set<Users> recipients, String type, String relatedEntityType, Long relatedEntityId, Users initiator, String content) {
         OffsetDateTime now = OffsetDateTime.now();
 
         for (Users user : recipients) {
@@ -34,7 +34,7 @@ public class NotificationService {
             notification.setCreatedAt(now);
             notification.setCreatedAtServer(now);
             notification.setIdUser(user);
-
+            notification.setContent(content);
             notificationsRepository.save(notification);
         }
     }

@@ -1,20 +1,23 @@
 package com.example.Altaska.controller;
 
+import com.example.Altaska.dto.NotificationDto;
 import com.example.Altaska.models.Notifications;
+import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.NotificationsRepository;
+import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/notifications")
-@RequiredArgsConstructor
 public class NotificationApiController {
 
     @Autowired
@@ -23,12 +26,38 @@ public class NotificationApiController {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private TasksRepository tasksRepository;  // чтобы получить название задачи
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     @GetMapping
-    public ResponseEntity<List<Notifications>> getNotifications(Principal principal) {
+    public ResponseEntity<List<NotificationDto>> getNotifications(Principal principal) {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         List<Notifications> notifications = notificationsRepository.findAllByIdUserOrderByCreatedAtDesc(user);
-        return ResponseEntity.ok(notifications);
+
+        List<NotificationDto> dtos = notifications.stream().map(n -> {
+            String relatedName = "";
+            if ("tasks".equalsIgnoreCase(n.getRelatedEntityType())) {
+                Tasks task = tasksRepository.findById(n.getRelatedEntityId()).orElse(null);
+                if (task != null) relatedName = task.getName();
+            }
+            // можно добавить else if для других relatedEntityType
+
+            return new NotificationDto(
+                    n.getId(),
+                    n.getType(),
+                    n.getCreatedAtServer().format(formatter),
+                    n.getIsRead(),
+                    n.getRelatedEntityType(),
+                    n.getRelatedEntityId(),
+                    relatedName,
+                    n.getContent()
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 
     @PostMapping("/read/{notificationId}")

@@ -1,8 +1,10 @@
 import { getCsrfToken } from './getCsrfToken.js';
 
 const notificationTypeDict = {
-  'add_task_performer': 'Вас назначили исполнителем',
-
+    'add_task_performer': 'Вас назначили исполнителем ',
+    'remove_task_performer': 'Вас сняли с исполнения ',
+    'assign_task_performer': 'Исполнитель взял задачу ',
+    'unassign_task_performer': 'Исполнитель отказался от задачи ',
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -63,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ${!notification.isRead ? '<span class="unread-dot"></span>' : ''}
             </div>
             <div class="notification-content" style="display:none;">
-              <pre>${JSON.stringify(notification, null, 2)}</pre>
+              ${notification.content ? notification.content : ''}
             </div>
           `;
 
