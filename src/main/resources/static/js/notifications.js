@@ -5,6 +5,16 @@ const notificationTypeDict = {
   'remove_task_performer': 'Вас сняли с исполнения ',
   'assign_task_performer': 'Исполнитель взял задачу ',
   'unassign_task_performer': 'Исполнитель отказался от задачи ',
+  'edit_task_name': 'Изменено название задачи ',
+  'edit_task_description': 'Изменено описание задачи ',
+  'edit_task_priority': 'Изменен приоритет задачи ',
+  'edit_task_status': 'Изменен статус задачи ',
+  'edit_task_deadline': 'Изменен дедлайн задачи ',
+  'edit_task_start_time': 'Изменена дата начала задачи ',
+  'delete_task': 'Задача была удалена',
+  'change_role': 'Ваша роль в проекте была изменена ',
+  'task_comment': 'Добавлен новый комментарий',
+  'task_attachment': 'Добавлен новый файл',
 };
 
 async function checkUnreadNotifications(bellButton) {

@@ -7,16 +7,12 @@ import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.repositories.*;
-import com.example.Altaska.services.ActivityLogService;
-import com.example.Altaska.services.EmailService;
-import com.example.Altaska.services.PermissionService;
-import com.example.Altaska.services.TaskCleanupService;
+import com.example.Altaska.services.*;
 import com.example.Altaska.validators.EmailValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -64,6 +60,9 @@ public class ProjectApiController {
 
     @Autowired
     private ActivityLogRepository activityLogRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
@@ -140,13 +139,11 @@ public class ProjectApiController {
 
         List<ProjectMembers> members = projectMembersRepository.findByIdProjectIdAndConfirmedTrue(id);
 
-        // Уникальные пользователи: участники + владелец
         Set<Users> users = members.stream()
                 .map(ProjectMembers::getIdUser)
                 .collect(Collectors.toSet());
         users.add(project.getIdOwner());
 
-        // Преобразуем в формат ответа
         List<Map<String, Object>> result = users.stream().map(user -> {
             Map<String, Object> map = new HashMap<>();
             map.put("userId", user.getId());
@@ -238,6 +235,22 @@ public class ProjectApiController {
                     member.getIdUser().getId(),
                     changes,
                     String.format("Изменена роль участника %s", member.getIdUser().getEmail())
+            );
+            String message = String.format(
+                    "Ваша роль в проекте \"%s\" была изменена с \"%s\" на \"%s\" пользователем %s",
+                    project.getName(),
+                    oldRole.getName(),
+                    newRole.getName(),
+                    currentUser.getEmail()
+            );
+
+            notificationService.notifyUsers(
+                    Set.of(member.getIdUser()),
+                    "change_role",
+                    "projects",
+                    projectId,
+                    currentUser,
+                    message
             );
         }
 

@@ -4,6 +4,7 @@ import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.ActivityLogService;
+import com.example.Altaska.services.NotificationService;
 import com.example.Altaska.services.PermissionService;
 import com.example.Altaska.services.TaskCleanupService;
 import jakarta.persistence.EntityManager;
@@ -60,6 +61,9 @@ public class TaskApiController {
 
     @Autowired
     private ActivityLogService activityLogService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/project/{projectId}")
     public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
@@ -204,6 +208,30 @@ public class TaskApiController {
                     List.of(new Change("name", oldName, name)),
                     "Название задачи изменено с \"" + oldName + "\" на \"" + name + "\""
             );
+            Set<Users> recipients = new HashSet<>();
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(task.getId());
+            for (TaskPerformers performer : performers) {
+                if (!performer.getIdUser().getId().equals(user.getId())) {
+                    recipients.add(performer.getIdUser());
+                }
+            }
+
+            Users creator = task.getIdCreator();
+            if (!creator.getId().equals(user.getId())) {
+                recipients.add(creator);
+            }
+
+            if (!recipients.isEmpty()) {
+                String message = "Название задачи было изменено с \"" + oldName + "\" на \"" + name + "\"";
+                notificationService.notifyUsers(
+                        recipients,
+                        "edit_task_name",
+                        "tasks",
+                        updatedTask.getId(),
+                        user,
+                        message
+                );
+            }
         }
         return updatedTask;
     }
@@ -238,6 +266,29 @@ public class TaskApiController {
                     updatedTask.getId(),
                     List.of(new Change("description", oldDescription, description)),
                     "Описание задачи " + task.getName() + " изменено"
+            );
+        }
+
+        List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+        Set<Users> recipients = performers.stream()
+                .map(TaskPerformers::getIdUser)
+                .filter(u -> !u.getId().equals(user.getId())) // исключаем текущего
+                .collect(Collectors.toSet());
+
+        Users creator = task.getIdCreator();
+        if (!creator.getId().equals(user.getId())) {
+            recipients.add(creator);
+        }
+
+        if (!recipients.isEmpty()) {
+            String message = "Описание задачи \"" + task.getName() + "\" было изменено пользователем " + user.getEmail();
+            notificationService.notifyUsers(
+                    recipients,
+                    "edit_task_description",
+                    "tasks",
+                    task.getId(),
+                    user,
+                    message
             );
         }
 
@@ -287,8 +338,29 @@ public class TaskApiController {
                     List.of(new Change("priority", oldPriorityName, newPriorityName)),
                     "Приоритет задачи " + task.getName() + " изменён с \"" + (oldPriorityName != null ? oldPriorityName : "нет") + "\" на \"" + (newPriorityName != null ? newPriorityName : "нет") + "\""
             );
-        }
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+            Set<Users> recipients = performers.stream()
+                    .map(TaskPerformers::getIdUser)
+                    .filter(u -> !u.getId().equals(user.getId()))
+                    .collect(Collectors.toSet());
 
+            Users creator = task.getIdCreator();
+            if (!creator.getId().equals(user.getId())) {
+                recipients.add(creator);
+            }
+
+            if (!recipients.isEmpty()) {
+                String message = "Приоритет задачи \"" + task.getName() + "\" был изменён пользователем " + user.getEmail();
+                notificationService.notifyUsers(
+                        recipients,
+                        "edit_task_priority",
+                        "tasks",
+                        task.getId(),
+                        user,
+                        message
+                );
+            }
+        }
         return updatedTask;
     }
 
@@ -336,6 +408,28 @@ public class TaskApiController {
                     List.of(new Change("status", oldStatusName, newStatusName)),
                     "Статус задачи " + task.getName() + " изменён с \"" + (oldStatusName != null ? oldStatusName : "нет") + "\" на \"" + (newStatusName != null ? newStatusName : "нет") + "\""
             );
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+            Set<Users> recipients = performers.stream()
+                    .map(TaskPerformers::getIdUser)
+                    .filter(u -> !u.getId().equals(user.getId()))
+                    .collect(Collectors.toSet());
+
+            Users creator = task.getIdCreator();
+            if (!creator.getId().equals(user.getId())) {
+                recipients.add(creator);
+            }
+
+            if (!recipients.isEmpty()) {
+                String message = "Статус задачи \"" + task.getName() + "\" был изменён пользователем " + user.getEmail();
+                notificationService.notifyUsers(
+                        recipients,
+                        "edit_task_status",
+                        "tasks",
+                        task.getId(),
+                        user,
+                        message
+                );
+            }
         }
 
         return updatedTask;
@@ -380,6 +474,28 @@ public class TaskApiController {
                     "Приоритет " + task.getName() + " задачи изменён с \"" + (oldPriorityName != null ? oldPriorityName : "нет") +
                             "\" на \"" + (newPriorityName != null ? newPriorityName : "нет") + "\""
             );
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+            Set<Users> recipients = performers.stream()
+                    .map(TaskPerformers::getIdUser)
+                    .filter(u -> !u.getId().equals(user.getId()))
+                    .collect(Collectors.toSet());
+
+            Users creator = task.getIdCreator();
+            if (!creator.getId().equals(user.getId())) {
+                recipients.add(creator);
+            }
+
+            if (!recipients.isEmpty()) {
+                String message = "Приоритет задачи \"" + task.getName() + "\" был изменён пользователем " + user.getEmail();
+                notificationService.notifyUsers(
+                        recipients,
+                        "edit_task_priority",
+                        "tasks",
+                        task.getId(),
+                        user,
+                        message
+                );
+            }
         }
         return tasksRepository.save(task);
     }
@@ -429,6 +545,28 @@ public class TaskApiController {
                     "Статус задачи " + task.getName() + " изменён с \"" + (oldStatusName != null ? oldStatusName : "нет") +
                             "\" на \"" + (newStatusName != null ? newStatusName : "нет") + "\""
             );
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+            Set<Users> recipients = performers.stream()
+                    .map(TaskPerformers::getIdUser)
+                    .filter(u -> !u.getId().equals(user.getId()))
+                    .collect(Collectors.toSet());
+
+            Users creator = task.getIdCreator();
+            if (!creator.getId().equals(user.getId())) {
+                recipients.add(creator);
+            }
+
+            if (!recipients.isEmpty()) {
+                String message = "Статус задачи \"" + task.getName() + "\" был изменён пользователем " + user.getEmail();
+                notificationService.notifyUsers(
+                        recipients,
+                        "edit_task_status",
+                        "tasks",
+                        task.getId(),
+                        user,
+                        message
+                );
+            }
         }
         return tasksRepository.save(task);
     }
@@ -478,6 +616,28 @@ public class TaskApiController {
                             (oldDeadline != null ? oldDeadline : "не задан") + "\" на \"" +
                             (newDeadline != null ? newDeadline : "не задан") + "\""
             );
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+            Set<Users> recipients = performers.stream()
+                    .map(TaskPerformers::getIdUser)
+                    .filter(u -> !u.getId().equals(user.getId()))
+                    .collect(Collectors.toSet());
+
+            Users creator = task.getIdCreator();
+            if (!creator.getId().equals(user.getId())) {
+                recipients.add(creator);
+            }
+
+            if (!recipients.isEmpty()) {
+                String message = "Срок задачи \"" + task.getName() + "\" был изменён пользователем " + user.getEmail();
+                notificationService.notifyUsers(
+                        recipients,
+                        "edit_task_deadline",
+                        "tasks",
+                        task.getId(),
+                        user,
+                        message
+                );
+            }
         }
         return updatedTask;
     }
@@ -525,8 +685,29 @@ public class TaskApiController {
                             (oldStartTime != null ? oldStartTime : "не задана") + "\" на \"" +
                             (newStartTime != null ? newStartTime : "не задана") + "\""
             );
-        }
+            List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+            Set<Users> recipients = performers.stream()
+                    .map(TaskPerformers::getIdUser)
+                    .filter(u -> !u.getId().equals(user.getId()))
+                    .collect(Collectors.toSet());
 
+            Users creator = task.getIdCreator();
+            if (!creator.getId().equals(user.getId())) {
+                recipients.add(creator);
+            }
+
+            if (!recipients.isEmpty()) {
+                String message = "Дата начала задачи \"" + task.getName() + "\" была изменена пользователем " + user.getEmail();
+                notificationService.notifyUsers(
+                        recipients,
+                        "edit_task_start_time",
+                        "tasks",
+                        task.getId(),
+                        user,
+                        message
+                );
+            }
+        }
         return updatedTask;
     }
 
@@ -542,11 +723,27 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete_tasks")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
+        List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
+        Set<Users> recipients = performers.stream()
+                .map(TaskPerformers::getIdUser)
+                .filter(u -> !u.getId().equals(user.getId()))
+                .collect(Collectors.toSet());
+        Users creator = task.getIdCreator();
+        if (!creator.getId().equals(user.getId())) {
+            recipients.add(creator);
+        }
         String taskName = task.getName();
-        taskCleanupService.deleteTaskDependencies(taskId);
-        taskCleanupService.deleteComments(taskId);
-        taskCleanupService.deleteSubtasks(taskId);
-        tasksRepository.delete(task);
+        if (!recipients.isEmpty()) {
+            String message = "Задача \"" + taskName + "\" была удалена пользователем " + user.getEmail();
+            notificationService.notifyUsers(
+                    recipients,
+                    "delete_task",
+                    "tasks",
+                    taskId,
+                    user,
+                    message
+            );
+        }
         activityLogService.logActivity(
                 user,
                 task.getIdProject(),
@@ -556,6 +753,10 @@ public class TaskApiController {
                 null,
                 "Задача \"" + taskName + "\" была удалена"
         );
+        taskCleanupService.deleteTaskDependencies(taskId);
+        taskCleanupService.deleteComments(taskId);
+        taskCleanupService.deleteSubtasks(taskId);
+        tasksRepository.delete(task);
         return ResponseEntity.ok(Map.of("message", "Задача успешно удалена"));
     }
 
@@ -576,7 +777,6 @@ public class TaskApiController {
             taskMap.put("deadlineServer", task.getDeadlineServer());
             taskMap.put("statusChangeAtServer", task.getStatusChangeAtServer());
 
-            // ВАЖНО: ключи должны быть idStatus и idPriority, как ожидает клиент
             if (task.getIdStatus() != null) {
                 Map<String, Object> status = new HashMap<>();
                 status.put("id", task.getIdStatus().getId());

@@ -1,14 +1,13 @@
 package com.example.Altaska.controller;
 
 import com.example.Altaska.dto.Change;
-import com.example.Altaska.models.Comments;
-import com.example.Altaska.models.Projects;
-import com.example.Altaska.models.Tasks;
-import com.example.Altaska.models.Users;
+import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.CommentsRepository;
+import com.example.Altaska.repositories.TaskPerformersRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.ActivityLogService;
+import com.example.Altaska.services.NotificationService;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.OffsetDateTime;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -41,6 +38,12 @@ public class CommentApiController {
 
     @Autowired
     private ActivityLogService activityLogService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private TaskPerformersRepository taskPerformersRepository;
 
     @Autowired
     public CommentApiController(CommentsRepository commentsRepository) {
@@ -103,6 +106,30 @@ public class CommentApiController {
                 changes,
                 "Добавлен комментарий к задаче: \"" + task.getName() + "\""
         );
+        List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(task.getId());
+        Set<Users> recipients = performers.stream()
+                .map(TaskPerformers::getIdUser)
+                .filter(u -> !u.getId().equals(user.getId()))
+                .collect(Collectors.toSet());
+
+        Users creator = task.getIdCreator();
+        if (!creator.getId().equals(user.getId())) {
+            recipients.add(creator);
+        }
+
+        if (!recipients.isEmpty()) {
+            String message = "Пользователь " + user.getEmail() +
+                    " добавил комментарий к задаче \"" + task.getName() + "\"";
+
+            notificationService.notifyUsers(
+                    recipients,
+                    "task_comment",
+                    "tasks",
+                    task.getId(),
+                    user,
+                    message
+            );
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -186,7 +213,6 @@ public class CommentApiController {
         );
         return ResponseEntity.ok().build();
     }
-
 
     // DTO для запроса
     public static class CommentRequest {
