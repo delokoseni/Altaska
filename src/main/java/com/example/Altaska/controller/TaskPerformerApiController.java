@@ -4,6 +4,7 @@ import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.ActivityLogService;
+import com.example.Altaska.services.NotificationService;
 import com.example.Altaska.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,9 @@ public class TaskPerformerApiController {
 
     @Autowired
     private ActivityLogService activityLogService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/{taskId}")
     public ResponseEntity<?> getTaskPerformers(@PathVariable Long taskId) {
@@ -84,6 +88,15 @@ public class TaskPerformerApiController {
                 null,
                 "К задаче \"" + task.getName() + "\" добавлен исполнитель \"" + performer.getEmail() + "\""
         );
+        if (!performer.getId().equals(task.getIdCreator().getId())) {
+            notificationService.notifyUsers(
+                    Set.of(performer),
+                    "add_task_performer",
+                    "tasks",
+                    task.getId(),
+                    currentUser
+            );
+        }
         return ResponseEntity.ok().build();
     }
 
