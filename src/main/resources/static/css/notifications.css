@@ -10,6 +10,8 @@
 }
 
 #notifications-panel .panel-header {
+  display: flex;
+  justify-content: space-between;
   background-color: var(--button-color); /* фиолетовая шапка */
   color: var(--text-color); /* белый текст в шапке */
   padding: 12px 16px;
@@ -113,3 +115,22 @@
   scrollbar-width: thin;
   scrollbar-color: var(--button-color) #f0f0f0;
 }
+
+#notifications-panel .clear-notifications-btn {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--button-color);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-left: auto;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+#notifications-panel .clear-notifications-btn:hover {
+  opacity: 1;
+}
+

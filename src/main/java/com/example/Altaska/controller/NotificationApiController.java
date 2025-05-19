@@ -77,4 +77,16 @@ public class NotificationApiController {
         }
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<?> clearNotifications(Principal principal) {
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        List<Notifications> userNotifications = notificationsRepository.findAllByIdUser(user);
+        notificationsRepository.deleteAll(userNotifications);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

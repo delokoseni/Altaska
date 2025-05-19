@@ -54,7 +54,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const header = document.createElement('div');
   header.className = 'panel-header';
-  header.textContent = 'Уведомления';
+
+  const title = document.createElement('span');
+  title.textContent = 'Уведомления';
+
+  const clearButton = document.createElement('button');
+  clearButton.textContent = 'Очистить';
+  clearButton.className = 'clear-notifications-btn';
+
+  clearButton.addEventListener('click', async () => {
+    if (!confirm("Удалить все уведомления?")) return;
+
+    try {
+      const csrfToken = getCsrfToken();
+      const response = await fetch('/api/notifications/clear', {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken
+        }
+      });
+
+      if (response.ok) {
+        contentContainer.innerHTML = '<div class="no-notifications">Уведомлений нет</div>';
+        const dot = bellButton.querySelector('.notification-dot');
+        if (dot) dot.style.display = 'none';
+      } else {
+        alert("Не удалось очистить уведомления");
+      }
+    } catch (e) {
+      console.error('Ошибка при очистке уведомлений', e);
+      alert("Ошибка при очистке уведомлений");
+    }
+  });
+
+  header.appendChild(title);
+  header.appendChild(clearButton);
+
   notificationsPanel.appendChild(header);
 
   const contentContainer = document.createElement('div');
