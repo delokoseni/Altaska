@@ -1,13 +1,22 @@
+const fieldTranslations = {
+    name: 'Название',
+    description: 'Описание',
+    status: 'Статус',
+    priority: 'Приоритет',
+    startTime: 'Время начала задачи',
+    archived: 'Архивирован',
+    permissions: 'Права',
+    role: 'Роль',
+    content: 'Содержание',
+    deadline: 'Дедлайн',
+};
+
 export function loadProjectLogsView(projectId) {
     const viewContent = document.querySelector('.view-content');
     viewContent.innerHTML = '';
     const wrapper = document.createElement('div');
     wrapper.className = 'project-logs-view';
     viewContent.appendChild(wrapper);
-
-    const title = document.createElement('h2');
-    title.textContent = 'История действий';
-    wrapper.appendChild(title);
 
     fetch(`/api/logs/project/${projectId}`)
         .then(response => response.json())
@@ -32,7 +41,7 @@ export function loadProjectLogsView(projectId) {
 
                 const summary = document.createElement('div');
                 summary.className = 'activity-log-summary';
-                summary.textContent = `[${date}] ${user} - ${details.action || 'действие'}${details.message ? `: ${details.message}` : ''}`;
+                summary.textContent = `[${date}] ${user} - ${details.message ? `${details.message}` : ''}`;
                 item.appendChild(summary);
 
                 const detailsSection = document.createElement('div');
@@ -45,14 +54,15 @@ export function loadProjectLogsView(projectId) {
 
                         const field = document.createElement('div');
                         field.className = 'log-change-field';
-                        field.textContent = `Поле: ${change.field}`;
+                        const translatedField = fieldTranslations[change.field] || change.field;
+                        field.textContent = translatedField;
 
                         const oldPre = document.createElement('pre');
-                        oldPre.textContent = 'Было:\n' + JSON.stringify(change.old, null, 2);
+                        oldPre.textContent = 'Было:\n' + formatValue(change.old);
                         oldPre.className = 'log-block-old';
 
                         const newPre = document.createElement('pre');
-                        newPre.textContent = 'Стало:\n' + JSON.stringify(change.new, null, 2);
+                        newPre.textContent = 'Стало:\n' + formatValue(change.new);
                         newPre.className = 'log-block-new';
 
                         changeBlock.appendChild(field);
@@ -75,7 +85,6 @@ export function loadProjectLogsView(projectId) {
 
             wrapper.appendChild(logList);
 
-            // Скрытие при клике вне
             document.addEventListener('click', (e) => {
                 document.querySelectorAll('.activity-log-item.expanded').forEach(el => {
                     if (!el.contains(e.target)) {
@@ -90,4 +99,17 @@ export function loadProjectLogsView(projectId) {
             errorText.textContent = 'Ошибка загрузки истории.';
             wrapper.appendChild(errorText);
         });
+}
+
+function formatValue(value) {
+    if (value === null || value === '') {
+        return '';
+    }
+    if (value === true) {
+            return 'Да';
+    }
+    if (value === false) {
+        return 'Нет';
+    }
+    return typeof value === 'string' ? value : JSON.stringify(value, null, 2);
 }

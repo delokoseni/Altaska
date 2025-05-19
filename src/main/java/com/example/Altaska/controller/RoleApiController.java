@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -176,11 +178,37 @@ public class RoleApiController {
         if (!permissionService.hasPermission(user.getId(), projectId, "edit_roles")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
-
+        String oldName = role.getName();
+        JsonNode oldPermissions = role.getPermissions();
         role.setName(request.name);
         role.setPermissions(request.permissions);
 
         Roles updatedRole = rolesRepository.save(role);
+
+        List<Change> changes = new ArrayList<>();
+        if (!Objects.equals(oldName, updatedRole.getName())) {
+            changes.add(new Change("name", oldName, updatedRole.getName()));
+        }
+
+        if (oldPermissions == null || !oldPermissions.equals(updatedRole.getPermissions())) {
+            changes.add(new Change(
+                    "permissions",
+                    oldPermissions != null ? oldPermissions.toPrettyString() : null,
+                    updatedRole.getPermissions() != null ? updatedRole.getPermissions().toPrettyString() : null
+            ));
+        }
+
+        if (!changes.isEmpty()) {
+            activityLogService.logActivity(
+                    user,
+                    project,
+                    "edit",
+                    "role",
+                    updatedRole.getId(),
+                    changes,
+                    "Изменена роль \"" + updatedRole.getName() + "\" в проекте \"" + project.getName() + "\""
+            );
+        }
 
         return new RoleDto(
                 updatedRole.getId(),

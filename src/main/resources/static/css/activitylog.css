@@ -33,8 +33,18 @@
 }
 
 .activity-log-item.expanded .activity-log-details {
-    max-height: 500px;
+    max-height: 1000px;
     padding-top: 16px;
+}
+
+.activity-log-item.expanded .activity-log-details {
+    animation: unset-log-maxheight-fix 0.3s forwards;
+}
+
+@keyframes unset-log-maxheight-fix {
+    to {
+        max-height: none;
+    }
 }
 
 .activity-log-details pre {
