@@ -17,19 +17,26 @@
     <link rel="stylesheet" href="/css/loadProjectInfoView.css">
     <link rel="stylesheet" href="/css/kanban.css">
     <link rel="stylesheet" href="/css/activitylog.css">
+    <link rel="stylesheet" href="/css/notifications.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/sidebar.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>
     <script type = "module" src="/js/projectSelection.js"></script>
     <script type = "module" src="/js/taskDetails.js"></script>
+    <script type = "module" src="/js/notifications.js" defer></script>
     <title>Главная</title>
 </head>
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/profile" class="profile-button">
-            <img src="/icons/profile.svg" alt="Профиль">
-        </a>
+        <div class="top-right-buttons">
+            <a href="" class="profile-button" title="Уведомления">
+                <img src="/icons/bell.svg" alt="Уведомления">
+            </a>
+            <a href="/profile" class="profile-button" title="Профиль">
+                <img src="/icons/profile.svg" alt="Профиль">
+            </a>
+        </div>
 
         <div class="sidebar-header">
             <h2>Проекты</h2>
