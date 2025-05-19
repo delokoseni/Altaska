@@ -76,3 +76,17 @@
   padding: 15px;
   color: var(--second-text-color);
 }
+
+.notification-dot {
+  position: absolute;
+  top: 0px;    /* чуть ниже верхнего края кнопки */
+  left: 0px;   /* чуть вправо от левого края */
+  width: 10px;
+  height: 10px;
+  background-color: orange;
+  border-radius: 50%;
+  border: 2px solid white; /* чтобы точка была видна на фоне иконки */
+  box-sizing: content-box;
+  pointer-events: none; /* чтобы точка не мешала клику */
+  z-index: 10;
+}

@@ -1,27 +1,52 @@
 import { getCsrfToken } from './getCsrfToken.js';
 
 const notificationTypeDict = {
-    'add_task_performer': 'Вас назначили исполнителем ',
-    'remove_task_performer': 'Вас сняли с исполнения ',
-    'assign_task_performer': 'Исполнитель взял задачу ',
-    'unassign_task_performer': 'Исполнитель отказался от задачи ',
+  'add_task_performer': 'Вас назначили исполнителем ',
+  'remove_task_performer': 'Вас сняли с исполнения ',
+  'assign_task_performer': 'Исполнитель взял задачу ',
+  'unassign_task_performer': 'Исполнитель отказался от задачи ',
 };
+
+async function checkUnreadNotifications(bellButton) {
+  try {
+    const response = await fetch('/api/notifications');
+    if (!response.ok) throw new Error('Ошибка загрузки уведомлений');
+    const notifications = await response.json();
+    const notificationDot = bellButton.querySelector('.notification-dot');
+
+    if (notifications.some(n => !n.isRead)) {
+      notificationDot.style.display = 'block';
+    } else {
+      notificationDot.style.display = 'none';
+    }
+  } catch (e) {
+    console.error('Ошибка при проверке непрочитанных уведомлений', e);
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const bellButton = document.querySelector('.profile-button[href=""]');
   if (!bellButton) return;
 
+  // Если точка для уведомлений не создана, создаём её
+  if (!bellButton.querySelector('.notification-dot')) {
+    const dot = document.createElement('span');
+    dot.className = 'notification-dot';
+    dot.style.display = 'none';
+    bellButton.appendChild(dot);
+  }
+
+  checkUnreadNotifications(bellButton);
+
   const notificationsPanel = document.createElement('div');
   notificationsPanel.id = 'notifications-panel';
   notificationsPanel.style.display = 'none';
 
-  // Добавляем шапку
   const header = document.createElement('div');
   header.className = 'panel-header';
   header.textContent = 'Уведомления';
   notificationsPanel.appendChild(header);
 
-  // Контейнер для списка уведомлений
   const contentContainer = document.createElement('div');
   contentContainer.className = 'notifications-content';
   notificationsPanel.appendChild(contentContainer);
@@ -33,14 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
     notificationsPanel.style.position = 'absolute';
     notificationsPanel.style.top = (window.scrollY + rect.bottom + 5) + 'px';
 
-    // Задаем right, а не left
     const rightPos = window.innerWidth - (rect.right + window.scrollX);
     notificationsPanel.style.right = rightPos + 'px';
-
-    // Убираем left, чтобы не конфликтовало
     notificationsPanel.style.left = 'auto';
   }
-
 
   async function loadNotifications() {
     try {
@@ -49,6 +70,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const notifications = await response.json();
 
       contentContainer.innerHTML = '';
+
+      const notificationDot = bellButton.querySelector('.notification-dot');
+
+      if (notifications.some(n => !n.isRead)) {
+        notificationDot.style.display = 'block';
+      } else {
+        notificationDot.style.display = 'none';
+      }
 
       if (notifications.length === 0) {
         contentContainer.innerHTML = '<div class="no-notifications">Уведомлений нет</div>';
@@ -77,13 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!isVisible && !notification.isRead) {
               try {
                 const csrfToken = getCsrfToken();
-                const markResponse = await fetch(`/api/notifications/read/${notification.id}`,
-                {
-                    method: 'POST',
-                    headers:
-                    {
-                        'X-CSRF-TOKEN': csrfToken
-                    }
+                const markResponse = await fetch(`/api/notifications/read/${notification.id}`, {
+                  method: 'POST',
+                  headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                  }
                 });
 
                 if (markResponse.ok) {
@@ -91,6 +118,11 @@ document.addEventListener("DOMContentLoaded", () => {
                   const dot = notifElem.querySelector('.unread-dot');
                   if (dot) dot.remove();
                   notification.isRead = true;
+
+                  // Обновляем точку уведомлений — скрываем, если непрочитанных нет
+                  const anyUnread = [...contentContainer.querySelectorAll('.notification-item.unread')].length > 0;
+                  const notificationDot = bellButton.querySelector('.notification-dot');
+                  notificationDot.style.display = anyUnread ? 'block' : 'none';
                 }
               } catch (e) {
                 console.error('Ошибка при отметке уведомления прочитанным', e);
@@ -135,4 +167,30 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener('scroll', () => {
     if (notificationsPanel.style.display === 'block') positionPanel();
   });
+
+  // Периодическая проверка новых уведомлений каждые 30 секунд
+  async function pollNotifications() {
+    try {
+      const response = await fetch('/api/notifications');
+      if (!response.ok) throw new Error('Ошибка загрузки уведомлений');
+      const notifications = await response.json();
+
+      const notificationDot = bellButton.querySelector('.notification-dot');
+      if (notifications.some(n => !n.isRead)) {
+        notificationDot.style.display = 'block';
+      } else {
+        notificationDot.style.display = 'none';
+      }
+
+      // Если панель открыта, обновим список уведомлений
+      if (notificationsPanel.style.display === 'block') {
+        // Можно вызвать loadNotifications() или обновить contentContainer напрямую
+        await loadNotifications();
+      }
+    } catch (e) {
+      console.error('Ошибка при периодической проверке уведомлений', e);
+    }
+  }
+
+  setInterval(pollNotifications, 30000);
 });

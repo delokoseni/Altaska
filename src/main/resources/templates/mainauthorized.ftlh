@@ -32,6 +32,7 @@
         <div class="top-right-buttons">
             <a href="" class="profile-button" title="Уведомления">
                 <img src="/icons/bell.svg" alt="Уведомления">
+                <span class="notification-dot" style="display:none;"></span>
             </a>
             <a href="/profile" class="profile-button" title="Профиль">
                 <img src="/icons/profile.svg" alt="Профиль">
