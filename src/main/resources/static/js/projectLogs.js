@@ -11,6 +11,64 @@ const fieldTranslations = {
     deadline: 'Дедлайн',
 };
 
+const permissionLabels = {
+    "add_task_tags": "Добавление тегов к задаче",
+    "remove_task_tags": "Удаление тегов из задачи",
+    "add_task_performers": "Назначение исполнителей задачи",
+    "remove_task_performers": "Удаление исполнителей задачи",
+    "accept_tasks": "Взятие задачи в работу",
+    "reject_tasks": "Отказ от выполнения задачи",
+    "create_tasks": "Создание задач",
+    "edit_task_title": "Редактирование названия задачи",
+    "edit_task_description": "Редактирование описания задачи",
+    "edit_task_priority": "Изменение приоритета задачи",
+    "edit_task_status": "Изменение статуса задачи",
+    "edit_task_deadline": "Изменение срока выполнения",
+    "edit_task_start_date": "Изменение даты начала задачи",
+    "delete_tasks": "Удаление задач",
+    "attach_task_files": "Прикрепление файлов к задаче",
+    "download_task_files": "Загрузка файлов из задачи",
+    "delete_task_files": "Удаление прикреплённых файлов",
+    "write_task_comments": "Написание комментариев",
+    "edit_task_comments": "Редактирование комментариев",
+    "delete_task_comments": "Удаление комментариев",
+    "create_gantt_chart": "Создание диаграммы Ганта",
+    "edit_project_title_description": "Редактирование названия и описания проекта",
+    "archive_project": "Архивирование проекта",
+    "change_user_roles": "Назначение ролей участникам",
+    "invite_project_members": "Приглашение участников в проект",
+    "remove_project_members": "Удаление участников из проекта",
+    "delete_project": "Удаление проекта",
+    "create_roles": "Создание ролей",
+    "delete_roles": "Удаление ролей",
+    "edit_roles": "Редактирование ролей",
+    "create_subtasks": "Создание подзадач",
+    "edit_subtasks": "Редактирование подзадач",
+    "delete_subtasks": "Удаление подзадач",
+    "create_tags": "Создание тегов проекта",
+    "delete_tags": "Удаление тегов проекта",
+    "edit_tags": "Редактирование тегов проекта"
+};
+
+function formatPermissions(jsonValue) {
+    let permissions;
+    try {
+        permissions = typeof jsonValue === 'string' ? JSON.parse(jsonValue) : jsonValue;
+    } catch (e) {
+        return 'Ошибка разбора JSON';
+    }
+
+    if (typeof permissions !== 'object' || permissions === null) {
+        return 'Недопустимый формат прав';
+    }
+
+    const lines = Object.entries(permissions)
+        .filter(([key]) => permissionLabels[key]) // игнорировать неизвестные
+        .map(([key, value]) => `- ${permissionLabels[key]}: ${value === true ? 'Да' : 'Нет'}`);
+
+    return lines.length > 0 ? lines.join('\n') : 'Нет данных';
+}
+
 export function loadProjectLogsView(projectId) {
     const viewContent = document.querySelector('.view-content');
     viewContent.innerHTML = '';
@@ -58,11 +116,11 @@ export function loadProjectLogsView(projectId) {
                         field.textContent = translatedField;
 
                         const oldPre = document.createElement('pre');
-                        oldPre.textContent = 'Было:\n' + formatValue(change.old);
+                        oldPre.textContent = 'Было:\n' + formatValue(change.old, change.field);
                         oldPre.className = 'log-block-old';
 
                         const newPre = document.createElement('pre');
-                        newPre.textContent = 'Стало:\n' + formatValue(change.new);
+                        newPre.textContent = 'Стало:\n' + formatValue(change.new, change.field);
                         newPre.className = 'log-block-new';
 
                         changeBlock.appendChild(field);
@@ -101,15 +159,13 @@ export function loadProjectLogsView(projectId) {
         });
 }
 
-function formatValue(value) {
-    if (value === null || value === '') {
-        return '';
-    }
-    if (value === true) {
-            return 'Да';
-    }
-    if (value === false) {
-        return 'Нет';
+function formatValue(value, field = '') {
+    if (value === null || value === '') return '';
+    if (value === true) return 'Да';
+    if (value === false) return 'Нет';
+    if (field === 'permissions') {
+        return formatPermissions(value);
     }
     return typeof value === 'string' ? value : JSON.stringify(value, null, 2);
 }
+
