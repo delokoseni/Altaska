@@ -1,9 +1,12 @@
 #notifications-panel {
-  background-color: transparent; /* или просто не указываем */
-  color: var(--text-color); /* цвет оставляем */
+  background-color: transparent;
+  color: var(--text-color);
   padding: 0;
   display: flex;
   flex-direction: column;
+  width: 400px;
+  min-width: 400px;
+  max-width: 400px;
 }
 
 #notifications-panel .panel-header {
@@ -18,7 +21,6 @@
   box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
 }
 
-/* Добавляем фон и цвет текста для контейнера с уведомлениями */
 #notifications-panel .notifications-content {
   background-color: white; /* светлый фон */
   color: var(--text-color); /* белый текст */
@@ -29,10 +31,9 @@
   border-bottom-right-radius: 6px;
 }
 
-/* Стили уведомлений */
 .notification-item {
   padding: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.3); /* полупрозрачный белый бордер */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   cursor: pointer;
   color: var(--text-color);
   transition: background-color 0.3s;
@@ -67,7 +68,7 @@
 .notification-content {
   margin-top: 6px;
   font-size: 0.85em;
-  white-space: pre-wrap;
+  white-space: normal;
   color: var(--second-text-color);
 }
 
@@ -79,14 +80,36 @@
 
 .notification-dot {
   position: absolute;
-  top: 0px;    /* чуть ниже верхнего края кнопки */
-  left: 0px;   /* чуть вправо от левого края */
+  top: 0px;
+  left: 0px;
   width: 10px;
   height: 10px;
   background-color: orange;
   border-radius: 50%;
-  border: 2px solid white; /* чтобы точка была видна на фоне иконки */
+  border: 2px solid white;
   box-sizing: content-box;
-  pointer-events: none; /* чтобы точка не мешала клику */
+  pointer-events: none;
   z-index: 10;
+}
+
+/* Стилизация полосы прокрутки внутри уведомлений */
+#notifications-panel .notifications-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+#notifications-panel .notifications-content::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+#notifications-panel .notifications-content::-webkit-scrollbar-thumb {
+  background-color: var(--button-color); /* Используем фирменный фиолетовый */
+  border-radius: 4px;
+  border: 2px solid white; /* Отступ внутри скроллбара */
+}
+
+/* Поддержка Firefox */
+#notifications-panel .notifications-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--button-color) #f0f0f0;
 }
