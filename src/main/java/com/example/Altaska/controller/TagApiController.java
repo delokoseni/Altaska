@@ -6,9 +6,11 @@ import com.example.Altaska.models.Tags;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.ProjectsRepository;
 import com.example.Altaska.repositories.TagsRepository;
+import com.example.Altaska.repositories.TasksTagsRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,13 +39,16 @@ public class TagApiController {
     @Autowired
     private ActivityLogService activityLogService;
 
+    @Autowired
+    private TasksTagsRepository tasksTagsRepository;
+
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<Tags>> getTagsByProject(@PathVariable Long projectId) {
         return ResponseEntity.ok(tagsRepository.findByIdProjectId(projectId));
     }
 
     @PostMapping("/create/{projectId}")
-    public ResponseEntity<Tags> createTag(@PathVariable Long projectId, @RequestParam String name, Principal principal) {
+    public ResponseEntity<?> createTag(@PathVariable Long projectId, @RequestParam String name, Principal principal) {
         Projects project = projectsRepository.findById(projectId).orElse(null);
         if (project == null) return ResponseEntity.notFound().build();
         Tags tag = new Tags();
@@ -53,7 +58,7 @@ public class TagApiController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
         permissionService.checkIfProjectArchived(tag.getIdProject());
         if (!permissionService.hasPermission(user.getId(), project.getId(), "create_tags")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         Tags savedTag = tagsRepository.save(tag);
 
@@ -72,7 +77,8 @@ public class TagApiController {
     }
 
     @DeleteMapping("/{tagId}")
-    public ResponseEntity<Void> deleteTag(@PathVariable Long tagId, Principal principal) {
+    @Transactional
+    public ResponseEntity<?> deleteTag(@PathVariable Long tagId, Principal principal) {
         Tags tag = tagsRepository.findById(tagId)
                 .orElse(null);
         if (tag == null) return ResponseEntity.notFound().build();
@@ -82,8 +88,9 @@ public class TagApiController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_tags")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
+        tasksTagsRepository.deleteByIdTag(tag);
         activityLogService.logActivity(
                 user,
                 project,
@@ -97,15 +104,16 @@ public class TagApiController {
         return ResponseEntity.ok().build();
     }
 
+
     @PostMapping("/update/{tagId}")
-    public ResponseEntity<Tags> updateTag(@PathVariable Long tagId, @RequestParam String name, Principal principal) {
+    public ResponseEntity<?> updateTag(@PathVariable Long tagId, @RequestParam String name, Principal principal) {
         Tags tag = tagsRepository.findById(tagId).orElse(null);
         if (tag == null) return ResponseEntity.notFound().build();
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
         permissionService.checkIfProjectArchived(tag.getIdProject());
         if (!permissionService.hasPermission(user.getId(), tag.getIdProject().getId(), "edit_tags")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         String oldName = tag.getName();
         tag.setName(name);

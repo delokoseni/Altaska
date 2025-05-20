@@ -20,4 +20,6 @@ public interface TasksTagsRepository extends JpaRepository<TasksTags, Long> {
     @Modifying
     @Query("DELETE FROM TasksTags tt WHERE tt.idTask.id = :taskId")
     void deleteByTaskId(Long taskId);
+
+    void deleteByIdTag(Tags tag);
 }

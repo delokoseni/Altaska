@@ -492,19 +492,59 @@ function loadProjectInfoView(projectId) {
         });
 }
 
+export async function handleFetchWithToast(url, options, successMessage, errorMessagePrefix = "Ошибка") {
+    try {
+        const response = await fetch(url, options);
+        const responseText = await response.text();
+
+        if (!response.ok) {
+            const hasEnglish = /[a-zA-Z]/.test(responseText);
+            const errorMessage = hasEnglish
+                ? `${errorMessagePrefix}: неизвестная ошибка`
+                : `${errorMessagePrefix}: ${responseText}`;
+            showToast(errorMessage, "error");
+            throw new Error(responseText);
+        }
+
+        showToast(successMessage || "Операция выполнена успешно");
+        return responseText ? JSON.parse(responseText) : null;
+    } catch (error) {
+        const message = error.message || '';
+        const hasEnglish = /[a-zA-Z]/.test(message);
+        if (hasEnglish) {
+            if (message === 'Failed to fetch') {
+                showToast(`${errorMessagePrefix}: нет подключения или сервер недоступен`, "error");
+            } else {
+                showToast(`${errorMessagePrefix}: неизвестная ошибка`, "error");
+            }
+        } else {
+            showToast(`${errorMessagePrefix}: ${message}`, "error");
+        }
+        throw error;
+    }
+}
+
+const fieldNames = {
+    name: "название",
+    description: "описание"
+};
+
 function updateProjectField(projectId, field, value) {
     const formData = new FormData();
     formData.append(field, value);
     formData.append(csrfParam, csrfToken);
 
-    fetch(`/api/projects/update/${projectId}`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("Ошибка при обновлении проекта");
-        return response.json();
-    })
+    const humanField = fieldNames[field] || field;
+
+    handleFetchWithToast(
+        `/api/projects/update/${projectId}`,
+        {
+            method: 'POST',
+            body: formData
+        },
+        `Поле «${humanField}» успешно обновлено`,
+        `Ошибка при обновлении поля «${humanField}»`
+    )
     .then(updated => {
         console.log(`Поле ${field} обновлено`, updated);
     })
@@ -567,10 +607,19 @@ function createTagElement(tag, projectId) {
     delBtn.className = 'tag-delete-button';
     delBtn.innerHTML = `<img src="/icons/trash.svg" alt="Удалить" class="icon">`;
     delBtn.onclick = () => {
-        fetch(`/api/tags/${tag.id}`, {
-            method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
-        }).then(() => loadProjectInfoView(projectId));
+        handleFetchWithToast(
+            `/api/tags/${tag.id}`,
+            {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': csrfToken }
+            },
+            `Тег «${tag.name}» успешно удалён`,
+            `Ошибка при удалении тега «${tag.name}»`
+        )
+        .then(() => loadProjectInfoView(projectId))
+        .catch(error => {
+            console.error('Ошибка при удалении тега:', error);
+        });
     };
 
     tagItem.appendChild(tagName);
@@ -602,16 +651,26 @@ function showAddTagForm(container, projectId) {
     cancelBtn.onclick = () => formWrapper.remove();
 
     const submitHandler = () => {
-        if (!input.value.trim()) return;
+        const tagName = input.value.trim();
+        if (!tagName) return;
 
         const formData = new FormData();
-        formData.append('name', input.value.trim());
+        formData.append('name', tagName);
         formData.append(csrfParam, csrfToken);
 
-        fetch(`/api/tags/create/${projectId}`, {
-            method: 'POST',
-            body: formData
-        }).then(() => loadProjectInfoView(projectId));
+        handleFetchWithToast(
+            `/api/tags/create/${projectId}`,
+            {
+                method: 'POST',
+                body: formData
+            },
+            'Тег успешно добавлен',
+            'Не удалось добавить тег'
+        ).then(() => {
+            loadProjectInfoView(projectId);
+        }).catch(error => {
+            console.error('Ошибка при добавлении тега:', error);
+        });
     };
 
     saveBtn.onclick = submitHandler;
@@ -633,13 +692,22 @@ function editTag(tagId, currentName, projectId) {
     const newName = prompt('Новое имя тега:', currentName);
     if (newName && newName !== currentName) {
         const formData = new FormData();
-        formData.append('name', newName);
+        formData.append('name', newName.trim());
         formData.append(csrfParam, csrfToken);
 
-        fetch(`/api/tags/update/${tagId}`, {
-            method: 'POST',
-            body: formData
-        }).then(() => loadProjectInfoView(projectId));
+        handleFetchWithToast(
+            `/api/tags/update/${tagId}`,
+            {
+                method: 'POST',
+                body: formData
+            },
+            'Тег успешно обновлён',
+            'Не удалось обновить тег'
+        )
+        .then(() => loadProjectInfoView(projectId))
+        .catch(error => {
+            console.error('Ошибка при обновлении тега:', error);
+        });
     }
 }
 
