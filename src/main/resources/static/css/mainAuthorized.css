@@ -202,7 +202,8 @@ h1, h2, h3 {
 /* Стили для кнопок */
 a.menu-button,
 a.login-button,
-a.register-button {
+a.register-button,
+.gantt-save-button{
     font-family: 'Nunito', sans-serif;
     background-color: var(--button-color);
     color: var(--text-color);
@@ -214,9 +215,14 @@ a.register-button {
     display: inline-block; /* чтобы вести себя как кнопки */
 }
 
+.gantt-save-button {
+    margin-bottom: 10px;
+}
+
 a.menu-button:not(.prev-button):not(.next-button):hover,
 a.login-button:hover,
-a.register-button:hover {
+a.register-button:hover,
+.gantt-save-button:hover{
     transform: scale(1.05);
     background-color: var(--hover-button-color);
     border-color: var(--hover-button-color);
