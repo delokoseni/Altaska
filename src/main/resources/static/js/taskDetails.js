@@ -250,7 +250,19 @@ function showTaskDetails(task, view = 'список') {
                             loadView(view, task.idProject.id);
                         })
                         .catch(err => {
-                            showToast(`Не удалось обновить "${targetLabels[target]}": ${err.message}`, "error");
+                            const message = err.message || '';
+                            const hasEnglishLetters = /[a-zA-Z]/.test(message);
+
+                            if (hasEnglishLetters) {
+                                if (message === 'Failed to fetch') {
+                                    showToast(`Не удалось обновить "${targetLabels[target]}": проверьте подключение к интернету или попробуйте позже`, "error");
+                                } else {
+                                    showToast(`Не удалось обновить "${targetLabels[target]}": неизвестная ошибка`, "error");
+                                }
+                            } else {
+                                showToast(`Не удалось обновить "${targetLabels[target]}": ${message}`, "error");
+                            }
+
                             field.disabled = false;
                             button.textContent = 'Сохранить';
                         });
