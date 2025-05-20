@@ -57,7 +57,7 @@ public class GanttController {
 
         permissionService.checkIfProjectArchived(tasks.getIdProject());
         if (!permissionService.hasPermission(user.getId(), tasks.getIdProject().getId(), "create_gantt_chart")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         for (TaskDTO dto : data.getTasks()) {
             Tasks task = tasksRepository.findById(dto.getId())

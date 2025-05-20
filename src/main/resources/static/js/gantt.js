@@ -1,4 +1,5 @@
 import { getCsrfToken } from './kanban.js';
+import { showToast } from './toast.js';
 
 ej.base.L10n.load({
     'ru': {
@@ -147,6 +148,7 @@ function createSaveButton() {
     const button = document.createElement('button');
     button.textContent = 'Сохранить';
     button.classList.add('gantt-save-button');
+
     button.addEventListener('click', async () => {
         if (!window.ganttObj) return;
 
@@ -157,28 +159,55 @@ function createSaveButton() {
             progress: task.Progress,
             dependencies: task.Predecessor // строка типа "1FS,2SS"
         }));
+
         console.log('Связи между задачами (dependencies):');
-                tasks.forEach(task => {
-                    console.log(`Задача ${task.id}: ${task.dependencies || 'нет связей'}`);
-                });
-                console.log('Данные для сохранения:', tasks);
+        tasks.forEach(task => {
+            console.log(`Задача ${task.id}: ${task.dependencies || 'нет связей'}`);
+        });
+        console.log('Данные для сохранения:', tasks);
+
         try {
             const response = await fetch('/api/gantt/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken() // если CSRF включён
+                    'X-CSRF-TOKEN': getCsrfToken()
                 },
                 body: JSON.stringify({ tasks })
             });
 
-            if (!response.ok) throw new Error('Ошибка сохранения');
-            alert('Сохранено!');
+            const text = await response.text();
+
+            if (!response.ok) {
+                const hasEnglish = /[a-zA-Z]/.test(text);
+                if (hasEnglish) {
+                    showToast("Ошибка сохранения диаграммы: неизвестная ошибка", "error");
+                } else {
+                    showToast("Ошибка сохранения диаграммы: " + text, "error");
+                }
+                throw new Error(text);
+            }
+
+            showToast("Изменения успешно сохранены ✅");
+            console.log("Сервер ответил:", text);
+
         } catch (e) {
             console.error('Ошибка при сохранении диаграммы Ганта:', e);
-            alert('Не удалось сохранить изменения.');
+            const message = e.message || '';
+            const hasEnglish = /[a-zA-Z]/.test(message);
+            if (hasEnglish) {
+                if (message === 'Failed to fetch') {
+                    showToast("Не удалось сохранить изменения: проверьте подключение к интернету или попробуйте позже", "error");
+                } else {
+                    showToast("Не удалось сохранить изменения: неизвестная ошибка", "error");
+                }
+            } else {
+                showToast("Не удалось сохранить изменения: " + message, "error");
+            }
         }
     });
 
     document.querySelector('.view-content').prepend(button);
 }
+
+
