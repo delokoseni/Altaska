@@ -1,3 +1,5 @@
+import { showToast } from './toast.js';
+
 export function initTaskCommentsSection(taskId, container, currentUserEmail) {
     let commentsWrapper = container.querySelector('.task-comments-section');
 
@@ -127,12 +129,35 @@ export function sendComment(taskId, text, csrfToken) {
             taskId: taskId,
             content: text
         })
-    }).then(response => {
+    })
+    .then(async response => {
         if (!response.ok) {
-            throw new Error('Ошибка сервера');
+            const errorText = await response.text();
+            const hasEnglish = /[a-zA-Z]/.test(errorText);
+            if (hasEnglish) {
+                showToast("Не удалось отправить комментарий: неизвестная ошибка", "error");
+            } else {
+                showToast("Не удалось отправить комментарий: " + errorText, "error");
+            }
+            throw new Error(errorText);
         }
+    })
+    .catch(error => {
+        const message = error.message || '';
+        const hasEnglish = /[a-zA-Z]/.test(message);
+        if (hasEnglish) {
+            if (message === 'Failed to fetch') {
+                showToast("Не удалось отправить комментарий: проверьте подключение к интернету или попробуйте позже", "error");
+            } else {
+                showToast("Не удалось отправить комментарий: неизвестная ошибка", "error");
+            }
+        } else {
+            showToast("Не удалось отправить комментарий: " + message, "error");
+        }
+        console.error("Ошибка при отправке комментария:", error);
     });
 }
+
 
 function editComment(commentId, currentText, taskId, commentsList, currentUserEmail) {
     const newText = prompt('Редактировать комментарий:', currentText);
@@ -141,41 +166,74 @@ function editComment(commentId, currentText, taskId, commentsList, currentUserEm
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken // Передайте CSRF токен
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify(newText)
         })
-        .then(response => {
-            if (response.ok) {
-                loadTaskComments(taskId, commentsList, currentUserEmail);
-            } else {
-                alert('Ошибка редактирования комментария');
+        .then(async response => {
+            if (!response.ok) {
+                const errorText = await response.text();
+                const hasEnglish = /[a-zA-Z]/.test(errorText);
+                if (hasEnglish) {
+                    showToast("Не удалось редактировать комментарий: неизвестная ошибка", "error");
+                } else {
+                    showToast("Не удалось редактировать комментарий: " + errorText, "error");
+                }
+                throw new Error(errorText);
             }
+            loadTaskComments(taskId, commentsList, currentUserEmail);
         })
         .catch(error => {
-            console.error('Ошибка редактирования комментария:', error);
+            const message = error.message || '';
+            const hasEnglish = /[a-zA-Z]/.test(message);
+            if (hasEnglish) {
+                if (message === 'Failed to fetch') {
+                    showToast("Не удалось редактировать комментарий: проверьте подключение к интернету или попробуйте позже", "error");
+                } else {
+                    showToast("Не удалось редактировать комментарий: неизвестная ошибка", "error");
+                }
+            } else {
+                showToast("Не удалось редактировать комментарий: " + message, "error");
+            }
+            console.error("Ошибка редактирования комментария:", error);
         });
     }
 }
 
-// Функция для удаления комментария
 function deleteComment(commentId, commentsList, taskId, currentUserEmail) {
     if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
         fetch(`/api/comments/delete-comment/${commentId}`, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': csrfToken // Передайте CSRF токен
+                'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => {
-            if (response.ok) {
-                loadTaskComments(taskId, commentsList, currentUserEmail);
-            } else {
-                alert('Ошибка удаления комментария');
+        .then(async response => {
+            if (!response.ok) {
+                const errorText = await response.text();
+                const hasEnglish = /[a-zA-Z]/.test(errorText);
+                if (hasEnglish) {
+                    showToast("Не удалось удалить комментарий: неизвестная ошибка", "error");
+                } else {
+                    showToast("Не удалось удалить комментарий: " + errorText, "error");
+                }
+                throw new Error(errorText);
             }
+            loadTaskComments(taskId, commentsList, currentUserEmail);
         })
         .catch(error => {
-            console.error('Ошибка удаления комментария:', error);
+            const message = error.message || '';
+            const hasEnglish = /[a-zA-Z]/.test(message);
+            if (hasEnglish) {
+                if (message === 'Failed to fetch') {
+                    showToast("Не удалось удалить комментарий: проверьте подключение к интернету или попробуйте позже", "error");
+                } else {
+                    showToast("Не удалось удалить комментарий: неизвестная ошибка", "error");
+                }
+            } else {
+                showToast("Не удалось удалить комментарий: " + message, "error");
+            }
+            console.error("Ошибка удаления комментария:", error);
         });
     }
 }

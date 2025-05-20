@@ -82,7 +82,7 @@ public class CommentApiController {
         Projects project = task.getIdProject();
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(user.getId(), project.getId(), "write_task_comments")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         Comments comment = new Comments();
@@ -152,7 +152,7 @@ public class CommentApiController {
         Projects project = task.getIdProject();
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_task_comments")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         if (content.startsWith("\"") && content.endsWith("\"")) {
             content = content.substring(1, content.length() - 1);
@@ -194,7 +194,7 @@ public class CommentApiController {
         Projects project = task.getIdProject();
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_task_comments")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         String oldContent = comment.getContent();
         commentsRepository.delete(comment);

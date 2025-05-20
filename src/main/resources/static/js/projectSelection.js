@@ -7,6 +7,7 @@ import { deleteTask } from './deleteTask.js';
 import { renderKanbanFiltersAndBoard } from './kanban.js';
 import { renderGanttChart } from './gantt.js';
 import { loadProjectLogsView } from './projectLogs.js';
+import { showToast } from './toast.js';
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -288,20 +289,27 @@ function showTaskForm(projectId, container, from = 'список') {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => {
-                    if (!response.ok) throw new Error("Ошибка при создании задачи");
+                .then(async response => {
+                    if (response.status === 403) {
+                        const text = await response.text();
+                        showToast(text || 'Недостаточно прав для создания задачи', 'error');
+                        throw new Error('Нет прав');
+                    }
+                    if (!response.ok) {
+                        const text = await response.text();
+                        showToast(text || 'Ошибка при создании задачи', 'error');
+                        throw new Error('Ошибка при создании задачи');
+                    }
                     return response.json();
                 })
                 .then(data => {
                     const taskId = data.id;
 
-                    // Назначение исполнителей
                     const selectedUserIds = performerCheckboxes
                         .filter(cb => cb.checked)
                         .map(cb => cb.value);
                     const performerPromises = selectedUserIds.map(userId => addPerformer(taskId, userId, csrfToken));
 
-                    // Загрузка файлов
                     const files = filesInput.files;
                     const uploadPromises = [];
 
@@ -321,28 +329,32 @@ function showTaskForm(projectId, container, from = 'список') {
                         uploadPromises.push(uploadPromise);
                     }
 
+                    const subtaskPromise = subtasksToSend.length > 0
+                        ? fetch(`/api/tasks/${taskId}/subtasks`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify(subtasksToSend)
+                        })
+                        : Promise.resolve();
+
                     return Promise.all([
                         ...performerPromises,
-                        subtasksToSend.length > 0
-                            ? fetch(`/api/tasks/${taskId}/subtasks`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': csrfToken
-                                },
-                                body: JSON.stringify(subtasksToSend)
-                            })
-                            : Promise.resolve(),
+                        subtaskPromise,
                         ...uploadPromises
                     ]);
                 })
                 .then(() => {
+                    showToast('Задача успешно создана', 'success');
                     loadView('список', projectId);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 })
                 .catch(error => {
+                    if (error.message === 'Нет прав') return;
                     console.error('Ошибка:', error);
-                    alert('Произошла ошибка при создании задачи');
+                    showToast('Произошла ошибка при создании задачи', 'error');
                 });
             };
 

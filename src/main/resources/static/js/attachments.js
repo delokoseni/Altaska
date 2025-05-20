@@ -1,3 +1,5 @@
+import { showToast } from './toast.js';
+
 // Функция для отображения блока с файлами
 export function initTaskFilesSection(taskId, container, csrfToken, currentUserEmail) {
     let filesWrapper = container.querySelector('.task-files-section');
@@ -77,7 +79,7 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
                 downloadIcon.src = '/icons/download.svg';
                 downloadIcon.alt = 'Скачать';
                 downloadIcon.classList.add('download-icon');
-
+                //TODO не показывается уведомление, а если показывается, то закрывает сайдбар
                 downloadIcon.addEventListener('click', () => {
                     window.location.href = `/api/files/download/${file.id}`;
                 });
@@ -122,19 +124,35 @@ export function uploadFile(file, taskId, filesListContainer, csrfToken, currentU
         },
         body: formData
     })
-    .then(response => {
+    .then(async response => {
         if (!response.ok) {
-            throw new Error('Ошибка при загрузке файла');
+            const errorText = await response.text();
+            const hasEnglish = /[a-zA-Z]/.test(errorText);
+            if (hasEnglish) {
+                showToast("Не удалось загрузить файл: неизвестная ошибка", "error");
+            } else {
+                showToast("Не удалось загрузить файл: " + errorText, "error");
+            }
+            throw new Error(errorText);
         }
         return response.json();
     })
-    .then(data => {
-        console.log('Файл загружен успешно:', data);
+    .then(() => {
         loadFilesList(taskId, filesListContainer, csrfToken, currentUserEmail);
     })
     .catch(error => {
-        console.error('Ошибка при загрузке файла:', error);
-        alert('Не удалось загрузить файл');
+        const message = error.message || '';
+        const hasEnglish = /[a-zA-Z]/.test(message);
+        if (hasEnglish) {
+            if (message === 'Failed to fetch') {
+                showToast("Не удалось загрузить файл: проверьте подключение к интернету или попробуйте позже", "error");
+            } else {
+                showToast("Не удалось загрузить файл: неизвестная ошибка", "error");
+            }
+        } else {
+            showToast("Не удалось загрузить файл: " + message, "error");
+        }
+        console.error("Ошибка при загрузке файла:", error);
     });
 }
 
@@ -145,18 +163,37 @@ function deleteFile(fileId, taskId, filesListContainer, csrfToken, currentUserEm
             'X-CSRF-TOKEN': csrfToken
         }
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Ошибка при удалении файла');
+    .then(async response => {
+        if (!response.ok) {
+            const errorText = await response.text();
+            const hasEnglish = /[a-zA-Z]/.test(errorText);
+            if (hasEnglish) {
+                showToast("Не удалось удалить файл: неизвестная ошибка", "error");
+            } else {
+                showToast("Не удалось удалить файл: " + errorText, "error");
+            }
+            throw new Error(errorText);
+        }
         return response.text();
     })
     .then(() => {
-        console.log('Файл удалён успешно');
         loadFilesList(taskId, filesListContainer, csrfToken, currentUserEmail);
     })
     .catch(error => {
-        console.error('Ошибка при удалении файла:', error);
-        alert('Не удалось удалить файл');
+        const message = error.message || '';
+        const hasEnglish = /[a-zA-Z]/.test(message);
+        if (hasEnglish) {
+            if (message === 'Failed to fetch') {
+                showToast("Не удалось удалить файл: проверьте подключение к интернету или попробуйте позже", "error");
+            } else {
+                showToast("Не удалось удалить файл: неизвестная ошибка", "error");
+            }
+        } else {
+            showToast("Не удалось удалить файл: " + message, "error");
+        }
+        console.error("Ошибка при удалении файла:", error);
     });
 }
+
 
 

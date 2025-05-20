@@ -350,7 +350,7 @@ function loadTaskTags(task, tagList, csrfToken, callback) {
             const ids = [];
 
             taskTags.forEach(t => {
-                ids.push(t.id); // id тэга
+                ids.push(t.id);
 
                 const tagItem = document.createElement('div');
                 tagItem.className = 'task-tag-item';
@@ -358,11 +358,41 @@ function loadTaskTags(task, tagList, csrfToken, callback) {
 
                 const removeBtn = document.createElement('button');
                 removeBtn.textContent = '✖';
-                removeBtn.onclick = () => {
-                    fetch(`/api/taskstags/${task.id}/${t.id}`, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': csrfToken }
-                    }).then(() => showTaskDetails(task));
+                removeBtn.onclick = async () => {
+                    try {
+                        const response = await fetch(`/api/taskstags/${task.id}/${t.id}`, {
+                            method: 'DELETE',
+                            headers: { 'X-CSRF-TOKEN': csrfToken }
+                        });
+
+                        if (!response.ok) {
+                            const errorMessage = await response.text();
+                            const hasEnglish = /[a-zA-Z]/.test(errorMessage);
+
+                            if (hasEnglish) {
+                                showToast("Не удалось удалить тэг: неизвестная ошибка", "error");
+                            } else {
+                                showToast("Не удалось удалить тэг: " + errorMessage, "error");
+                            }
+                            return;
+                        }
+
+                        showToast("Тэг успешно удалён");
+                        showTaskDetails(task);
+                    } catch (error) {
+                        const message = error.message || '';
+                        const hasEnglish = /[a-zA-Z]/.test(message);
+
+                        if (hasEnglish) {
+                            if (message === 'Failed to fetch') {
+                                showToast("Не удалось удалить тэг: проверьте подключение к интернету или попробуйте позже", "error");
+                            } else {
+                                showToast("Не удалось удалить тэг: неизвестная ошибка", "error");
+                            }
+                        } else {
+                            showToast("Не удалось удалить тэг: " + message, "error");
+                        }
+                    }
                 };
 
                 tagItem.appendChild(removeBtn);
@@ -393,13 +423,13 @@ function loadProjectTags(task, tagSelect) {
 }
 
 function setupAddTagButton(task, tagSelect, addTagButton, csrfParam, csrfToken, getCurrentTagIds) {
-    addTagButton.onclick = () => {
+    addTagButton.onclick = async () => {
         const tagId = tagSelect.value;
         if (!tagId) return;
 
         const currentTags = getCurrentTagIds();
         if (currentTags.includes(Number(tagId))) {
-            alert('Этот тэг уже прикреплён к задаче.');
+            showToast('Этот тэг уже прикреплён к задаче.', 'error');
             return;
         }
 
@@ -407,11 +437,41 @@ function setupAddTagButton(task, tagSelect, addTagButton, csrfParam, csrfToken, 
         formData.append('tagId', tagId);
         formData.append(csrfParam, csrfToken);
 
-        fetch(`/api/taskstags/${task.id}/add`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: formData
-        }).then(() => showTaskDetails(task));
+        try {
+            const response = await fetch(`/api/taskstags/${task.id}/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                const hasEnglish = /[a-zA-Z]/.test(errorMessage);
+
+                if (hasEnglish) {
+                    showToast("Не удалось добавить тэг: неизвестная ошибка", "error");
+                } else {
+                    showToast("Не удалось добавить тэг: " + errorMessage, "error");
+                }
+                return;
+            }
+
+            showToast("Тэг успешно добавлен");
+            showTaskDetails(task);
+        } catch (error) {
+            const message = error.message || '';
+            const hasEnglish = /[a-zA-Z]/.test(message);
+
+            if (hasEnglish) {
+                if (message === 'Failed to fetch') {
+                    showToast("Не удалось добавить тэг: проверьте подключение к интернету или попробуйте позже", "error");
+                } else {
+                    showToast("Не удалось добавить тэг: неизвестная ошибка", "error");
+                }
+            } else {
+                showToast("Не удалось добавить тэг: " + message, "error");
+            }
+        }
     };
 }
 

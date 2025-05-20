@@ -66,7 +66,7 @@ public class TaskPerformerApiController {
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
         if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "add_task_performers")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         if (taskPerformersRepository.existsByIdTaskAndIdUser(task, performer)) {
@@ -113,7 +113,7 @@ public class TaskPerformerApiController {
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
         if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "remove_task_performers")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         Users performer = usersRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
@@ -150,7 +150,7 @@ public class TaskPerformerApiController {
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
         if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "accept_tasks")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         if (taskPerformersRepository.existsByIdTaskAndIdUser(task, currentUser)) {
@@ -197,7 +197,7 @@ public class TaskPerformerApiController {
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
 
         if (!permissionService.hasPermission(currentUser.getId(), task.getIdProject().getId(), "reject_tasks")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         TaskPerformers performer = taskPerformersRepository.findByIdTaskAndIdUser(task, currentUser)

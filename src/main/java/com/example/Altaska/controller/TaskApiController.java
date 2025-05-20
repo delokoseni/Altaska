@@ -71,7 +71,7 @@ public class TaskApiController {
     }
 
     @PostMapping("/create/{projectId}")
-    public Tasks createTask(@PathVariable Long projectId,
+    public ResponseEntity<?> createTask(@PathVariable Long projectId,
                             @RequestParam String name,
                             @RequestParam(required = false) String description,
                             @RequestParam String createdAt,
@@ -93,7 +93,7 @@ public class TaskApiController {
 
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(user.getId(), projectId, "create_tasks")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         if (projectOpt.isPresent() && userOpt.isPresent()) {
@@ -172,7 +172,7 @@ public class TaskApiController {
                     "Создана задача \"" + savedTask.getName() + "\" в проекте \"" + project.getName() + "\""
             );
 
-            return savedTask;
+            return ResponseEntity.ok(savedTask);
         } else {
             throw new RuntimeException("Проект или пользователь не найден");
         }

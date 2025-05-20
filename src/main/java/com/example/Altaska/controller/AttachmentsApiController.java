@@ -90,7 +90,7 @@ public class AttachmentsApiController {
         }
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(user.getId(), project.getId(), "attach_task_files")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         try {
             Attachments attachment = new Attachments();
@@ -206,7 +206,7 @@ public class AttachmentsApiController {
         }
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(currentUserId, project.getId(), "delete_task_files")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         attachmentsRepository.delete(file);
         Users currentUser = usersRepository.findById(currentUserId).orElse(null);

@@ -14,6 +14,7 @@ import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -51,7 +52,7 @@ public class TasksTagsApiController {
     }
 
     @PostMapping("/{taskId}/add")
-    public void addTagToTask(@PathVariable Long taskId, @RequestParam Long tagId, Principal principal) {
+    public ResponseEntity<?> addTagToTask(@PathVariable Long taskId, @RequestParam Long tagId, Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow();
         Tags tag = tagsRepository.findById(tagId).orElseThrow();
 
@@ -59,7 +60,7 @@ public class TasksTagsApiController {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "add_task_tags")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
         TasksTags tasksTags = new TasksTags();
@@ -76,11 +77,12 @@ public class TasksTagsApiController {
                 null,
                 "К задаче \"" + task.getName() + "\" добавлен тег \"" + tag.getName() + "\""
         );
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{taskId}/{tagId}")
     @Transactional
-    public void removeTagFromTask(@PathVariable Long taskId,
+    public ResponseEntity<?> removeTagFromTask(@PathVariable Long taskId,
                                   @PathVariable Long tagId,
                                   Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow();
@@ -88,7 +90,7 @@ public class TasksTagsApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "remove_task_tags")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         permissionService.checkIfProjectArchived(task.getIdProject());
         activityLogService.logActivity(
@@ -101,6 +103,7 @@ public class TasksTagsApiController {
                 "Из задачи \"" + task.getName() + "\" удалён тег \"" + tag.getName() + "\""
         );
         tasksTagsRepository.deleteByIdTaskAndIdTag(task, tag);
+        return ResponseEntity.ok().build();
     }
 
 }

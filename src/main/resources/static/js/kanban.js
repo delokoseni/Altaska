@@ -1,3 +1,5 @@
+import { showToast } from './toast.js';
+
 // Функция для получения всех задач проекта
 function getAllTasksForProject(projectId) {
     return fetch(`/api/tasks/project/${projectId}/withperformers`)
@@ -284,40 +286,83 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
     }
 }
 
+// Универсальный обработчик fetch с showToast
+function handleFetchWithToast(url, options, successMessage, errorPrefix = "Ошибка") {
+    return fetch(url, options)
+        .then(async response => {
+            if (!response.ok) {
+                const errorText = await response.text();
+                const hasEnglish = /[a-zA-Z]/.test(errorText);
+                if (hasEnglish) {
+                    showToast(`${errorPrefix}: неизвестная ошибка`, "error");
+                } else {
+                    showToast(`${errorPrefix}: ${errorText}`, "error");
+                }
+                throw new Error(errorText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (successMessage) {
+                showToast(successMessage);
+            }
+            return data;
+        })
+        .catch(error => {
+            const message = error.message || '';
+            const hasEnglish = /[a-zA-Z]/.test(message);
+            if (hasEnglish) {
+                if (message === 'Failed to fetch') {
+                    showToast(`${errorPrefix}: проверьте подключение к интернету или попробуйте позже`, "error");
+                } else {
+                    showToast(`${errorPrefix}: неизвестная ошибка`, "error");
+                }
+            } else {
+                showToast(`${errorPrefix}: ${message}`, "error");
+            }
+            console.error(`${errorPrefix}:`, error);
+            throw error; // если нужно пробросить ошибку дальше
+        });
+}
+
 // Функция для обновления статуса задачи на сервере
 function updateTaskStatus(taskId, newStatus) {
     const csrfToken = getCsrfToken();
-    fetch(`/api/tasks/${taskId}/statusByName`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
+    return handleFetchWithToast(
+        `/api/tasks/${taskId}/statusByName`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ statusName: newStatus }),
         },
-        body: JSON.stringify({ statusName: newStatus }),
-    })
-    .then(response => response.json())
-    .then(updatedTask => {
-        console.log('Статус задачи обновлен:', updatedTask);
-    })
-    .catch(error => console.error('Ошибка обновления статуса задачи:', error));
+        "Статус задачи обновлён",
+        "Ошибка обновления статуса задачи"
+    ).then(updatedTask => {
+        console.log("Статус задачи обновлён:", updatedTask);
+    });
 }
 
 // Функция для обновления приоритета задачи на сервере
 function updateTaskPriority(taskId, newPriority) {
     const csrfToken = getCsrfToken();
-    fetch(`/api/tasks/${taskId}/priorityByName`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
+    return handleFetchWithToast(
+        `/api/tasks/${taskId}/priorityByName`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ priorityName: newPriority }),
         },
-        body: JSON.stringify({ priorityName: newPriority }),
-    })
-    .then(response => response.json())
-    .then(updatedTask => {
-        console.log('Приоритет задачи обновлен:', updatedTask);
-    })
-    .catch(error => console.error('Ошибка обновления приоритета задачи:', error));
+        "Приоритет задачи обновлён",
+        "Ошибка обновления приоритета задачи"
+    ).then(updatedTask => {
+        console.log("Приоритет задачи обновлён:", updatedTask);
+    });
 }
 
 export function getCsrfToken() {

@@ -1,3 +1,5 @@
+import { showToast } from './toast.js';
+
 export function addSubtask(taskId, subtaskData, csrfToken, callback) {
     const url = `/api/tasks/${taskId}/subtasks`;
     fetch(url, {
@@ -8,22 +10,41 @@ export function addSubtask(taskId, subtaskData, csrfToken, callback) {
         },
         body: JSON.stringify([subtaskData]) // Заворачиваем в массив!
     })
-    .then(response => {
+    .then(async response => {
         if (!response.ok) {
-            return response.text().then(err => { throw new Error('Ошибка от сервера: ' + err); });
+            const errorText = await response.text();
+            const hasEnglish = /[a-zA-Z]/.test(errorText);
+            if (hasEnglish) {
+                showToast("Не удалось добавить подзадачу: неизвестная ошибка", "error");
+            } else {
+                showToast("Не удалось добавить подзадачу: " + errorText, "error");
+            }
+            throw new Error(errorText);
         }
         return response.json();
     })
     .then(subtasks => {
         if (Array.isArray(subtasks) && subtasks.length > 0) {
+            showToast("Подзадача успешно добавлена");
             callback(subtasks[0]); // возвращаем первую добавленную подзадачу
         } else {
+            showToast("Не удалось добавить подзадачу: пустой ответ от сервера", "error");
             throw new Error('Подзадача не добавлена');
         }
     })
     .catch(error => {
-        console.error('Ошибка:', error);
-        alert('Ошибка: ' + error.message);
+        const message = error.message || '';
+        const hasEnglish = /[a-zA-Z]/.test(message);
+        if (hasEnglish) {
+            if (message === 'Failed to fetch') {
+                showToast("Не удалось добавить подзадачу: проверьте подключение к интернету или попробуйте позже", "error");
+            } else {
+                showToast("Не удалось добавить подзадачу: неизвестная ошибка", "error");
+            }
+        } else {
+            showToast("Не удалось добавить подзадачу: " + message, "error");
+        }
+        console.error("Ошибка добавления подзадачи:", error);
     });
 }
 
@@ -40,16 +61,32 @@ export function updateSubtask(taskId, subtaskId, subtaskData, csrfToken, callbac
     .then(async response => {
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error('Ошибка от сервера: ' + errorText);
+            const hasEnglish = /[a-zA-Z]/.test(errorText);
+            if (hasEnglish) {
+                showToast("Не удалось обновить подзадачу: неизвестная ошибка", "error");
+            } else {
+                showToast("Не удалось обновить подзадачу: " + errorText, "error");
+            }
+            throw new Error(errorText);
         }
         return response.json();
     })
     .then(subtask => {
-        callback(subtask); // просто передаём подзадачу
+        showToast("Подзадача успешно обновлена");
+        callback(subtask);
     })
     .catch(error => {
-        console.error('Ошибка:', error);
-        alert('Ошибка: ' + error.message);
+        const message = error.message || '';
+        const hasEnglish = /[a-zA-Z]/.test(message);
+        if (hasEnglish) {
+            if (message === 'Failed to fetch') {
+                showToast("Не удалось обновить подзадачу: проверьте подключение к интернету или попробуйте позже", "error");
+            } else {
+                showToast("Не удалось обновить подзадачу: неизвестная ошибка", "error");
+            }
+        } else {
+            showToast("Не удалось обновить подзадачу: " + message, "error");
+        }
     });
 }
 
@@ -61,14 +98,32 @@ export function deleteSubtask(taskId, subtaskId, csrfToken, callback) {
             'X-CSRF-TOKEN': csrfToken,
         },
     })
-    .then(response => {
+    .then(async response => {
         if (!response.ok) {
-            throw new Error('Ошибка при удалении подзадачи');
+            const errorText = await response.text();
+            const hasEnglish = /[a-zA-Z]/.test(errorText);
+            if (hasEnglish) {
+                showToast("Не удалось удалить подзадачу: неизвестная ошибка", "error");
+            } else {
+                showToast("Не удалось удалить подзадачу: " + errorText, "error");
+            }
+            throw new Error(errorText);
         }
-        callback(subtaskId);  // Успешно удалили подзадачу, вызываем callback
+        showToast("Подзадача успешно удалена");
+        callback(subtaskId);
     })
     .catch(error => {
-        console.error('Ошибка:', error);
+        const message = error.message || '';
+        const hasEnglish = /[a-zA-Z]/.test(message);
+        if (hasEnglish) {
+            if (message === 'Failed to fetch') {
+                showToast("Не удалось удалить подзадачу: проверьте подключение к интернету или попробуйте позже", "error");
+            } else {
+                showToast("Не удалось удалить подзадачу: неизвестная ошибка", "error");
+            }
+        } else {
+            showToast("Не удалось удалить подзадачу: " + message, "error");
+        }
     });
 }
 

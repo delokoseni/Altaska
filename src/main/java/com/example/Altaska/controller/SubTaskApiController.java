@@ -42,7 +42,7 @@ public class SubTaskApiController {
     private ActivityLogService activityLogService;
 
     @PostMapping
-    public List<SubTasks> createSubtasks(@PathVariable Long taskId,
+    public ResponseEntity<?> createSubtasks(@PathVariable Long taskId,
                                          @RequestBody List<SubTaskDTO> subtasks,
                                          Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -54,7 +54,7 @@ public class SubTaskApiController {
         permissionService.checkIfProjectArchived(task.getIdProject());
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "create_subtasks")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         List<SubTasks> saved = new ArrayList<>();
@@ -81,7 +81,7 @@ public class SubTaskApiController {
             );
         }
 
-        return saved;
+        return ResponseEntity.ok(saved);
     }
 
     @GetMapping
@@ -103,7 +103,7 @@ public class SubTaskApiController {
     }
 
     @PutMapping("/{subtaskId}")
-    public SubTasks updateSubtask(@PathVariable Long subtaskId,
+    public ResponseEntity<?> updateSubtask(@PathVariable Long subtaskId,
                                   @RequestBody SubTaskDTO dto,
                                   Principal principal) {
         SubTasks subTask = subTasksRepository.findById(subtaskId)
@@ -115,7 +115,7 @@ public class SubTaskApiController {
         permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
 
         if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit_subtasks")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         String oldName = subTask.getName();
@@ -146,11 +146,11 @@ public class SubTaskApiController {
             );
         }
 
-        return updatedSubTask;
+        return ResponseEntity.ok(updatedSubTask);
     }
 
     @DeleteMapping("/{subtaskId}")
-    public ResponseEntity<Void> deleteSubtask(@PathVariable Long subtaskId, Principal principal) {
+    public ResponseEntity<?> deleteSubtask(@PathVariable Long subtaskId, Principal principal) {
         SubTasks subTask = subTasksRepository.findById(subtaskId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Подзадача не найдена"));
 
@@ -160,7 +160,7 @@ public class SubTaskApiController {
         permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
 
         if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "delete_subtasks")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         activityLogService.logActivity(
                 user,
