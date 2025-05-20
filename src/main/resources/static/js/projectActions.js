@@ -1,24 +1,18 @@
-export function deleteProject(projectId, onSuccess) {
+export function deleteProject(projectId, handleFetchWithToast, onSuccess) {
     if (!confirm("Вы уверены, что хотите удалить проект? Это действие необратимо.")) return;
 
-    fetch(`/api/projects/${projectId}`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRF-TOKEN': csrfToken
-        }
-    })
-    .then(res => {
-        if (res.ok) {
-            alert("Проект удалён.");
-            onSuccess(); // например: возвращение на главную страницу
-        } else {
-            return res.text().then(text => {
-                alert("Ошибка удаления: " + text);
-            });
-        }
-    })
-    .catch(err => {
-        console.error("Ошибка при удалении проекта:", err);
-        alert("Произошла ошибка при удалении проекта.");
-    });
+    handleFetchWithToast(
+        `/api/projects/${projectId}`,
+        {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        },
+        "Проект успешно удалён",
+        "Ошибка при удалении проекта"
+    )
+    .then(() => onSuccess())
+    .catch(error => console.error("Ошибка при удалении проекта:", error));
 }
+

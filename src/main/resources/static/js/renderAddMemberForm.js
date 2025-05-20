@@ -1,13 +1,12 @@
 import { showLoader, hideLoader } from './loader.js';
 
-export function renderAddMemberForm(container, projectId, roles, previousContentBackup, loadProjectInfoView) {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
+export function renderAddMemberForm(container, projectId, roles, previousContentBackup, loadProjectInfoView, handleFetchWithToast) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (!previousContentBackup) {
         previousContentBackup = container.innerHTML;
     }
+
     container.innerHTML = '';
 
     const form = document.createElement('div');
@@ -35,37 +34,39 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
     const inviteButton = document.createElement('button');
     inviteButton.textContent = 'Пригласить';
 
-    inviteButton.onclick = () => {
+    inviteButton.onclick = async () => {
         const email = emailInput.value.trim();
         const roleId = roleSelect.value;
 
         if (!email || !roleId) {
-            alert('Пожалуйста, заполните все поля.');
+            showToast('Пожалуйста, заполните все поля.', 'error');
             return;
         }
-        showLoader();
+
         const clientDate = new Date().toISOString().split('T')[0];
         const inviteUrl = `/api/projects/${projectId}/invite?email=${encodeURIComponent(email)}&roleId=${roleId}&clientDate=${clientDate}`;
-        fetch(inviteUrl, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            }
-        })
-        .then(res => {
-            hideLoader();
-            if (res.ok) {
-                alert('Приглашение отправлено!');
-                container.innerHTML = previousContentBackup;
-                loadProjectInfoView(projectId);
-            } else {
-                return res.text().then(text => { throw new Error(text); });
-            }
-        })
-        .catch(err => {
+
+        showLoader();
+        try {
+            await handleFetchWithToast(
+                inviteUrl,
+                {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                },
+                'Приглашение отправлено!',
+                'Ошибка при отправке приглашения'
+            );
+            container.innerHTML = previousContentBackup;
+            loadProjectInfoView(projectId);
+        } catch (err) {
             console.error('Ошибка при отправке приглашения:', err);
-            alert('Ошибка при отправке приглашения: ' + err.message);
-        });
+            // showToast уже вызван внутри handleFetchWithToast
+        } finally {
+            hideLoader();
+        }
     };
 
     const cancelButton = document.createElement('button');

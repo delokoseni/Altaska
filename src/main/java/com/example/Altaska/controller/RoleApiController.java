@@ -71,7 +71,7 @@ public class RoleApiController {
 
     @PostMapping
     @Transactional
-    public RoleDto createCustomRole(@PathVariable Long projectId, @RequestBody RoleRequest request, Principal principal) {
+    public ResponseEntity<?> createCustomRole(@PathVariable Long projectId, @RequestBody RoleRequest request, Principal principal) {
         Optional<Projects> projectOpt = projectsRepository.findById(projectId);
         if (projectOpt.isEmpty()) {
             throw new RuntimeException("Проект не найден");
@@ -84,7 +84,7 @@ public class RoleApiController {
 
         boolean hasPermission = permissionService.hasPermission(user.getId(), projectOpt.get().getId(), "delete_roles");
         if (!hasPermission) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
         Roles newRole = new Roles();
@@ -105,17 +105,17 @@ public class RoleApiController {
                 ),
                 "Создана кастомная роль \"" + savedRole.getName() + "\" в проекте \"" + projectOpt.get().getName() + "\""
         );
-        return new RoleDto(
+        return ResponseEntity.ok(new RoleDto(
                 savedRole.getId(),
                 savedRole.getName(),
                 savedRole.getIsCustom(),
                 savedRole.getPermissions(),
                 savedRole.getIdProject() != null ? savedRole.getIdProject().getId() : null
-        );
+        ));
     }
 
     @DeleteMapping("/{roleId}")
-    public ResponseEntity<Void> deleteRole(@PathVariable Long projectId, @PathVariable Long roleId, Principal principal) {
+    public ResponseEntity<?> deleteRole(@PathVariable Long projectId, @PathVariable Long roleId, Principal principal) {
         Optional<Roles> roleOpt = rolesRepository.findById(roleId);
         if (roleOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -124,7 +124,7 @@ public class RoleApiController {
         Roles role = roleOpt.get();
 
         if (role.getIdProject() == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Глобальные роли не могут быть удалены");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Эта роль не может быть изменена.");
         }
 
         Projects project = projectsRepository.findById(role.getIdProject().getId())
@@ -137,7 +137,7 @@ public class RoleApiController {
 
         boolean hasPermission = permissionService.hasPermission(user.getId(), project.getId(), "delete_roles");
         if (!hasPermission) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         activityLogService.logActivity(
                 user,
@@ -154,7 +154,7 @@ public class RoleApiController {
 
     @PutMapping("/{roleId}")
     @Transactional
-    public RoleDto updateRole(
+    public ResponseEntity<?> updateRole(
             @PathVariable Long projectId,
             @PathVariable Long roleId,
             @RequestBody RoleRequest request,
@@ -176,7 +176,7 @@ public class RoleApiController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
         if (!permissionService.hasPermission(user.getId(), projectId, "edit_roles")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         String oldName = role.getName();
         JsonNode oldPermissions = role.getPermissions();
@@ -210,13 +210,13 @@ public class RoleApiController {
             );
         }
 
-        return new RoleDto(
+        return ResponseEntity.ok(new RoleDto(
                 updatedRole.getId(),
                 updatedRole.getName(),
                 updatedRole.getIsCustom(),
                 updatedRole.getPermissions(),
                 updatedRole.getIdProject() != null ? updatedRole.getIdProject().getId() : null
-        );
+        ));
     }
 
 }

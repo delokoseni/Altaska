@@ -464,7 +464,7 @@ function loadProjectInfoView(projectId) {
                 const addMemberBtn = document.createElement('button');
                 addMemberBtn.textContent = 'Добавить участника';
                 addMemberBtn.onclick = () => {
-                    renderAddMemberForm(container, projectId, roles, container.innerHTML, loadProjectInfoView);
+                    renderAddMemberForm(container, projectId, roles, container.innerHTML, loadProjectInfoView, handleFetchWithToast);
                 };
                 membersSection.appendChild(addMemberBtn);
 
@@ -481,7 +481,7 @@ function loadProjectInfoView(projectId) {
             deleteButton.style.color = 'white';
             deleteButton.style.marginTop = '20px';
             deleteButton.onclick = () => {
-                deleteProject(projectId, () => {
+                deleteProject(projectId, handleFetchWithToast, () => {
                     window.location.reload();
                 });
             };
@@ -498,12 +498,8 @@ export async function handleFetchWithToast(url, options, successMessage, errorMe
         const responseText = await response.text();
 
         if (!response.ok) {
-            const hasEnglish = /[a-zA-Z]/.test(responseText);
-            const errorMessage = hasEnglish
-                ? `${errorMessagePrefix}: неизвестная ошибка`
-                : `${errorMessagePrefix}: ${responseText}`;
-            showToast(errorMessage, "error");
-            throw new Error(responseText);
+            // Пробрасываем ошибку, но не показываем Toast тут — это сделает catch
+            throw new Error(responseText || 'Неизвестная ошибка');
         }
 
         showToast(successMessage || "Операция выполнена успешно");
@@ -784,26 +780,29 @@ function createArchiveToggleButton(project, projectId) {
     button.textContent = project.isArchived ? 'Разархивировать проект' : 'Архивировать проект';
 
     button.onclick = () => {
-        fetch(`/api/projects/archive/${projectId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
+        const newArchivedState = !project.isArchived;
+        const successMessage = newArchivedState
+            ? 'Проект успешно архивирован'
+            : 'Проект успешно разархивирован';
+        const errorMessage = newArchivedState
+            ? 'Ошибка при архивировании проекта'
+            : 'Ошибка при разархивировании проекта';
+
+        handleFetchWithToast(
+            `/api/projects/archive/${projectId}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ archived: newArchivedState })
             },
-            body: JSON.stringify({
-                archived: !project.isArchived
-            })
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Ошибка архивации проекта');
-                return response.json();
-            })
-            .then(() => {
-                loadProjectInfoView(projectId);
-            })
-            .catch(error => {
-                console.error('Ошибка при архивации проекта:', error);
-            });
+            successMessage,
+            errorMessage
+        )
+        .then(() => loadProjectInfoView(projectId))
+        .catch(error => console.error('Ошибка при архивации/разархивации проекта:', error));
     };
 
     return button;
@@ -957,45 +956,36 @@ function renderCreateRoleView(container, projectId, previousSection) {
     createButton.onclick = () => {
         const name = nameInput.value.trim();
         if (!name) {
-            alert('Имя роли не может быть пустым');
+            showToast('Имя роли не может быть пустым', 'error');
             return;
         }
 
-        // Собираем объект прав
         const permissions = {};
         Object.keys(permissionLabels).forEach(key => {
             const checkbox = document.getElementById(key);
             permissions[key] = checkbox.checked;
         });
 
-        console.log("Права перед отправкой на сервер:", permissions);
-
-        fetch(`/api/projects/${projectId}/roles`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
+        handleFetchWithToast(
+            `/api/projects/${projectId}/roles`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ name, permissions })
             },
-            body: JSON.stringify({
-                name: name,
-                permissions: permissions
-            })
+            'Роль успешно создана',
+            'Ошибка при создании роли'
+        )
+        .then(() => {
+            container.removeChild(createSection);
+            previousSection.remove();
+            renderRolesSection(container, projectId);
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Роль создана!');
-                container.removeChild(createSection);
-                previousSection.remove();
-                renderRolesSection(container, projectId);
-            } else {
-                response.text().then(errorMessage => {
-                    alert(`Ошибка при создании роли: ${errorMessage}`);
-                });
-            }
-        })
-        .catch(err => {
-            console.error('Ошибка при отправке данных:', err);
-            alert('Произошла ошибка при отправке данных на сервер');
+        .catch(error => {
+            console.error('Ошибка при создании роли:', error);
         });
     };
 
@@ -1003,23 +993,24 @@ function renderCreateRoleView(container, projectId, previousSection) {
     container.appendChild(createSection);
 }
 
+
 function deleteRole(roleId, projectId, container) {
     if (!confirm('Удалить эту роль?')) return;
 
-    fetch(`/api/projects/${projectId}/roles/${roleId}`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRF-TOKEN': csrfToken
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            // Перерисовываем блок с ролями
-            container.innerHTML = '';
-            renderRolesSection(container, projectId);
-        } else {
-            console.error('Ошибка при удалении роли:', response.statusText);
-        }
+    handleFetchWithToast(
+        `/api/projects/${projectId}/roles/${roleId}`,
+        {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        },
+        'Роль успешно удалена',
+        'Не удалось удалить роль'
+    )
+    .then(() => {
+        container.innerHTML = '';
+        renderRolesSection(container, projectId);
     })
     .catch(error => {
         console.error('Ошибка при удалении роли:', error);
@@ -1128,7 +1119,6 @@ function renderEditRoleView(container, projectId, role, previousSection) {
         }, csrfToken);
 
         if (updatedRole) {
-            alert('Роль обновлена!');
             container.removeChild(editSection);
             previousSection.remove();
             renderRolesSection(container, projectId);
@@ -1141,27 +1131,27 @@ function renderEditRoleView(container, projectId, role, previousSection) {
 
 async function updateRole(projectId, roleId, updatedData, csrfToken) {
     try {
-        const response = await fetch(`/api/projects/${projectId}/roles/${roleId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
+        const updatedRole = await handleFetchWithToast(
+            `/api/projects/${projectId}/roles/${roleId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(updatedData)
             },
-            body: JSON.stringify(updatedData)
-        });
+            'Роль успешно обновлена',
+            'Ошибка при обновлении роли'
+        );
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Ошибка при обновлении роли: ${errorText}`);
-        }
-
-        const updatedRole = await response.json();
         console.log("Роль обновлена:", updatedRole);
         return updatedRole;
     } catch (error) {
-        console.error(error.message);
+        console.error('Ошибка при обновлении роли:', error);
     }
 }
+
 
 function renderMemberItem(member, projectId, roles) {
     const listItem = document.createElement('li');
@@ -1188,39 +1178,34 @@ function renderMemberItem(member, projectId, roles) {
     roleSelect.onchange = () => {
         const newRoleId = parseInt(roleSelect.value);
         if (newRoleId !== member.roleId) {
-            fetch(`/api/projects/${projectId}/members/${member.userId}/role`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+            handleFetchWithToast(
+                `/api/projects/${projectId}/members/${member.userId}/role`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ roleId: newRoleId })
                 },
-                body: JSON.stringify({ roleId: newRoleId })
-            })
-            .then(res => {
-                if (res.ok) {
-                    alert('Роль обновлена');
-                    loadProjectInfoView(projectId);
-                } else {
-                    res.text().then(text => alert('Ошибка: ' + text));
-                }
-            })
+                'Роль участника успешно обновлена',
+                'Ошибка при обновлении роли участника'
+            )
+            .then(() => loadProjectInfoView(projectId))
             .catch(err => console.error('Ошибка смены роли:', err));
         }
     };
 
     listItem.appendChild(roleSelect);
 
-    // Кнопка удаления участника
     const deleteBtn = document.createElement('button');
-    if(member.confirmed)
-        deleteBtn.textContent = 'Удалить';
-    else
-        deleteBtn.textContent = 'Отозвать';
+    deleteBtn.textContent = member.confirmed ? 'Удалить' : 'Отозвать';
     deleteBtn.onclick = () => {
-        removeProjectMember(projectId, member.userId, member.email, loadProjectInfoView);
+        removeProjectMember(projectId, member.userId, member.email, handleFetchWithToast, loadProjectInfoView);
     };
     listItem.appendChild(deleteBtn);
 
     return listItem;
 }
+
 

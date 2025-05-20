@@ -254,7 +254,8 @@ public class ProjectApiController {
             );
         }
 
-        return ResponseEntity.ok("Роль обновлена");
+        return ResponseEntity.ok(Map.of("message", "Роль обновлена"));
+
     }
 
     @PostMapping("/{projectId}/invite")
@@ -341,7 +342,7 @@ public class ProjectApiController {
                 )),
                 "Пользователь " + email + " был приглашён в проект"
         );
-        return ResponseEntity.ok("Приглашение отправлено");
+        return ResponseEntity.ok(Map.of("message", "Приглашение отправлено"));
     }
 
     /*
@@ -431,7 +432,7 @@ public class ProjectApiController {
                 "Пользователь " + removedUser.getEmail() + " был удалён из проекта"
         );
 
-        return ResponseEntity.ok("Участник удалён");
+        return ResponseEntity.ok(Map.of("message", "Участник удалён"));
     }
 
     @Transactional
