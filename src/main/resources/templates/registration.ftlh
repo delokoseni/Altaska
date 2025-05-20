@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/css/mainstyle.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/registrationlogin.css">
+    <link rel="stylesheet" href="/css/toast.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/passwordToggle.js"></script>
     <title>Регистрация</title>
@@ -21,11 +22,19 @@
 <main>
     <div class="container">
         <h1>Регистрация</h1>
-    <#if error??>
-        <div class="error-message">
-            <p>${error}</p>
-        </div>
-    </#if>
+        <#if error??>
+            <script type="module">
+                import { showToast } from '/js/toast.js';
+                showToast("${error?js_string}", "error");
+            </script>
+        </#if>
+        <#if success??>
+            <script type="module">
+                import { showToast } from '/js/toast.js';
+                showToast("${success?js_string}", "success");
+            </script>
+        </#if>
+
     <form action="/registration" method="post">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <label>Email <span class="required" title="Поле обязательно для заполнения">*</span></label>
