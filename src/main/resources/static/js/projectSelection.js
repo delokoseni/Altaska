@@ -243,6 +243,8 @@ function renderTaskFilters(tasks, tagsWithTasks, performersMap, container, onFil
         <option value="createdAt-asc">Сначала старые</option>
         <option value="priority-asc">Приоритет ↑</option>
         <option value="priority-desc">Приоритет ↓</option>
+        <option value="deadline-asc">Ближайший срок</option>
+        <option value="deadline-desc">Самый отдалённый срок</option>
     `;
 
     [statusSelect, prioritySelect, tagSelect, performerSelect, sortSelect].forEach(select => {
