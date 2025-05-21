@@ -62,8 +62,6 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
-
-    /* Новое: для вложенной структуры */
     display: flex;
     flex-direction: column;
     position: relative;

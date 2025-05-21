@@ -73,9 +73,13 @@ function loadView(view, projectId) {
                     tasks.forEach(task => {
                         const taskDiv = document.createElement('div');
                         taskDiv.className = 'task-item';
-                        taskDiv.innerHTML = `
+                        const contentWrapper = document.createElement('div');
+                        contentWrapper.className = 'task-content';
+
+                        const textContainer = document.createElement('div');
+                        textContainer.innerHTML = `
                             <h3>${task.name}</h3>
-                            <p>${task.idStatus.name} ${task.idPriority ? task.idPriority.name : ''}</p>
+                            <p>Статус: ${task.idStatus.name} Приоритет: ${task.idPriority ? task.idPriority.name : 'Без приоритета'}</p>
                         `;
 
                         const deleteIcon = document.createElement('img');
@@ -92,7 +96,9 @@ function loadView(view, projectId) {
                             }
                         };
 
-                        taskDiv.appendChild(deleteIcon);
+                        contentWrapper.appendChild(textContainer);
+                        contentWrapper.appendChild(deleteIcon);
+                        taskDiv.appendChild(contentWrapper);
 
                         taskDiv.addEventListener('click', () => {
                             showTaskDetails(task);
