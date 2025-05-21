@@ -1,0 +1,45 @@
+/* Обёртка для всех фильтров */
+.task-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px 0;
+    align-items: center;
+}
+
+/* Общий стиль для всех выпадающих списков */
+.task-filter-select {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 2px solid var(--button-color, #007bff);
+    background-color: var(--second-text-color, #f0f0f0);
+    color: var(--text-color, #333);
+    font-size: 14px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3csvg%20width%3d%2212%22%20height%3d%228%22%20viewBox%3d%220%200%2012%208%22%20fill%3d%22none%22%20xmlns%3d%22http%3a//www.w3.org/2000/svg%22%3e%3cpath%20d%3d%22M1%201L6%207L11%201%22%20stroke%3d%22%23666%22%20stroke-width%3d%222%22/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px 8px;
+    padding-right: 36px; /* Чтобы текст не налезал на стрелочку */
+    transition: border-color 0.2s, box-shadow 0.2s;
+    white-space: nowrap;          /* чтобы текст в select не переносился */
+    overflow: hidden;             /* скрыть переполнение */
+    text-overflow: ellipsis;
+}
+
+.task-filter-select:focus {
+    border-color: var(--button-color, #007bff);
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+
+/* Уточнённый стиль для адаптации текста */
+.task-filters select option {
+    padding: 4px;
+}

@@ -259,13 +259,44 @@ function renderTaskFilters(tasks, tagsWithTasks, performersMap, container, onFil
         });
     });
 
-    filtersContainer.append(
-        'Статус:', statusSelect,
-        ' Приоритет:', prioritySelect,
-        ' Тег:', tagSelect,
-        ' Исполнитель:', performerSelect,
-        ' Сортировка:', sortSelect
+    // Вспомогательная функция для обёртки с лейблом
+    function createFilterBlock(labelText, selectElement) {
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.gap = '5px';
+
+        const label = document.createElement('span');
+        label.textContent = labelText;
+
+        wrapper.append(label, selectElement);
+        return wrapper;
+    }
+
+    // Первый ряд — первые 3 фильтра
+    const firstRow = document.createElement('div');
+    firstRow.style.display = 'flex';
+    firstRow.style.gap = '15px';
+    firstRow.style.marginBottom = '8px';
+
+    firstRow.append(
+        createFilterBlock('Статус:', statusSelect),
+        createFilterBlock('Приоритет:', prioritySelect),
+        createFilterBlock('Тег:', tagSelect)
     );
+
+    // Второй ряд — оставшиеся 2 фильтра
+    const secondRow = document.createElement('div');
+    secondRow.style.display = 'flex';
+    secondRow.style.gap = '15px';
+
+    secondRow.append(
+        createFilterBlock('Исполнитель:', performerSelect),
+        createFilterBlock('Сортировка:', sortSelect)
+    );
+
+    filtersContainer.innerHTML = '';
+    filtersContainer.append(firstRow, secondRow);
 
     container.appendChild(filtersContainer);
 }
