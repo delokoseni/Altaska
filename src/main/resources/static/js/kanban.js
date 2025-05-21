@@ -1,4 +1,5 @@
 import { showToast } from './toast.js';
+import { deleteTask } from './deleteTask.js';
 
 // Функция для получения всех задач проекта
 function getAllTasksForProject(projectId) {
@@ -267,9 +268,30 @@ function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, upda
             taskCard.setAttribute('draggable', 'true');
             taskCard.setAttribute('data-task-id', task.id);
 
+            const contentWrapper = document.createElement('div');
+            contentWrapper.classList.add('task-content');
+
             const taskTitle = document.createElement('div');
             taskTitle.textContent = task.name;
-            taskCard.appendChild(taskTitle);
+            taskTitle.classList.add('task-title');
+
+            const deleteIcon = document.createElement('img');
+            deleteIcon.src = '/icons/trash.svg';
+            deleteIcon.alt = 'Удалить задачу';
+            deleteIcon.className = 'delete-task-icon';
+            deleteIcon.width = 24;
+            deleteIcon.height = 24;
+
+            deleteIcon.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                    deleteTask(task.id, csrfToken);
+                }
+            };
+
+            contentWrapper.appendChild(taskTitle);
+            contentWrapper.appendChild(deleteIcon);
+            taskCard.appendChild(contentWrapper);
 
             taskCard.addEventListener('click', () => {
                 showTaskDetails(task, 'канбан');

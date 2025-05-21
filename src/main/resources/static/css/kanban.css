@@ -62,9 +62,41 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
+
+    /* Новое: для вложенной структуры */
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
 .kanban-task:hover {
     transform: scale(1.02);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.task-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-title {
+    flex-grow: 1;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.delete-task-icon {
+    flex-shrink: 0;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    align-self: center;
+}
+
+.delete-task-icon:hover {
+    opacity: 1;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
 }
