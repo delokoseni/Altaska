@@ -901,6 +901,25 @@ public class TaskApiController {
         public ProjectDto getIdProject() { return idProject; } // Возвращаем объект ProjectDto
     }
 
+    @GetMapping("/project/{projectId}/performers-map")
+    public ResponseEntity<Map<Long, List<String>>> getPerformersMap(@PathVariable Long projectId) {
+        // Получаем все задачи проекта
+        List<Tasks> projectTasks = tasksRepository.findByIdProject_Id(projectId);
+        List<Long> taskIds = projectTasks.stream()
+                .map(Tasks::getId)
+                .toList();
 
+        // Получаем исполнителей по задачам
+        List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskIdIn(taskIds);
+
+        // Группируем по taskId
+        Map<Long, List<String>> result = performers.stream()
+                .collect(Collectors.groupingBy(
+                        tp -> tp.getIdTask().getId(),
+                        Collectors.mapping(tp -> tp.getIdUser().getEmail(), Collectors.toList())
+                ));
+
+        return ResponseEntity.ok(result);
+    }
 }
 

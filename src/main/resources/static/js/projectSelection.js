@@ -64,13 +64,16 @@ function loadView(view, projectId) {
 function renderTaskListView(projectId, viewContent) {
     let tasks = [];
     let tagsWithTasks = [];
+    let performersMap = {};
 
     Promise.all([
         fetch(`/api/tasks/project/${projectId}`).then(res => res.json()),
-        fetch(`/api/taskstags/project/${projectId}/tags-with-tasks`).then(res => res.json())
-    ]).then(([loadedTasks, loadedTags]) => {
+        fetch(`/api/taskstags/project/${projectId}/tags-with-tasks`).then(res => res.json()),
+        fetch(`/api/tasks/project/${projectId}/performers-map`).then(res => res.json())
+    ]).then(([loadedTasks, loadedTags, loadedPerformers]) => {
         tasks = loadedTasks;
         tagsWithTasks = loadedTags;
+        performersMap = loadedPerformers;
 
         tasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -110,16 +113,26 @@ function renderTaskListView(projectId, viewContent) {
                 filtered = filtered.filter(t => t.idPriority?.name === filters.priority);
             }
             if (filters.tag) {
-                // Находим тег в tagsWithTasks
                 const tagObj = tagsWithTasks.find(tag => tag.tagName === filters.tag);
                 if (tagObj) {
                     const allowedTaskIds = new Set(tagObj.taskIds);
                     filtered = filtered.filter(t => allowedTaskIds.has(t.id));
                 } else {
-                    // Если тег не найден — пустой результат
                     filtered = [];
                 }
             }
+            if (filters.performer) {
+                if (filters.performer === '__none__') {
+                    filtered = filtered.filter(t => !performersMap[t.id] || performersMap[t.id].length === 0);
+                } else {
+                    const allowedTaskIds = Object.entries(performersMap)
+                        .filter(([taskId, performers]) => performers.includes(filters.performer))
+                        .map(([taskId]) => parseInt(taskId));
+                    const allowedSet = new Set(allowedTaskIds);
+                    filtered = filtered.filter(t => allowedSet.has(t.id));
+                }
+            }
+
             if (filters.sort) {
                 const [field, order] = filters.sort.split('-');
                 filtered.sort((a, b) => {
@@ -149,9 +162,12 @@ function renderTaskListView(projectId, viewContent) {
                 contentWrapper.className = 'task-content';
 
                 const textContainer = document.createElement('div');
+                const performers = performersMap[task.id]?.join(', ') || 'Нет исполнителей';
+
                 textContainer.innerHTML = `
                     <h3>${task.name}</h3>
-                    <p>Статус: ${task.idStatus.name} Приоритет: ${task.idPriority?.name || 'Без приоритета'}</p>
+                    <p>Статус: ${task.idStatus.name} | Приоритет: ${task.idPriority?.name || 'Без приоритета'}</p>
+                    <p>Исполнители: ${performers}</p>
                 `;
 
                 const deleteIcon = document.createElement('img');
@@ -180,17 +196,17 @@ function renderTaskListView(projectId, viewContent) {
             });
         };
 
-        renderTaskFilters(tasks, tagsWithTasks, taskListContainer, renderFilteredTasks);
+        renderTaskFilters(tasks, tagsWithTasks, performersMap, taskListContainer, renderFilteredTasks);
         taskListContainer.appendChild(filteredContainer);
-        renderFilteredTasks({ status: '', priority: '', sort: 'createdAt-desc' });
+        renderFilteredTasks({ status: '', priority: '', tag: '', performer: '', sort: 'createdAt-desc' });
 
         viewContent.appendChild(taskListContainer);
     }).catch(error => {
-        console.error('Ошибка загрузки задач или тегов:', error);
+        console.error('Ошибка загрузки задач или тегов/исполнителей:', error);
     });
 }
 
-function renderTaskFilters(tasks, tagsWithTasks, container, onFilterChange) {
+function renderTaskFilters(tasks, tagsWithTasks, performersMap, container, onFilterChange) {
     const filtersContainer = document.createElement('div');
     filtersContainer.className = 'task-filters';
 
@@ -212,6 +228,15 @@ function renderTaskFilters(tasks, tagsWithTasks, container, onFilterChange) {
         ${tagsWithTasks.map(tag => `<option value="${tag.tagName}">${tag.tagName}</option>`).join('')}
     `;
 
+    const performerSelect = document.createElement('select');
+    performerSelect.innerHTML = `
+        <option value="">Все исполнители</option>
+        <option value="__none__">Без исполнителей</option>
+        ${[...new Set(Object.values(performersMap).flat())]
+            .filter(Boolean)
+            .map(name => `<option value="${name}">${name}</option>`).join('')}
+    `;
+
     const sortSelect = document.createElement('select');
     sortSelect.innerHTML = `
         <option value="createdAt-desc">Сначала новые</option>
@@ -220,13 +245,14 @@ function renderTaskFilters(tasks, tagsWithTasks, container, onFilterChange) {
         <option value="priority-desc">Приоритет ↓</option>
     `;
 
-    [statusSelect, prioritySelect, tagSelect, sortSelect].forEach(select => {
+    [statusSelect, prioritySelect, tagSelect, performerSelect, sortSelect].forEach(select => {
         select.className = 'task-filter-select';
         select.addEventListener('change', () => {
             const filters = {
                 status: statusSelect.value,
                 priority: prioritySelect.value,
                 tag: tagSelect.value,
+                performer: performerSelect.value,
                 sort: sortSelect.value
             };
             onFilterChange(filters);
@@ -237,8 +263,10 @@ function renderTaskFilters(tasks, tagsWithTasks, container, onFilterChange) {
         'Статус:', statusSelect,
         ' Приоритет:', prioritySelect,
         ' Тег:', tagSelect,
+        ' Исполнитель:', performerSelect,
         ' Сортировка:', sortSelect
     );
+
     container.appendChild(filtersContainer);
 }
 
