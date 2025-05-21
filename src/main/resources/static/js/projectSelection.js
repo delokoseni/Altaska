@@ -232,7 +232,7 @@ function showTaskForm(projectId, container, from = 'список') {
             const filesInput = document.createElement('input');
             filesInput.type = 'file';
             filesInput.name = 'files';
-            filesInput.multiple = true;
+            filesInput.multiple = false;
 
             const submitBtn = document.createElement('button');
             submitBtn.type = 'submit';

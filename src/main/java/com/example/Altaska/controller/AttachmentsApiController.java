@@ -88,6 +88,30 @@ public class AttachmentsApiController {
         if (project == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("У задачи не указан проект");
         }
+        String fileName = file.getOriginalFilename();
+        String contentType = file.getContentType();
+        long maxFileSize = 25L * 1024 * 1024; // 25MB
+
+        if (fileName == null || fileName.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя файла не может быть пустым");
+        }
+
+        if (fileName.length() > 255) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя файла слишком длинное (макс 255 символов)");
+        }
+
+        List<String> allowedMimeTypes = List.of(
+                "image/png",
+                "image/jpeg",
+                "application/pdf",
+                "text/plain",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        );
+
+        if (contentType == null || !allowedMimeTypes.contains(contentType)) {
+            return ResponseEntity.badRequest().body("Недопустимый тип файла: " + contentType);
+        }
         permissionService.checkIfProjectArchived(project);
         if (!permissionService.hasPermission(user.getId(), project.getId(), "attach_task_files")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");

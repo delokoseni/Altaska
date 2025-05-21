@@ -73,7 +73,7 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
             files.forEach(file => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
-                fileItem.textContent = `${file.fileName} (${file.fileType}) `;
+                fileItem.textContent = `${file.fileName}`;
 
                 const downloadIcon = document.createElement('img');
                 downloadIcon.src = '/icons/download.svg';
