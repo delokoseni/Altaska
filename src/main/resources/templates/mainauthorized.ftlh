@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/css/toast.css">
     <link rel="stylesheet" href="/css/activitylog.css">
     <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="/css/renderTaskFilters.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/sidebar.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>

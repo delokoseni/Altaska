@@ -43,75 +43,7 @@ function loadView(view, projectId) {
     viewContent.innerHTML = '';
 
     if (view === 'список') {
-        fetch(`/api/tasks/project/${projectId}`)
-            .then(response => response.json())
-            .then(tasks => {
-                tasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                const taskListContainer = document.createElement('div');
-                taskListContainer.className = 'task-list';
-                const header = document.createElement('div');
-                header.className = 'task-header';
-                const title = document.createElement('span');
-                title.textContent = tasks.length === 0 ? 'Нет задач' : 'Задачи';
-                header.appendChild(title);
-
-                const addBtn = document.createElement('button');
-                addBtn.className = 'add-project-button';
-
-                const plusText = document.createTextNode('+');
-                addBtn.appendChild(plusText);
-                const addLabel = document.createElement('span');
-                addLabel.className = 'add-label';
-                addLabel.textContent = 'Добавить';
-                addBtn.appendChild(addLabel);
-
-                addBtn.onclick = () => showTaskForm(projectId, taskListContainer);
-                header.appendChild(addBtn);
-                taskListContainer.appendChild(header);
-
-                if (tasks.length > 0) {
-                    tasks.forEach(task => {
-                        const taskDiv = document.createElement('div');
-                        taskDiv.className = 'task-item';
-                        const contentWrapper = document.createElement('div');
-                        contentWrapper.className = 'task-content';
-
-                        const textContainer = document.createElement('div');
-                        textContainer.innerHTML = `
-                            <h3>${task.name}</h3>
-                            <p>Статус: ${task.idStatus.name} Приоритет: ${task.idPriority ? task.idPriority.name : 'Без приоритета'}</p>
-                        `;
-
-                        const deleteIcon = document.createElement('img');
-                        deleteIcon.src = '/icons/trash.svg';
-                        deleteIcon.alt = 'Удалить задачу';
-                        deleteIcon.className = 'delete-task-icon';
-                        deleteIcon.width = 24;
-                        deleteIcon.height = 24;
-
-                        deleteIcon.onclick = (e) => {
-                            e.stopPropagation();
-                            if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
-                                deleteTask(task.id, csrfToken);
-                            }
-                        };
-
-                        contentWrapper.appendChild(textContainer);
-                        contentWrapper.appendChild(deleteIcon);
-                        taskDiv.appendChild(contentWrapper);
-
-                        taskDiv.addEventListener('click', () => {
-                            showTaskDetails(task);
-                        });
-                        taskListContainer.appendChild(taskDiv);
-                    });
-                }
-
-                viewContent.appendChild(taskListContainer);
-            })
-            .catch(error => {
-                console.error('Ошибка загрузки задач:', error);
-            });
+        renderTaskListView(projectId, viewContent);
     }
     if (view === 'канбан') {
         renderKanbanFiltersAndBoard(projectId, showTaskForm);
@@ -127,6 +59,170 @@ function loadView(view, projectId) {
     {
         loadProjectLogsView(projectId);
     }
+}
+
+function renderTaskListView(projectId, viewContent) {
+    fetch(`/api/tasks/project/${projectId}`)
+        .then(response => response.json())
+        .then(tasks => {
+            tasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            const taskListContainer = document.createElement('div');
+            taskListContainer.className = 'task-list';
+
+            const header = document.createElement('div');
+            header.className = 'task-header';
+
+            const title = document.createElement('span');
+            title.textContent = tasks.length === 0 ? 'Нет задач' : 'Задачи';
+            header.appendChild(title);
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-project-button';
+            addBtn.appendChild(document.createTextNode('+'));
+
+            const addLabel = document.createElement('span');
+            addLabel.className = 'add-label';
+            addLabel.textContent = 'Добавить';
+            addBtn.appendChild(addLabel);
+
+            addBtn.onclick = () => showTaskForm(projectId, taskListContainer);
+            header.appendChild(addBtn);
+
+            taskListContainer.appendChild(header);
+
+            // Контейнер для отфильтрованных задач
+            const filteredContainer = document.createElement('div');
+
+            const renderFilteredTasks = (filters) => {
+                let filtered = [...tasks];
+
+                if (filters.status) {
+                    filtered = filtered.filter(t => t.idStatus?.name === filters.status);
+                }
+                if (filters.priority) {
+                    filtered = filtered.filter(t => t.idPriority?.name === filters.priority);
+                }
+                if (filters.sort) {
+                    const [field, order] = filters.sort.split('-');
+                    filtered.sort((a, b) => {
+                        let valA, valB;
+                        if (field === 'createdAt') {
+                            valA = new Date(a.createdAt);
+                            valB = new Date(b.createdAt);
+                        } else if (field === 'priority') {
+                            valA = a.idPriority?.id || 0;
+                            valB = b.idPriority?.id || 0;
+                        }
+                        return order === 'asc' ? valA - valB : valB - valA;
+                    });
+                }
+
+                filteredContainer.innerHTML = '';
+                if (filtered.length === 0) {
+                    filteredContainer.textContent = 'Нет задач по выбранным критериям';
+                    return;
+                }
+
+                filtered.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'task-item';
+
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.className = 'task-content';
+
+                    const textContainer = document.createElement('div');
+                    textContainer.innerHTML = `
+                        <h3>${task.name}</h3>
+                        <p>Статус: ${task.idStatus.name} Приоритет: ${task.idPriority?.name || 'Без приоритета'}</p>
+                    `;
+
+                    const deleteIcon = document.createElement('img');
+                    deleteIcon.src = '/icons/trash.svg';
+                    deleteIcon.alt = 'Удалить задачу';
+                    deleteIcon.className = 'delete-task-icon';
+                    deleteIcon.width = 24;
+                    deleteIcon.height = 24;
+
+                    deleteIcon.onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                            deleteTask(task.id, csrfToken);
+                        }
+                    };
+
+                    contentWrapper.appendChild(textContainer);
+                    contentWrapper.appendChild(deleteIcon);
+                    taskDiv.appendChild(contentWrapper);
+
+                    taskDiv.addEventListener('click', () => {
+                        showTaskDetails(task);
+                    });
+
+                    filteredContainer.appendChild(taskDiv);
+                });
+            };
+
+            // Добавляем фильтры ПЕРЕД списком задач
+            renderTaskFilters(tasks, taskListContainer, renderFilteredTasks);
+
+            // Добавляем контейнер задач
+            taskListContainer.appendChild(filteredContainer);
+
+            // Первоначальный рендер
+            renderFilteredTasks({ status: '', priority: '', sort: 'createdAt-desc' });
+
+            viewContent.appendChild(taskListContainer);
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки задач:', error);
+        });
+}
+
+function renderTaskFilters(tasks, container, onFilterChange) {
+    const filtersContainer = document.createElement('div');
+    filtersContainer.className = 'task-filters';
+
+    const statusSelect = document.createElement('select');
+    statusSelect.innerHTML = `
+        <option value="">Все статусы</option>
+        ${[...new Set(tasks.map(t => t.idStatus?.name))]
+            .filter(Boolean)
+            .map(name => `<option value="${name}">${name}</option>`)
+            .join('')}
+    `;
+
+    const prioritySelect = document.createElement('select');
+    prioritySelect.innerHTML = `
+        <option value="">Все приоритеты</option>
+        ${[...new Set(tasks.map(t => t.idPriority?.name))]
+            .filter(Boolean)
+            .map(name => `<option value="${name}">${name}</option>`)
+            .join('')}
+    `;
+
+    const sortSelect = document.createElement('select');
+    sortSelect.innerHTML = `
+        <option value="createdAt-desc">Сначала новые</option>
+        <option value="createdAt-asc">Сначала старые</option>
+        <option value="priority-asc">Приоритет ↑</option>
+        <option value="priority-desc">Приоритет ↓</option>
+    `;
+
+    [statusSelect, prioritySelect, sortSelect].forEach(select => {
+        select.className = 'task-filter-select';
+        select.addEventListener('change', () => {
+            const filters = {
+                status: statusSelect.value,
+                priority: prioritySelect.value,
+                sort: sortSelect.value
+            };
+            onFilterChange(filters);
+        });
+    });
+
+    filtersContainer.append('Статус:', statusSelect, ' Приоритет:', prioritySelect, ' Сортировка:', sortSelect);
+    container.appendChild(filtersContainer);
 }
 
 function showTaskForm(projectId, container, from = 'список') {
