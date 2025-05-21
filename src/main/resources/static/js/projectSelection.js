@@ -137,13 +137,18 @@ function renderTaskListView(projectId, viewContent) {
                 const [field, order] = filters.sort.split('-');
                 filtered.sort((a, b) => {
                     let valA, valB;
+
                     if (field === 'createdAt') {
                         valA = new Date(a.createdAt);
                         valB = new Date(b.createdAt);
                     } else if (field === 'priority') {
                         valA = a.idPriority?.id || 0;
                         valB = b.idPriority?.id || 0;
+                    } else if (field === 'deadline') {
+                        valA = a.deadlineServer ? new Date(a.deadlineServer) : new Date(8640000000000000); // максимальная дата
+                        valB = b.deadlineServer ? new Date(b.deadlineServer) : new Date(8640000000000000);
                     }
+
                     return order === 'asc' ? valA - valB : valB - valA;
                 });
             }
