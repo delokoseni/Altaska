@@ -20,7 +20,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/taskstags")
@@ -105,5 +108,48 @@ public class TasksTagsApiController {
         tasksTagsRepository.deleteByIdTaskAndIdTag(task, tag);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/project/{projectId}/tags-with-tasks")
+    public List<TagWithTasksDto> getTagsWithTasks(@PathVariable Long projectId) {
+        List<Tasks> tasks = tasksRepository.findByIdProject_Id(projectId);
+
+        Map<Long, TagWithTasksDto> tagMap = new HashMap<>();
+
+        for (Tasks task : tasks) {
+            List<TasksTags> taskTags = tasksTagsRepository.findByIdTask(task);
+            for (TasksTags tt : taskTags) {
+                Tags tag = tt.getIdTag();
+                TagWithTasksDto tagDto = tagMap.computeIfAbsent(tag.getId(), id -> {
+                    TagWithTasksDto dto = new TagWithTasksDto();
+                    dto.setTagId(id);
+                    dto.setTagName(tag.getName());
+                    dto.setTaskIds(new ArrayList<>());
+                    return dto;
+                });
+                tagDto.getTaskIds().add(task.getId());
+            }
+        }
+
+        return new ArrayList<>(tagMap.values());
+    }
+
+    public class TagWithTasksDto {
+        private Long tagId;
+        private String tagName;
+        private List<Long> taskIds;
+
+        public Long getTagId() { return tagId; }
+
+        public String getTagName() {return tagName; }
+
+        public List<Long> getTaskIds() {return taskIds; }
+
+        public void setTagId(Long tagId) { this.tagId = tagId; }
+
+        public void setTagName(String tagName) {this.tagName = tagName; }
+
+        public void setTaskIds(List<Long> taskIds) {this.taskIds = taskIds; }
+    }
+
 
 }
