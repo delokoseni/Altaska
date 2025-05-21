@@ -65,6 +65,7 @@ function renderTaskListView(projectId, viewContent) {
     let tasks = [];
     let tagsWithTasks = [];
     let performersMap = {};
+    let taskCountInfo;
 
     Promise.all([
         fetch(`/api/tasks/project/${projectId}`).then(res => res.json()),
@@ -145,7 +146,7 @@ function renderTaskListView(projectId, viewContent) {
                         valA = a.idPriority?.id || 0;
                         valB = b.idPriority?.id || 0;
                     } else if (field === 'deadline') {
-                        valA = a.deadlineServer ? new Date(a.deadlineServer) : new Date(8640000000000000); // максимальная дата
+                        valA = a.deadlineServer ? new Date(a.deadlineServer) : new Date(8640000000000000);
                         valB = b.deadlineServer ? new Date(b.deadlineServer) : new Date(8640000000000000);
                     }
 
@@ -156,53 +157,58 @@ function renderTaskListView(projectId, viewContent) {
             filteredContainer.innerHTML = '';
             if (filtered.length === 0) {
                 filteredContainer.textContent = 'Нет задач по выбранным критериям';
-                return;
+            } else {
+                filtered.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'task-item';
+
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.className = 'task-content';
+
+                    const textContainer = document.createElement('div');
+                    const performers = performersMap[task.id]?.join(', ') || 'Нет исполнителей';
+
+                    textContainer.innerHTML = `
+                        <h3>${task.name}</h3>
+                        <p>Статус: ${task.idStatus.name} | Приоритет: ${task.idPriority?.name || 'Без приоритета'}</p>
+                        <p>Исполнители: ${performers}</p>
+                    `;
+
+                    const deleteIcon = document.createElement('img');
+                    deleteIcon.src = '/icons/trash.svg';
+                    deleteIcon.alt = 'Удалить задачу';
+                    deleteIcon.className = 'delete-task-icon';
+                    deleteIcon.width = 24;
+                    deleteIcon.height = 24;
+
+                    deleteIcon.onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                            deleteTask(task.id, csrfToken);
+                        }
+                    };
+
+                    contentWrapper.appendChild(textContainer);
+                    contentWrapper.appendChild(deleteIcon);
+                    taskDiv.appendChild(contentWrapper);
+
+                    taskDiv.addEventListener('click', () => {
+                        showTaskDetails(task);
+                    });
+
+                    filteredContainer.appendChild(taskDiv);
+                });
             }
 
-            filtered.forEach(task => {
-                const taskDiv = document.createElement('div');
-                taskDiv.className = 'task-item';
-
-                const contentWrapper = document.createElement('div');
-                contentWrapper.className = 'task-content';
-
-                const textContainer = document.createElement('div');
-                const performers = performersMap[task.id]?.join(', ') || 'Нет исполнителей';
-
-                textContainer.innerHTML = `
-                    <h3>${task.name}</h3>
-                    <p>Статус: ${task.idStatus.name} | Приоритет: ${task.idPriority?.name || 'Без приоритета'}</p>
-                    <p>Исполнители: ${performers}</p>
-                `;
-
-                const deleteIcon = document.createElement('img');
-                deleteIcon.src = '/icons/trash.svg';
-                deleteIcon.alt = 'Удалить задачу';
-                deleteIcon.className = 'delete-task-icon';
-                deleteIcon.width = 24;
-                deleteIcon.height = 24;
-
-                deleteIcon.onclick = (e) => {
-                    e.stopPropagation();
-                    if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
-                        deleteTask(task.id, csrfToken);
-                    }
-                };
-
-                contentWrapper.appendChild(textContainer);
-                contentWrapper.appendChild(deleteIcon);
-                taskDiv.appendChild(contentWrapper);
-
-                taskDiv.addEventListener('click', () => {
-                    showTaskDetails(task);
-                });
-
-                filteredContainer.appendChild(taskDiv);
-            });
+            updateTaskCountInfo(filtered, tasks);
         };
 
-        renderTaskFilters(tasks, tagsWithTasks, performersMap, taskListContainer, renderFilteredTasks);
+        // Добавим taskCountInfo через замыкание
+        const renderTaskFiltersResult = renderTaskFilters(tasks, tagsWithTasks, performersMap, taskListContainer, renderFilteredTasks);
+        taskCountInfo = renderTaskFiltersResult.taskCountInfo;
+
         taskListContainer.appendChild(filteredContainer);
+
         renderFilteredTasks({ status: '', priority: '', tag: '', performer: '', sort: 'createdAt-desc' });
 
         viewContent.appendChild(taskListContainer);
@@ -266,7 +272,6 @@ function renderTaskFilters(tasks, tagsWithTasks, performersMap, container, onFil
         });
     });
 
-    // Вспомогательная функция для обёртки с лейблом
     function createFilterBlock(labelText, selectElement) {
         const wrapper = document.createElement('div');
         wrapper.style.display = 'flex';
@@ -280,7 +285,6 @@ function renderTaskFilters(tasks, tagsWithTasks, performersMap, container, onFil
         return wrapper;
     }
 
-    // Первый ряд — первые 3 фильтра
     const firstRow = document.createElement('div');
     firstRow.style.display = 'flex';
     firstRow.style.gap = '15px';
@@ -292,20 +296,33 @@ function renderTaskFilters(tasks, tagsWithTasks, performersMap, container, onFil
         createFilterBlock('Тег:', tagSelect)
     );
 
-    // Второй ряд — оставшиеся 2 фильтра
     const secondRow = document.createElement('div');
     secondRow.style.display = 'flex';
     secondRow.style.gap = '15px';
 
+    const taskCountInfo = document.createElement('div');
+    taskCountInfo.classList.add('task-count-info');
+    taskCountInfo.textContent = `Количество задач: ${tasks.length} / ${tasks.length}`;
+
     secondRow.append(
         createFilterBlock('Исполнитель:', performerSelect),
-        createFilterBlock('Сортировка:', sortSelect)
+        createFilterBlock('Сортировка:', sortSelect),
+        taskCountInfo
     );
 
     filtersContainer.innerHTML = '';
     filtersContainer.append(firstRow, secondRow);
 
     container.appendChild(filtersContainer);
+
+    return { taskCountInfo };
+}
+
+function updateTaskCountInfo(filteredTasks, allTasks) {
+    const countBlock = document.querySelector('.task-count-info');
+    if (countBlock) {
+        countBlock.textContent = `Количество задач: ${filteredTasks.length} / ${allTasks.length}`;
+    }
 }
 
 function showTaskForm(projectId, container, from = 'список') {
@@ -1109,7 +1126,8 @@ function renderCreateRoleView(container, projectId, previousSection) {
         "delete_subtasks": "Удаление подзадач",
         "create_tags": "Создание тегов проекта",
         "delete_tags": "Удаление тегов проекта",
-        "edit_tags": "Редактирование тегов проекта"
+        "edit_tags": "Редактирование тегов проекта",
+        "view_project_log": "Просмотр истории проекта"
     };
 
     const permissionsList = document.createElement('div');
@@ -1256,7 +1274,8 @@ function renderEditRoleView(container, projectId, role, previousSection) {
             "delete_subtasks": "Удаление подзадач",
             "create_tags": "Создание тегов проекта",
             "delete_tags": "Удаление тегов проекта",
-            "edit_tags": "Редактирование тегов проекта"
+            "edit_tags": "Редактирование тегов проекта",
+            "view_project_log": "Просмотр истории проекта"
         };
     const permissionsList = document.createElement('div');
     permissionsList.className = 'permissions-list';

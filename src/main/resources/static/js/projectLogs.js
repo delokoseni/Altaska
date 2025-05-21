@@ -1,3 +1,5 @@
+import { showToast } from './toast.js';
+
 const fieldTranslations = {
     name: 'Название',
     description: 'Описание',
@@ -47,7 +49,8 @@ const permissionLabels = {
     "delete_subtasks": "Удаление подзадач",
     "create_tags": "Создание тегов проекта",
     "delete_tags": "Удаление тегов проекта",
-    "edit_tags": "Редактирование тегов проекта"
+    "edit_tags": "Редактирование тегов проекта",
+    "view_project_log": "Просмотр истории проекта"
 };
 
 function formatPermissions(jsonValue) {
@@ -77,8 +80,23 @@ export function loadProjectLogsView(projectId) {
     viewContent.appendChild(wrapper);
 
     fetch(`/api/logs/project/${projectId}`)
-        .then(response => response.json())
+        .then(async response => {
+            if (!response.ok) {
+                // Ошибка, получаем текст и показываем тост
+                const errorText = await response.text();
+                showToast(errorText || 'Ошибка при загрузке истории.', 'error');
+                // Можно отобразить сообщение в wrapper, если надо
+                const errorMsg = document.createElement('p');
+                errorMsg.textContent = errorText || 'Ошибка при загрузке истории.';
+                wrapper.appendChild(errorMsg);
+                // Прекращаем дальнейшую обработку
+                return null;
+            }
+            return response.json();
+        })
         .then(logs => {
+            if (!logs) return; // Если была ошибка, выходим
+
             if (logs.length === 0) {
                 const noLogs = document.createElement('p');
                 noLogs.textContent = 'История пуста.';
@@ -153,6 +171,7 @@ export function loadProjectLogsView(projectId) {
         })
         .catch(error => {
             console.error('Ошибка загрузки логов:', error);
+            showToast('Ошибка загрузки истории.', 'error');
             const errorText = document.createElement('p');
             errorText.textContent = 'Ошибка загрузки истории.';
             wrapper.appendChild(errorText);
