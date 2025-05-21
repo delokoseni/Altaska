@@ -38,6 +38,29 @@ function selectProject(projectId, projectName) {
     loadView('список', projectId);
 }
 
+function goToMainPage() {
+    sessionStorage.removeItem('currentProjectId');
+    sessionStorage.removeItem('currentProjectName');
+
+    const mainContent = document.querySelector('.main-content');
+    mainContent.innerHTML = '<div class="view-content">Добро пожаловать!</div>';
+}
+
+function toggleArchived() {
+    const archived = document.getElementById('archived-projects');
+    const title = document.querySelector('.project-section-title.collapsible');
+    if (archived.style.display === 'none') {
+        archived.style.display = 'block';
+        title.textContent = 'Архивированные проекты ▲';
+    } else {
+        archived.style.display = 'none';
+        title.textContent = 'Архивированные проекты ▼';
+    }
+}
+
+window.goToMainPage = goToMainPage;
+window.toggleArchived = toggleArchived;
+
 function loadView(view, projectId) {
     const viewContent = document.querySelector('.view-content');
     viewContent.innerHTML = '';
@@ -1003,9 +1026,14 @@ function createArchiveToggleButton(project, projectId) {
             successMessage,
             errorMessage
         )
-        .then(() => loadProjectInfoView(projectId))
+        .then(() => {
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        })
         .catch(error => console.error('Ошибка при архивации/разархивации проекта:', error));
     };
+
 
     return button;
 }

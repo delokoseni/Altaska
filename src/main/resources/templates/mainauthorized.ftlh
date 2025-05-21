@@ -50,18 +50,46 @@
                 </button>
             </div>
         </div>
+        <!-- Кнопка "Главная" -->
+        <div class="project-entry">
+            <button class="project-button" onclick="goToMainPage()">Главная</button>
+        </div>
         <#if projects?? && (projects?size > 0)>
-            <#list projects as project>
-                <div class="project-entry">
-                    <button class="project-button" onclick="selectProject('${project.getId()}', '${project.getName()}')">
-                        ${project.getName()}
-                    </button>
-                </div>
-            </#list>
-        <#else>
-            <div class="no-projects-message">Нет проектов</div>
-        </#if>
-    </aside>
+        <#assign activeProjects = projects?filter(p -> !p.isArchived)>
+        <#if activeProjects?has_content>
+        <div class="project-section">
+            <#list activeProjects as project>
+            <div class="project-entry">
+                <button class="project-button"
+                        onclick="selectProject('${project.getId()}', '${project.getName()}')">
+                    ${project.getName()}
+                </button>
+            </div>
+        </#list>
+</div>
+</#if>
+
+<!-- Архивированные проекты -->
+<#assign archivedProjects = projects?filter(p -> p.isArchived)>
+<#if archivedProjects?has_content>
+<div class="project-section">
+    <div class="project-section-title collapsible" style="cursor: pointer;" onclick="toggleArchived()">Архивированные проекты ▼</div>
+    <div id="archived-projects" style="display: none;">
+        <#list archivedProjects as project>
+        <div class="project-entry">
+            <button class="project-button"
+                    onclick="selectProject('${project.getId()}', '${project.getName()}')">
+                ${project.getName()}
+            </button>
+        </div>
+    </#list>
+</div>
+</div>
+</#if>
+<#else>
+<div class="no-projects-message">Нет проектов</div>
+</#if>
+</aside>
 <section class="main-content"></section>
 </div>
 <script>
