@@ -68,8 +68,6 @@
         </#list>
 </div>
 </#if>
-
-<!-- Архивированные проекты -->
 <#assign archivedProjects = projects?filter(p -> p.isArchived)>
 <#if archivedProjects?has_content>
 <div class="project-section">
@@ -95,6 +93,11 @@
 <script>
     const csrfParam = '${_csrf.parameterName}';
     const csrfToken = '${_csrf.token}';
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        goToMainPage();
+    });
 </script>
 </body>
 </html>

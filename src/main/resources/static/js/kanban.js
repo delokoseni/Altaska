@@ -221,7 +221,7 @@ function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
 
 
 // Отображение канбан-доски с поддержкой перетаскивания
-function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, updateBoard) {
+export function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, updateBoard) {
     container.innerHTML = '';
     const groupedTasks = groupTasksByFilter(tasks, groupBy, statuses, priorities);
 

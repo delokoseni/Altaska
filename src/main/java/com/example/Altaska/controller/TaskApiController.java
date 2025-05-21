@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.*;
@@ -921,5 +920,11 @@ public class TaskApiController {
 
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/assigned")
+    public List<Tasks> getAssignedTasks(Principal principal) {
+        return tasksRepository.findAllByPerformer(principal.getName());
+    }
+
 }
 

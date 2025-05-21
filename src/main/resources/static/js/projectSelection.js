@@ -4,7 +4,7 @@ import { deleteProject } from './projectActions.js';
 import { createSubtasksSection } from './subTasks.js';
 import { addPerformer } from './taskPerformers.js';
 import { deleteTask } from './deleteTask.js';
-import { renderKanbanFiltersAndBoard } from './kanban.js';
+import { renderKanbanFiltersAndBoard, renderKanbanBoard } from './kanban.js';
 import { renderGanttChart } from './gantt.js';
 import { loadProjectLogsView } from './projectLogs.js';
 import { showToast } from './toast.js';
@@ -41,9 +41,220 @@ function selectProject(projectId, projectName) {
 function goToMainPage() {
     sessionStorage.removeItem('currentProjectId');
     sessionStorage.removeItem('currentProjectName');
-
     const mainContent = document.querySelector('.main-content');
-    mainContent.innerHTML = '<div class="view-content">Добро пожаловать!</div>';
+    mainContent.innerHTML = '';
+    const title = document.createElement('h2');
+    title.textContent = 'Главная';
+    title.style.marginBottom = '12px';
+    mainContent.appendChild(title);
+    const menu = document.createElement('div');
+    menu.className = 'project-menu';
+    ['Список', 'Канбан'].forEach(view => {
+        const button = document.createElement('button');
+        button.textContent = view;
+        button.onclick = () => loadMainView(view.toLowerCase());
+        menu.appendChild(button);
+    });
+    const viewContent = document.createElement('div');
+    viewContent.className = 'view-content';
+    mainContent.append(menu, viewContent);
+    loadMainView('список');
+}
+
+function loadMainView(view) {
+    const viewContent = document.querySelector('.view-content');
+    viewContent.innerHTML = '';
+
+    if (view === 'список') {
+        renderMainAssignedTasks(viewContent);
+    }
+
+    if (view === 'канбан') {
+        renderKanbanForAssignedTasks(viewContent);
+    }
+}
+
+function getAssignedTasks() {
+    return fetch('/api/tasks/assigned')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при получении назначенных задач');
+            }
+            return response.json();
+        })
+        .then(tasks => {
+            console.log('Полученные назначенные задачи:', tasks);
+            return tasks;
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки назначенных задач:', error);
+            showToast('Ошибка загрузки назначенных задач', 'error');
+            return [];
+        });
+}
+
+// Основная функция для отображения канбана с назначенными задачами
+export function renderKanbanForAssignedTasks(container) {
+    Promise.all([
+        getAssignedTasks(),
+        fetch('/api/priorities').then(r => r.json()),
+        fetch('/api/statuses').then(r => r.json())
+    ])
+    .then(([tasks, priorities, statuses]) => {
+        container.innerHTML = '';
+
+        // Контейнер для фильтров (только группировка)
+        const filterContainer = document.createElement('div');
+        filterContainer.className = 'kanban-filters';
+        container.appendChild(filterContainer);
+
+        // Селектор группировки: по статусу или приоритету
+        const groupBySelectorContainer = document.createElement('div');
+        groupBySelectorContainer.className = 'kanban-filter';
+
+        const groupByLabel = document.createElement('label');
+        groupByLabel.textContent = 'Группировать по: ';
+        groupBySelectorContainer.appendChild(groupByLabel);
+
+        const groupBySelect = document.createElement('select');
+        const options = [
+            { value: 'status', text: 'Статусу' },
+            { value: 'priority', text: 'Приоритету' }
+        ];
+        options.forEach(({ value, text }) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = text;
+            groupBySelect.appendChild(option);
+        });
+
+        groupBySelectorContainer.appendChild(groupBySelect);
+        filterContainer.appendChild(groupBySelectorContainer);
+
+        // Заголовок
+        const header = document.createElement('div');
+        header.className = 'task-header';
+        const title = document.createElement('span');
+        title.textContent = tasks.length === 0 ? 'Нет назначенных задач' : 'Мои задачи';
+        header.appendChild(title);
+        container.appendChild(header);
+
+        // Канбан-доска
+        const kanbanBoard = document.createElement('div');
+        kanbanBoard.className = 'kanban-board';
+        container.appendChild(kanbanBoard);
+
+        function updateBoard() {
+            renderKanbanBoard(kanbanBoard, groupBySelect.value, tasks, statuses, priorities, updateBoard);
+        }
+
+        groupBySelect.addEventListener('change', updateBoard);
+        updateBoard();
+    })
+    .catch(error => {
+        console.error('Ошибка при загрузке данных для канбан-доски назначенных задач:', error);
+        showToast('Ошибка загрузки данных для канбан-доски', 'error');
+    });
+}
+
+function renderMainAssignedTasks(viewContent) {
+    fetch('/api/tasks/assigned')
+        .then(res => res.json())
+        .then(tasks => {
+            const allTasks = [...tasks];
+            const container = document.createElement('div');
+            container.className = 'task-list';
+
+            const header = document.createElement('div');
+            header.className = 'task-header';
+
+            const title = document.createElement('span');
+            title.textContent = tasks.length === 0 ? 'Нет задач' : 'Мои задачи';
+            header.appendChild(title);
+
+            const taskCount = document.createElement('span');
+            taskCount.style.marginLeft = '12px';
+            header.appendChild(taskCount);
+
+            container.appendChild(header);
+
+            const filtersContainer = document.createElement('div');
+            filtersContainer.className = 'task-filters';
+
+            const statusSelect = document.createElement('select');
+            statusSelect.innerHTML = `
+                <option value="">Все статусы</option>
+                ${[...new Set(allTasks.map(t => t.idStatus?.name))]
+                    .filter(Boolean)
+                    .map(name => `<option value="${name}">${name}</option>`).join('')}
+            `;
+
+            const prioritySelect = document.createElement('select');
+            prioritySelect.innerHTML = `
+                <option value="">Все приоритеты</option>
+                ${[...new Set(allTasks.map(t => t.idPriority?.name))]
+                    .filter(Boolean)
+                    .map(name => `<option value="${name}">${name}</option>`).join('')}
+            `;
+
+            [statusSelect, prioritySelect].forEach(select => {
+                select.className = 'task-filter-select';
+                select.style.marginRight = '10px';
+                filtersContainer.appendChild(select);
+            });
+
+            container.appendChild(filtersContainer);
+
+            const taskList = document.createElement('div');
+
+            container.appendChild(taskList);
+            viewContent.appendChild(container);
+
+            function applyFilters() {
+                const status = statusSelect.value;
+                const priority = prioritySelect.value;
+
+                let filtered = [...allTasks];
+
+                if (status) {
+                    filtered = filtered.filter(t => t.idStatus?.name === status);
+                }
+                if (priority) {
+                    filtered = filtered.filter(t => t.idPriority?.name === priority);
+                }
+
+                taskList.innerHTML = '';
+
+                if (filtered.length === 0) {
+                    taskList.textContent = 'Нет задач по выбранным фильтрам';
+                } else {
+                    filtered.forEach(task => {
+                        const taskDiv = document.createElement('div');
+                        taskDiv.className = 'task-item';
+
+                        taskDiv.innerHTML = `
+                            <h3>${task.name}</h3>
+                            <p>Проект: ${task.idProject?.name || 'Без проекта'}</p>
+                            <p>Статус: ${task.idStatus.name} | Приоритет: ${task.idPriority?.name || 'Без приоритета'}</p>
+                        `;
+
+                        taskDiv.addEventListener('click', () => showTaskDetails(task));
+                        taskList.appendChild(taskDiv);
+                    });
+                }
+
+                taskCount.textContent = `(${filtered.length} / ${allTasks.length})`;
+            }
+
+            statusSelect.addEventListener('change', applyFilters);
+            prioritySelect.addEventListener('change', applyFilters);
+
+            applyFilters(); // Инициализация
+        })
+        .catch(err => {
+            console.error('Ошибка при загрузке задач:', err);
+            viewContent.textContent = 'Ошибка при загрузке задач';
+        });
 }
 
 function toggleArchived() {
