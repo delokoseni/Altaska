@@ -8,6 +8,7 @@ import { renderKanbanFiltersAndBoard, renderKanbanBoard } from './kanban.js';
 import { renderGanttChart } from './gantt.js';
 import { loadProjectLogsView } from './projectLogs.js';
 import { showToast } from './toast.js';
+import { showTaskLogsSidebar } from './taskLogSidebar.js'
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -408,6 +409,18 @@ function renderTaskListView(projectId, viewContent) {
                         <p>Исполнители: ${performers}</p>
                     `;
 
+                    const logIcon = document.createElement('img');
+                    logIcon.src = '/icons/log.svg';
+                    logIcon.alt = 'Лог задачи';
+                    logIcon.className = 'delete-task-icon';
+                    logIcon.width = 24;
+                    logIcon.height = 24;
+
+                    logIcon.onclick = (e) => {
+                        e.stopPropagation();
+                        showTaskLogsSidebar(task)
+                    };
+
                     const deleteIcon = document.createElement('img');
                     deleteIcon.src = '/icons/trash.svg';
                     deleteIcon.alt = 'Удалить задачу';
@@ -423,7 +436,14 @@ function renderTaskListView(projectId, viewContent) {
                     };
 
                     contentWrapper.appendChild(textContainer);
-                    contentWrapper.appendChild(deleteIcon);
+
+                    const iconContainer = document.createElement('div');
+                    iconContainer.className = 'icon-container';
+                    iconContainer.appendChild(logIcon);
+                    iconContainer.appendChild(deleteIcon);
+
+                    contentWrapper.appendChild(iconContainer);
+
                     taskDiv.appendChild(contentWrapper);
 
                     taskDiv.addEventListener('click', () => {

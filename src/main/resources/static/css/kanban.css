@@ -98,3 +98,9 @@
     opacity: 1;
     filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
 }
+
+.icon-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
