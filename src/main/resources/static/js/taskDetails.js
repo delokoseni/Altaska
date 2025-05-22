@@ -14,6 +14,14 @@ const targetLabels = {
     status: 'Статус'
 };
 
+function toLocalDateTimeInputString(utcDateString) {
+    if (!utcDateString) return '';
+    const date = new Date(utcDateString);
+    const offset = date.getTimezoneOffset(); // в минутах
+    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+    return localDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+}
+
 function showTaskDetails(task, view = 'список') {
     const existing = document.querySelector('.task-details-sidebar');
     if (existing) existing.remove();
@@ -21,8 +29,8 @@ function showTaskDetails(task, view = 'список') {
     const sidebar = document.createElement('div');
     sidebar.className = 'task-details-sidebar slide-in';
 
-    const formatStartTime = task.startTimeServer ? new Date(task.startTimeServer).toISOString().slice(0, 16) : '';
-    const formatDeadline = task.deadlineServer ? new Date(task.deadlineServer).toISOString().slice(0, 16) : '';
+    const formatStartTime = toLocalDateTimeInputString(task.startTimeServer);
+    const formatDeadline = toLocalDateTimeInputString(task.deadlineServer);
 
     fetch('/api/priorities')
         .then(response => response.json())
