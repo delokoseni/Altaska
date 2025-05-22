@@ -51,6 +51,9 @@ public class TagApiController {
     public ResponseEntity<?> createTag(@PathVariable Long projectId, @RequestParam String name, Principal principal) {
         Projects project = projectsRepository.findById(projectId).orElse(null);
         if (project == null) return ResponseEntity.notFound().build();
+        if(name == null || name.length() > 20) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина названия тэга не может быть больше 20 символов!");
+        }
         Tags tag = new Tags();
         tag.setName(name);
         tag.setIdProject(project);
@@ -109,6 +112,9 @@ public class TagApiController {
     public ResponseEntity<?> updateTag(@PathVariable Long tagId, @RequestParam String name, Principal principal) {
         Tags tag = tagsRepository.findById(tagId).orElse(null);
         if (tag == null) return ResponseEntity.notFound().build();
+        if(name == null || name.length() > 20) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина названия тэга не может быть больше 20 символов!");
+        }
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
         permissionService.checkIfProjectArchived(tag.getIdProject());

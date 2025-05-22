@@ -61,6 +61,12 @@ public class SubTaskApiController {
         for (SubTaskDTO dto : subtasks) {
             SubTasks subTask = new SubTasks();
             subTask.setIdTask(task);
+            if(dto.getName() == null || dto.getName().length() > 100) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина названия подзадачи не может быть больше 100 символов!");
+            }
+            if(dto.getDescription() == null || dto.getDescription().length() > 500) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина описания подзадачи не может быть больше 500 символов!");
+            }
             subTask.setName(dto.getName());
             subTask.setDescription(dto.getDescription());
             subTask.setCreatedAt(LocalDate.now()); //TODO заменить на время пользователя
@@ -117,7 +123,12 @@ public class SubTaskApiController {
         if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit_subtasks")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-
+        if(dto.getName() == null || dto.getName().length() > 100) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина названия подзадачи не может быть больше 100 символов!");
+        }
+        if(dto.getDescription() == null || dto.getDescription().length() > 500) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина описания подзадачи не может быть больше 500 символов!");
+        }
         String oldName = subTask.getName();
         String oldDescription = subTask.getDescription();
         subTask.setName(dto.getName());

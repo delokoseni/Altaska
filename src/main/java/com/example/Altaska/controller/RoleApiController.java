@@ -82,6 +82,13 @@ public class RoleApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
+        if (request.name == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя роли не может быть пустым.");
+        }
+        if (request.name.length() > 100) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя роли не может быть длиннее 100 символов.");
+        }
+
         boolean hasPermission = permissionService.hasPermission(user.getId(), projectOpt.get().getId(), "delete_roles");
         if (!hasPermission) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
@@ -165,6 +172,12 @@ public class RoleApiController {
 
         if (role.getIdProject() == null || !role.getIdProject().getId().equals(projectId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Глобальные роли нельзя редактировать");
+        }
+        if (request.name == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя роли не может быть пустым.");
+        }
+        if (request.name.length() > 100) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя роли не может быть длиннее 100 символов.");
         }
 
         Projects project = projectsRepository.findById(projectId)

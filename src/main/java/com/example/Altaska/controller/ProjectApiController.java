@@ -88,9 +88,18 @@ public class ProjectApiController {
             changes.add(new Change("name", project.getName(), name));
             project.setName(name);
         }
+        if ((description != null ? description.length() : 0) >  1500) {
+            return ResponseEntity.badRequest().body("Описание проекта не может быть длиннее 1500 символов!");
+        }
         if (description != null && !description.equals(project.getDescription())) {
             changes.add(new Change("description", project.getDescription(), description));
             project.setDescription(description);
+        }
+        if (name != null && name.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Имя проекта не может быть пустым!");
+        }
+        if (name != null && name.length() >  128) {
+            return ResponseEntity.badRequest().body("Имя проекта не может быть длиннее 128 символов!");
         }
         projectsRepository.save(project);
         if (!changes.isEmpty()) {

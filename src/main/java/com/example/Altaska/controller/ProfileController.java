@@ -172,7 +172,6 @@ public class ProfileController {
         }
     }
 
-
     private void completeEmailChange(Users user) {
         expireUserSessions(user.getEmail());
         user.setEmail(user.getNewEmail());

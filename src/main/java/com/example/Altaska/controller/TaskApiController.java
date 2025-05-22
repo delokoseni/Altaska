@@ -86,6 +86,12 @@ public class TaskApiController {
         if (projectOpt.isEmpty() || userOpt.isEmpty()) {
             throw new RuntimeException("Проект или пользователь не найден");
         }
+        if(name == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Название задачи не может быть пустым!");
+        }
+        if(name.length() > 50) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина названия задачи не может быть больше 50 символов!");
+        }
 
         Projects project = projectOpt.get();
         Users user = userOpt.get();
@@ -141,6 +147,9 @@ public class TaskApiController {
                 deadlineDateTime = zonedDateTime.toLocalDateTime();
             }
             task.setDeadlineServer(deadlineDateTime);
+            if (startTimeDateTime != null && deadlineDateTime != null && !deadlineDateTime.isAfter(startTimeDateTime)) {
+                return ResponseEntity.badRequest().body("Дедлайн задачи должен быть позже старта задачи!");
+            }
             Tasks savedTask = tasksRepository.save(task);
 
             if (tagIds != null) {
@@ -183,7 +192,12 @@ public class TaskApiController {
                                 Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Задача не найдена"));
-
+        if(name == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Название задачи не может быть пустым!");
+        }
+        if(name.length() > 50) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Длина названия задачи не может быть больше 50 символов!");
+        }
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         permissionService.checkIfProjectArchived(task.getIdProject());
@@ -596,7 +610,10 @@ public class TaskApiController {
         } else {
             task.setDeadlineServer(null);
         }
-
+        if (task.getStartTimeServer() != null && task.getDeadlineServer() != null &&
+                !task.getDeadlineServer().isAfter(task.getStartTimeServer())) {
+            return ResponseEntity.badRequest().body("Дедлайн задачи должен быть позже старта задачи!");
+        }
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());
@@ -670,8 +687,10 @@ public class TaskApiController {
         } else {
             task.setStartTimeServer(null);
         }
-
-        // Обновление системных полей
+        if (task.getStartTimeServer() != null && task.getDeadlineServer() != null &&
+                !task.getDeadlineServer().isAfter(task.getStartTimeServer())) {
+            return ResponseEntity.badRequest().body("Дедлайн задачи должен быть позже старта задачи!");
+        }
         task.setUpdatedBy(principal.getName());
         task.setUpdatedAtServer(LocalDateTime.now());
         task.setUpdatedAt(OffsetDateTime.now());

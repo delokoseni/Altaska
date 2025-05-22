@@ -6,6 +6,7 @@ import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,12 +51,11 @@ public class MainAuthorizedController {
     }
 
     @PostMapping("/create-project")
-    public String createProject(@RequestParam String name,
+    public ResponseEntity<?> createProject(@RequestParam String name,
                                 @RequestParam String description,
                                 @RequestParam String createdAt,
                                 @RequestParam String updatedAt,
-                                Principal principal,
-                                RedirectAttributes redirectAttributes) {
+                                Principal principal) {
         if (principal != null) {
             String email = principal.getName();
             Optional<Users> currentUserOpt = userRepository.findByEmail(email);
@@ -63,6 +63,9 @@ public class MainAuthorizedController {
             OffsetDateTime clientUpdatedAt = OffsetDateTime.parse(updatedAt);
             if (currentUserOpt.isPresent()) {
                 Users user = currentUserOpt.get();
+                if (name != null && name.trim().isEmpty()) {
+                    return ResponseEntity.badRequest().body("Имя проекта не может быть пустым!");
+                }
                 Projects newProject = projectService.createProject(name, description, user, clientCreatedAt, clientUpdatedAt);
                 activityLogService.logActivity(
                         user,
@@ -73,10 +76,9 @@ public class MainAuthorizedController {
                         null,
                         "Создан проект с названием: " + name
                 );
-                redirectAttributes.addFlashAttribute("message", "Проект создан!");
             }
         }
-        return "redirect:/mainauthorized";
+        return ResponseEntity.ok("Проект создан!");
     }
 
     @GetMapping("/current-user-email")

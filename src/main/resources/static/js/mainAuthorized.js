@@ -56,11 +56,28 @@ document.addEventListener('DOMContentLoaded', () => {
             formWrapper.appendChild(form);
             mainContent.appendChild(formWrapper);
 
-            form.addEventListener('submit', (event) => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
                 const now = new Date();
                 createdAtInput.value = now.toISOString().split('T')[0];
                 updatedAtInput.value = now.toISOString();
+                const formData = new FormData(form);
+                try {
+                    const response = await fetch('/create-project', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.text();
+                    if (!response.ok) {
+                        alert(result);
+                    } else {
+                        window.location.href = '/mainauthorized';
+                    }
+                } catch (error) {
+                    alert('Ошибка при создании проекта: ' + error.message);
+                }
             });
+
         });
     }
 });
