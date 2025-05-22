@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/registrationlogin.css">
     <link rel="stylesheet" href="/css/toast.css">
-    <script src="/js/themeToggle.js" defer></script>
     <script src="/js/passwordToggle.js"></script>
     <title>Вход</title>
 </head>

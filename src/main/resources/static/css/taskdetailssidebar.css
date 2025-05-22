@@ -563,3 +563,39 @@
 .task-details-sidebar .task-files-section button:hover {
     background-color: var(--hover-button-color);
 }
+
+.task-timer {
+  display: flex; /* ставит кнопки в ряд */
+  gap: 8px;      /* отступ между кнопками */
+  align-items: center; /* выравниваем кнопки по вертикали */
+}
+
+.task-timer .timer-btn {
+  display: flex;               /* flex внутри кнопки */
+  align-items: center;         /* вертикальное центрирование иконки */
+  justify-content: center;     /* горизонтальное центрирование иконки */
+  height: 36px;
+  padding: 0 12px;
+  font-size: 1.1em;
+  box-sizing: border-box;
+  margin: 0;
+  border: none;
+  cursor: pointer;
+  background-color: var(--button-color);
+  color: var(--text-color);
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.task-timer .timer-btn:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-timer .timer-btn:active {
+    background-color: var(--active-button-color, #3a6db0);
+}
+
+.task-timer .timer-btn:focus {
+    outline: 2px solid var(--hover-button-color);
+    outline-offset: 2px;
+}

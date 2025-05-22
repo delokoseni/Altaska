@@ -85,6 +85,7 @@ function showTaskDetails(task, view = 'список') {
             content.className = 'task-details-content';
 
             content.innerHTML = `
+                <h2>Задача</h2>
                 <label class="field-label">Таймер:</label>
                 <div class="task-timer">
                     <span id="timer-${task.id}">00:00:00</span>
@@ -92,8 +93,6 @@ function showTaskDetails(task, view = 'список') {
                     <button class="timer-btn" data-action="pause">⏸</button>
                     <button class="timer-btn" data-action="reset">⟲</button>
                 </div>
-
-                <h2>Задача</h2>
 
                 <label class="field-label">Название:</label>
                 <input class="editable-field task-name" value="${task.name}" disabled />

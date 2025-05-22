@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <label>Название проекта:</label>
                 <input type="text" name="name" required>
                 <label>Описание:</label>
-                <textarea name="description" rows="4" cols="50" required></textarea>
+                <textarea name="description" rows="4" cols="50"></textarea>
             `;
 
             const createdAtInput = document.createElement('input');
