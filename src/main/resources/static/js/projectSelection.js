@@ -858,7 +858,6 @@ function loadProjectInfoView(projectId) {
             const container = document.createElement('div');
             container.className = 'project-info-container';
 
-            // --- Название ---
             const nameGroup = document.createElement('div');
             const nameLabel = document.createElement('h3');
             nameLabel.textContent = 'Название проекта:';
@@ -874,7 +873,6 @@ function loadProjectInfoView(projectId) {
             nameGroup.appendChild(nameInput);
             nameGroup.appendChild(nameEditButton);
 
-            // --- Описание ---
             const descGroup = document.createElement('div');
             const descLabel = document.createElement('h3');
             descLabel.textContent = 'Описание проекта:';
@@ -915,7 +913,6 @@ function loadProjectInfoView(projectId) {
             container.appendChild(descGroup);
             wrapper.appendChild(container);
 
-            // --- Теги ---
             renderTagsSection(container, projectId);
 
             Promise.all([
@@ -956,6 +953,10 @@ function loadProjectInfoView(projectId) {
             renderRolesSection(container, projectId);
             const archiveButton = createArchiveToggleButton(project, projectId);
             container.appendChild(archiveButton);
+
+            const leaveButton = createLeaveProjectButton(projectId);
+            container.appendChild(leaveButton);
+
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Удалить проект';
             deleteButton.style.backgroundColor = 'red';
@@ -971,6 +972,40 @@ function loadProjectInfoView(projectId) {
         .catch(error => {
             console.error('Ошибка загрузки проекта:', error);
         });
+}
+
+function createLeaveProjectButton(projectId) {
+    const button = document.createElement('button');
+    button.textContent = 'Покинуть проект';
+    button.classList.add('leave-project-button');
+
+    button.addEventListener('click', async () => {
+        if (!confirm('Вы уверены, что хотите покинуть проект?')) return;
+
+        try {
+            const response = await fetch(`/api/projects/${projectId}/members/leave`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showToast('Вы покинули проект.', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showToast(result.message || 'Ошибка при выходе из проекта.', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            showToast('Ошибка при подключении к серверу.', 'error');
+        }
+    });
+
+    return button;
 }
 
 export async function handleFetchWithToast(url, options, successMessage, errorMessagePrefix = "Ошибка") {
@@ -1289,8 +1324,6 @@ function createArchiveToggleButton(project, projectId) {
         })
         .catch(error => console.error('Ошибка при архивации/разархивации проекта:', error));
     };
-
-
     return button;
 }
 

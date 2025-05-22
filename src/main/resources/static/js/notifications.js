@@ -15,6 +15,7 @@ const notificationTypeDict = {
   'change_role': 'Ваша роль в проекте была изменена ',
   'task_comment': 'Добавлен новый комментарий',
   'task_attachment': 'Добавлен новый файл',
+  'leave_user': 'Пользователь покинул проект'
 };
 
 async function checkUnreadNotifications(bellButton) {

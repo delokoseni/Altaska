@@ -470,5 +470,47 @@ public class ProjectApiController {
         return ResponseEntity.ok(Map.of("message", "Проект успешно удалён"));
     }
 
+    @DeleteMapping("/{projectId}/members/leave")
+    public ResponseEntity<?> leaveProject(@PathVariable Long projectId, Principal principal) {
+        Projects project = projectsRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+        Users currentUser = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        if (Objects.equals(project.getIdOwner().getId(), currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Владелец не может покинуть проект."));
+        }
+        permissionService.checkIfProjectArchived(project);
+        Optional<ProjectMembers> memberOpt = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, currentUser.getId());
+        if (memberOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Вы не являетесь участником этого проекта"));
+        }
+        projectMembersRepository.delete(memberOpt.get());
+        activityLogService.logActivity(
+                currentUser,
+                project,
+                "delete",
+                "project_member",
+                currentUser.getId(),
+                List.of(new Change("deleted", false, true)),
+                "Пользователь " + currentUser.getEmail() + " покинул проект"
+        );
+        String message = String.format(
+                "Пользователь \"%s\" покинул проект \"%s\".",
+                currentUser.getEmail(),
+                project.getName()
+        );
+
+        notificationService.notifyUsers(
+                Set.of(project.getIdOwner()),
+                "leave_user",
+                "projects",
+                projectId,
+                currentUser,
+                message
+        );
+
+        return ResponseEntity.ok(Map.of("message", "Вы покинули проект"));
+    }
+
 }
 
