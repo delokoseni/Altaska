@@ -255,3 +255,9 @@ main {
     100% { transform: rotate(360deg); }
 }
 
+.project-button.active-project-button {
+    background-color: var(--selected-bg-color, #d0ebff); /* Светло-синий фон */
+    color: var(--selected-text-color, #004085);           /* Тёмно-синий текст */
+    font-weight: bold;
+    border-left: 4px solid var(--primary-color, #007bff);
+}

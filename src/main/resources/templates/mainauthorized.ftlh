@@ -50,7 +50,6 @@
                 </button>
             </div>
         </div>
-        <!-- Кнопка "Главная" -->
         <div class="project-entry">
             <button class="project-button" onclick="goToMainPage()">Главная</button>
         </div>
@@ -61,7 +60,8 @@
             <#list activeProjects as project>
             <div class="project-entry">
                 <button class="project-button"
-                        onclick="selectProject('${project.getId()}', '${project.getName()}')">
+                        data-project-id="${project.getId()}"
+                        onclick="selectProject(this)">
                     ${project.getName()}
                 </button>
             </div>
@@ -76,7 +76,8 @@
         <#list archivedProjects as project>
         <div class="project-entry">
             <button class="project-button"
-                    onclick="selectProject('${project.getId()}', '${project.getName()}')">
+                    data-project-id="${project.getId()}"
+                    onclick="selectProject(this)">
                 ${project.getName()}
             </button>
         </div>

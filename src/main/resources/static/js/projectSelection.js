@@ -13,8 +13,21 @@ import { showTaskLogsSidebar } from './taskLogSidebar.js'
 window.selectProject = selectProject;
 window.loadView = loadView;
 
-function selectProject(projectId, projectName) {
+function selectProject(buttonElement) {
+    const projectId = buttonElement.dataset.projectId;
+
+    // Удалить выделение со всех кнопок
+    document.querySelectorAll('.project-button').forEach(btn => {
+        btn.classList.remove('active-project-button');
+    });
+
+    // Выделить текущую кнопку
+    buttonElement.classList.add('active-project-button');
+
+    // Сохранить выбор
     sessionStorage.setItem('currentProjectId', projectId);
+
+    const projectName = buttonElement.textContent.trim();
     sessionStorage.setItem('currentProjectName', projectName);
 
     const mainContent = document.querySelector('.main-content');
@@ -27,7 +40,9 @@ function selectProject(projectId, projectName) {
     views.forEach(view => {
         const button = document.createElement('button');
         button.textContent = view;
-        button.onclick = function () { loadView(view.toLowerCase(), projectId); };
+        button.onclick = function () {
+            loadView(view.toLowerCase(), projectId);
+        };
         menu.appendChild(button);
     });
 
@@ -814,7 +829,7 @@ function showTaskForm(projectId, container, from = 'список') {
                 })
                 .then(() => {
                     showToast('Задача успешно создана', 'success');
-                    loadView('список', projectId);
+                    loadView(from, projectId);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 })
                 .catch(error => {
