@@ -722,6 +722,7 @@ public class TaskApiController {
         return ResponseEntity.ok(updatedTask);
     }
 
+    @Transactional
     @DeleteMapping("/{taskId}/delete")
     public ResponseEntity<?> deleteTask(@PathVariable Long taskId, Principal principal) {
         Tasks task = tasksRepository.findById(taskId)
@@ -734,15 +735,18 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete_tasks")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
+
         List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
         Set<Users> recipients = performers.stream()
                 .map(TaskPerformers::getIdUser)
                 .filter(u -> !u.getId().equals(user.getId()))
                 .collect(Collectors.toSet());
+
         Users creator = task.getIdCreator();
         if (!creator.getId().equals(user.getId())) {
             recipients.add(creator);
         }
+
         String taskName = task.getName();
         if (!recipients.isEmpty()) {
             String message = "Задача \"" + taskName + "\" была удалена пользователем " + user.getEmail();
@@ -755,6 +759,7 @@ public class TaskApiController {
                     message
             );
         }
+
         activityLogService.logActivity(
                 user,
                 task.getIdProject(),
@@ -764,12 +769,15 @@ public class TaskApiController {
                 null,
                 "Задача \"" + taskName + "\" была удалена"
         );
+
         taskCleanupService.deleteTaskDependencies(taskId);
         taskCleanupService.deleteComments(taskId);
         taskCleanupService.deleteSubtasks(taskId);
         tasksRepository.delete(task);
+
         return ResponseEntity.ok(Map.of("message", "Задача успешно удалена"));
     }
+
 
     @GetMapping("/project/{projectId}/withperformers")
     public List<Map<String, Object>> getTasksWithPerformersByProject(@PathVariable Long projectId) {

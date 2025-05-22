@@ -31,7 +31,7 @@ public class TaskCleanupService {
 
     @Transactional
     public void deleteTaskDependencies(Long taskId) {
-        taskPerformersRepository.deleteByTaskId(taskId);
+        taskPerformersRepository.deleteByIdTask_Id(taskId);
         tasksTagsRepository.deleteByTaskId(taskId);
         statusesLogRepository.deleteByIdTask_Id(taskId);
         attachmentsRepository.deleteByIdTask_Id(taskId);
