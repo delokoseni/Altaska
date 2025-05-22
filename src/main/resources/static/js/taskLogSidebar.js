@@ -16,10 +16,11 @@ export function showTaskLogsSidebar(task) {
 
     const content = document.createElement('div');
     content.className = 'task-details-content';
-
+    const formattedTimeSpent = formatSecondsToHHMMSS(task.timeSpent ?? 0);
     content.innerHTML = `
         <div class="task-log-section">
-            <h3>История изменения статуса</h3>
+            <h3>История изменения статуса задачи ${task.name}</h3>
+            <p>Потраченное на задачу время: <b>${formattedTimeSpent}</b></p>
             <div class="task-log-container logs-status">
                 <p>Загрузка...</p>
             </div>
@@ -61,4 +62,16 @@ export function showTaskLogsSidebar(task) {
             window.removeEventListener('click', outsideClickListener);
         }
     }
+}
+
+function formatSecondsToHHMMSS(seconds) {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return [
+        hrs.toString().padStart(2, '0'),
+        mins.toString().padStart(2, '0'),
+        secs.toString().padStart(2, '0')
+    ].join(':');
 }
