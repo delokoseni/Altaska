@@ -108,6 +108,13 @@ export function renderKanbanForAssignedTasks(container) {
         filterContainer.className = 'kanban-filters';
         container.appendChild(filterContainer);
 
+        const header = document.createElement('div');
+        header.className = 'task-header';
+        const title = document.createElement('span');
+        title.textContent = tasks.length === 0 ? 'Нет назначенных задач' : 'Мои задачи';
+        header.appendChild(title);
+        container.appendChild(header);
+
         // Селектор группировки: по статусу или приоритету
         const groupBySelectorContainer = document.createElement('div');
         groupBySelectorContainer.className = 'kanban-filter';
@@ -117,6 +124,7 @@ export function renderKanbanForAssignedTasks(container) {
         groupBySelectorContainer.appendChild(groupByLabel);
 
         const groupBySelect = document.createElement('select');
+        groupBySelect.className = 'kanban-filter-select group-by-selector';
         const options = [
             { value: 'status', text: 'Статусу' },
             { value: 'priority', text: 'Приоритету' }
@@ -130,14 +138,6 @@ export function renderKanbanForAssignedTasks(container) {
 
         groupBySelectorContainer.appendChild(groupBySelect);
         filterContainer.appendChild(groupBySelectorContainer);
-
-        // Заголовок
-        const header = document.createElement('div');
-        header.className = 'task-header';
-        const title = document.createElement('span');
-        title.textContent = tasks.length === 0 ? 'Нет назначенных задач' : 'Мои задачи';
-        header.appendChild(title);
-        container.appendChild(header);
 
         // Канбан-доска
         const kanbanBoard = document.createElement('div');
@@ -169,7 +169,7 @@ function renderMainAssignedTasks(viewContent) {
             header.className = 'task-header';
 
             const title = document.createElement('span');
-            title.textContent = tasks.length === 0 ? 'Нет задач' : 'Мои задачи';
+            title.textContent = tasks.length === 0 ? 'Нет задач' : 'Мои задачи:';
             header.appendChild(title);
 
             const taskCount = document.createElement('span');
@@ -243,7 +243,7 @@ function renderMainAssignedTasks(viewContent) {
                     });
                 }
 
-                taskCount.textContent = `(${filtered.length} / ${allTasks.length})`;
+                taskCount.textContent = `${filtered.length} / ${allTasks.length}`;
             }
 
             statusSelect.addEventListener('change', applyFilters);
