@@ -301,6 +301,7 @@ function renderTaskListView(projectId, viewContent) {
     let tagsWithTasks = [];
     let performersMap = {};
     let taskCountInfo;
+    let currentFilters = { status: '', priority: '', tag: '', performer: '', sort: 'createdAt-desc' };
 
     Promise.all([
         fetch(`/api/tasks/project/${projectId}`).then(res => res.json()),
@@ -395,6 +396,7 @@ function renderTaskListView(projectId, viewContent) {
             } else {
                 filtered.forEach(task => {
                     const taskDiv = document.createElement('div');
+                    taskDiv.setAttribute('data-task-id', task.id);
                     taskDiv.className = 'task-item';
 
                     const contentWrapper = document.createElement('div');
@@ -431,7 +433,15 @@ function renderTaskListView(projectId, viewContent) {
                     deleteIcon.onclick = (e) => {
                         e.stopPropagation();
                         if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
-                            deleteTask(task.id, csrfToken);
+                            deleteTask(task.id, csrfToken, () => {
+                                tasks = tasks.filter(t => t.id !== task.id);
+                                const status = taskListContainer.querySelector('.status-select')?.value || '';
+                                const priority = taskListContainer.querySelector('.priority-select')?.value || '';
+                                const tag = taskListContainer.querySelector('.tag-select')?.value || '';
+                                const performer = taskListContainer.querySelector('.performer-select')?.value || '';
+                                const sort = taskListContainer.querySelector('.sort-select')?.value || 'createdAt-desc';
+                                renderFilteredTasks({ status, priority, tag, performer, sort });
+                            });
                         }
                     };
 

@@ -141,8 +141,7 @@ export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
         header.appendChild(title);
         const addBtn = document.createElement('button');
         addBtn.className = 'add-project-button';
-        const plusText = document.createTextNode('+');
-        addBtn.appendChild(plusText);
+        addBtn.appendChild(document.createTextNode('+'));
         const addLabel = document.createElement('span');
         addLabel.className = 'add-label';
         addLabel.textContent = 'Добавить';
@@ -155,13 +154,24 @@ export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
         kanbanBoard.className = 'kanban-board';
         viewContent.appendChild(kanbanBoard);
 
+        // Функция обновления доски
         function updateBoard() {
             const filters = {
                 memberId: memberSelect.value
             };
-
             const filteredTasks = filterTasks(tasks, filters);
-            renderKanbanBoard(kanbanBoard, groupBySelect.value, filteredTasks, statuses, priorities, updateBoard);
+            renderKanbanBoard(kanbanBoard, groupBySelect.value, filteredTasks, statuses, priorities, updateBoard, deleteTaskAndRefresh);
+        }
+
+        // Функция удаления задачи с обновлением массива и доски
+        function deleteTaskAndRefresh(taskId) {
+            deleteTask(taskId, csrfToken, () => {
+                const index = tasks.findIndex(t => t.id === taskId);
+                if (index !== -1) {
+                    tasks.splice(index, 1);
+                }
+                updateBoard();
+            });
         }
 
         groupBySelect.addEventListener('change', updateBoard);
@@ -219,9 +229,8 @@ function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
     return groups;
 }
 
-
 // Отображение канбан-доски с поддержкой перетаскивания
-export function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, updateBoard) {
+export function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, updateBoard, deleteTaskCallback) {
     container.innerHTML = '';
     const groupedTasks = groupTasksByFilter(tasks, groupBy, statuses, priorities);
 
@@ -285,7 +294,7 @@ export function renderKanbanBoard(container, groupBy, tasks, statuses, prioritie
             deleteIcon.onclick = (e) => {
                 e.stopPropagation();
                 if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
-                    deleteTask(task.id, csrfToken);
+                    deleteTaskCallback(task.id);
                 }
             };
 

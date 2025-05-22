@@ -1,6 +1,6 @@
 import { showToast } from './toast.js';
 
-export function deleteTask(taskId, csrfToken) {
+export function deleteTask(taskId, csrfToken, onSuccess) {
     const formData = new URLSearchParams();
     fetch(`/api/tasks/${taskId}/delete`, {
         method: 'DELETE',
@@ -26,7 +26,9 @@ export function deleteTask(taskId, csrfToken) {
     .then(data => {
         showToast("Задача успешно удалена");
         console.log("Задача удалена", data);
-        setTimeout(() => window.location.reload(), 1000);
+        if (typeof onSuccess === 'function') {
+            onSuccess();
+        }
     })
     .catch(error => {
         const message = error.message || '';
