@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="/css/activitylog.css">
     <link rel="stylesheet" href="/css/notifications.css">
     <link rel="stylesheet" href="/css/renderTaskFilters.css">
+    <link rel="stylesheet" href="/css/taskStatusesLog.css">
     <script src="/js/themeToggle.js" defer></script>
     <script src="/js/sidebar.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>

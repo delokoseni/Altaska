@@ -22,7 +22,7 @@ public class StatusesLogApiController {
                 .map(log -> new StatusLogDto(
                         log.getChangeAt(),
                         log.getIdUser().getEmail(),
-                        log.getIdTask().getIdStatus().getName()
+                        log.getNewStatus()
                 ))
                 .toList();
     }

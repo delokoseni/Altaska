@@ -22,6 +22,9 @@ public class StatusesLog {
     @JoinColumn(name = "id_task", referencedColumnName = "id")
     private Tasks idTask;
 
+    @Column(name = "new_status", nullable = false)
+    private String newStatus;
+
     public Long getId() {
         return id;
     }
@@ -38,6 +41,10 @@ public class StatusesLog {
         return idTask;
     }
 
+    public String getNewStatus() {
+        return newStatus;
+    }
+
     public void setChangeAt(OffsetDateTime changeAt) {
         this.changeAt = changeAt;
     }
@@ -49,4 +56,6 @@ public class StatusesLog {
     public void setIdTask(Tasks idTask) {
         this.idTask = idTask;
     }
+
+    public void  setNewStatus(String newStatus) { this.newStatus = newStatus; }
 }
