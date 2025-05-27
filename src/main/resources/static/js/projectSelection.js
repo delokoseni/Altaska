@@ -9,6 +9,7 @@ import { renderGanttChart } from './gantt.js';
 import { loadProjectLogsView } from './projectLogs.js';
 import { showToast } from './toast.js';
 import { showTaskLogsSidebar } from './taskLogSidebar.js'
+import { renderRolePermissionsView } from './renderRolePermissionsView.js';
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -1350,6 +1351,15 @@ function renderRolesSection(container, projectId) {
                     const text = document.createElement('span');
                     text.textContent = role.name + (role.idProject === null ? ' (глобальная)' : '');
                     li.appendChild(text);
+
+                    const viewButton = document.createElement('button');
+                    viewButton.className = 'role-view-button';
+                    viewButton.innerHTML = `<img src="/icons/EyeOpen.svg" alt="Просмотреть" class="icon">`;
+                    viewButton.onclick = () => {
+                        renderRolePermissionsView(role);
+                    };
+                    li.appendChild(viewButton);
+
 
                     // Только для проектных ролей
                     if (role.idProject !== null) {

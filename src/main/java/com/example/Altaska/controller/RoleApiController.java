@@ -232,4 +232,38 @@ public class RoleApiController {
         ));
     }
 
+    @GetMapping("/{roleId}/permissions")
+    public ResponseEntity<?> getRolePermissions(@PathVariable Long projectId, @PathVariable Long roleId) {
+        Roles role = rolesRepository.findById(roleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Роль не найдена"));
+
+        if (role.getIdProject() == null) {
+            if (projectId != 0) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Это глобальная роль, она не принадлежит проекту");
+            }
+        } else {
+            if (!role.getIdProject().getId().equals(projectId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Роль не принадлежит проекту");
+            }
+        }
+
+        JsonNode permissions = role.getPermissions();
+        if (permissions == null || permissions.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<Object> result = new ArrayList<>();
+        permissions.fieldNames().forEachRemaining(key -> {
+            JsonNode value = permissions.get(key);
+            if (value.asBoolean(false)) {
+                result.add(new Object() {
+                    public final String name = key;
+                });
+            }
+        });
+
+        return ResponseEntity.ok(result);
+    }
+
+
 }

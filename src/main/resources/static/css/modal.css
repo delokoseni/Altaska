@@ -1,0 +1,59 @@
+/* Изолированные стили для модального окна */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* затемнённый фон */
+  display: flex;
+  justify-content: center; /* по горизонтали центр */
+  align-items: center;     /* по вертикали центр */
+  z-index: 1000;           /* поверх всего */
+}
+
+.modal {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  max-width: 400px;
+  width: 90%;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  color: black;
+}
+
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.modal ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.modal p {
+  margin-bottom: 20px;
+}
+
+.modal button {
+  background-color: #007BFF;
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.modal button:hover {
+  background-color: #0056b3;
+}

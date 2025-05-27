@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/css/notifications.css">
     <link rel="stylesheet" href="/css/renderTaskFilters.css">
     <link rel="stylesheet" href="/css/taskStatusesLog.css">
+    <link rel="stylesheet" href="/css/modal.css">
     <script src="/js/sidebar.js" defer></script>
     <script src="/js/mainAuthorized.js" defer></script>
     <script type = "module" src="/js/projectSelection.js"></script>
