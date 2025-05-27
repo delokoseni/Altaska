@@ -13,7 +13,7 @@ export async function renderRolePermissionsView(role) {
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
 
-        // modal wrapper (для центрирования по viewport)
+        // modal wrapper
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-wrapper';
 
@@ -21,12 +21,19 @@ export async function renderRolePermissionsView(role) {
         const modal = document.createElement('div');
         modal.className = 'modal';
 
-        // шапка
+        // header
         const header = document.createElement('div');
         header.className = 'modal-header';
         header.textContent = `Права роли: ${roleName}`;
 
-        // содержимое
+        // Кнопка-крестик
+        const closeIcon = document.createElement('span');
+        closeIcon.className = 'modal-close-icon';
+        closeIcon.innerHTML = '&times;';
+        closeIcon.onclick = () => document.body.removeChild(overlay);
+        header.appendChild(closeIcon);
+
+        // content
         const content = document.createElement('div');
         content.className = 'modal-content';
 
@@ -44,14 +51,9 @@ export async function renderRolePermissionsView(role) {
             content.appendChild(permissionsList);
         }
 
-        // футер
+        // footer (оставим на случай будущего использования, но не добавляем кнопку)
         const footer = document.createElement('div');
         footer.className = 'modal-footer';
-
-        const closeBtn = document.createElement('button');
-        closeBtn.textContent = 'Закрыть';
-        closeBtn.onclick = () => document.body.removeChild(overlay);
-        footer.appendChild(closeBtn);
 
         // Сборка
         modal.appendChild(header);
@@ -61,12 +63,12 @@ export async function renderRolePermissionsView(role) {
         overlay.appendChild(wrapper);
         document.body.appendChild(overlay);
 
-        // Закрытие по клику вне окна
         overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
+            if (!e.target.closest('.modal')) {
                 document.body.removeChild(overlay);
             }
         });
+
 
     } catch (error) {
         console.error('Ошибка при отображении прав роли:', error);
