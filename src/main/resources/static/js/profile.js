@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <img id="eye-icon-passwordNewRepeat" src="/icons/EyeSlashed.svg" class="eye-icon" alt="Глаз">
                 </span>
             </div>
-            <button type="submit" class="profile-button">Сменить пароль</button>
+            <button type="submit" class="profile-button">Сохранить</button>
             <button type="button" class="profile-button" id="cancelChangePassword">Отмена</button>
         </form>
     `;

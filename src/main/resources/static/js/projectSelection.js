@@ -942,7 +942,7 @@ function loadProjectInfoView(projectId) {
                 const addMemberBtn = document.createElement('button');
                 addMemberBtn.textContent = 'Добавить участника';
                 addMemberBtn.onclick = () => {
-                    renderAddMemberForm(container, projectId, roles, container.innerHTML, loadProjectInfoView, handleFetchWithToast);
+                    renderAddMemberForm(container, projectId, container.innerHTML, loadProjectInfoView, handleFetchWithToast);
                 };
                 membersSection.appendChild(addMemberBtn);
 
@@ -1508,11 +1508,17 @@ function renderCreateRoleView(container, projectId, previousSection) {
             console.error('Ошибка при создании роли:', error);
         });
     };
+    const backFromRoleAppendButton = document.createElement('button');
+    backFromRoleAppendButton.textContent = 'Отмена';
 
     createSection.appendChild(createButton);
+    createSection.appendChild(backFromRoleAppendButton);
+    backFromRoleAppendButton.onclick = () => {
+        container.removeChild(createSection);
+        previousSection.style.display = '';
+    };
     container.appendChild(createSection);
 }
-
 
 function deleteRole(roleId, projectId, container) {
     if (!confirm('Удалить эту роль?')) return;

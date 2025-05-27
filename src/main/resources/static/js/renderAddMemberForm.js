@@ -1,6 +1,6 @@
 import { showLoader, hideLoader } from './loader.js';
 
-export function renderAddMemberForm(container, projectId, roles, previousContentBackup, loadProjectInfoView, handleFetchWithToast) {
+export async function renderAddMemberForm(container, projectId, previousContentBackup, loadProjectInfoView, handleFetchWithToast) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (!previousContentBackup) {
@@ -8,6 +8,22 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
     }
 
     container.innerHTML = '';
+    showLoader();
+
+    let roles;
+    try {
+        const res = await fetch(`/api/projects/${projectId}/roles`);
+        if (!res.ok) throw new Error('Ошибка при загрузке ролей');
+        roles = await res.json();
+    } catch (err) {
+        console.error('Ошибка загрузки ролей:', err);
+        hideLoader();
+        showToast('Не удалось загрузить роли.', 'error');
+        container.innerHTML = previousContentBackup;
+        return;
+    }
+
+    hideLoader();
 
     const form = document.createElement('div');
     form.className = 'add-member-form';
@@ -33,7 +49,6 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
 
     const inviteButton = document.createElement('button');
     inviteButton.textContent = 'Пригласить';
-
     inviteButton.onclick = async () => {
         const email = emailInput.value.trim();
         const roleId = roleSelect.value;
@@ -63,7 +78,6 @@ export function renderAddMemberForm(container, projectId, roles, previousContent
             loadProjectInfoView(projectId);
         } catch (err) {
             console.error('Ошибка при отправке приглашения:', err);
-            // showToast уже вызван внутри handleFetchWithToast
         } finally {
             hideLoader();
         }
