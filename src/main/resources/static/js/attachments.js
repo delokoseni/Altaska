@@ -79,7 +79,6 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
                 downloadIcon.src = '/icons/download.svg';
                 downloadIcon.alt = 'Скачать';
                 downloadIcon.classList.add('download-icon');
-                //TODO не показывается уведомление, а если показывается, то закрывает сайдбар
                 downloadIcon.addEventListener('click', () => {
                     window.location.href = `/api/files/download/${file.id}`;
                 });

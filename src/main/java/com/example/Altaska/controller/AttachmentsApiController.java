@@ -167,7 +167,7 @@ public class AttachmentsApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при загрузке файла");
         }
     }
-    //TODO Проверка прав и архивации
+
     @GetMapping("/download/{fileId}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable Long fileId, Principal principal) {
         Attachments attachment = attachmentsRepository.findById(fileId).orElse(null);
@@ -185,11 +185,6 @@ public class AttachmentsApiController {
         Projects project = task.getIdProject();
         if (project == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-        if(permissionService.checkIfProjectArchived(task.getIdProject()))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Проект архивирован и не может быть изменён");
-        if (!permissionService.hasPermission(user.getId(), project.getId(), "download_task_files")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
         activityLogService.logActivity(
                 user,

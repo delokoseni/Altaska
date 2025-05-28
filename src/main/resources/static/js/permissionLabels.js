@@ -14,7 +14,6 @@ export const permissionLabels = {
     "edit_task_start_date": "Изменение даты начала задачи",
     "delete_tasks": "Удаление задач",
     "attach_task_files": "Прикрепление файлов к задаче",
-    "download_task_files": "Загрузка файлов из задачи",
     "delete_task_files": "Удаление прикреплённых файлов",
     "write_task_comments": "Написание комментариев",
     "edit_task_comments": "Редактирование комментариев",

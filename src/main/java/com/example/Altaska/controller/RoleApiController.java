@@ -59,7 +59,6 @@ public class RoleApiController {
             Map.entry("edit_task_start_date", "Изменение даты начала задачи"),
             Map.entry("delete_tasks", "Удаление задач"),
             Map.entry("attach_task_files", "Прикрепление файлов к задаче"),
-            Map.entry("download_task_files", "Загрузка файлов из задачи"),
             Map.entry("delete_task_files", "Удаление прикреплённых файлов"),
             Map.entry("write_task_comments", "Написание комментариев"),
             Map.entry("edit_task_comments", "Редактирование комментариев"),

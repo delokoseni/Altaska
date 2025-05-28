@@ -155,7 +155,6 @@ function renderAddButton(select, taskId, projectId, containerElement, csrfToken)
     containerElement.appendChild(addBtn);
 }
 
-//TODO возможно нужно удалить
 export async function addPerformer(taskId, userId, csrfToken) {
     const response = await fetch(`/api/task-performers/${taskId}`, {
         method: "POST",
