@@ -853,7 +853,6 @@ function loadProjectInfoView(projectId) {
     wrapper.className = 'project-info-view';
     viewContent.appendChild(wrapper);
 
-
     fetch(`/api/projects/${projectId}`)
         .then(response => response.json())
         .then(project => {
@@ -1353,15 +1352,6 @@ function renderRolesSection(container, projectId) {
                     text.textContent = role.name + (role.idProject === null ? ' (глобальная)' : '');
                     li.appendChild(text);
 
-                    const viewButton = document.createElement('button');
-                    viewButton.className = 'role-view-button';
-                    viewButton.innerHTML = `<img src="/icons/EyeOpen.svg" alt="Просмотреть" class="icon">`;
-                    viewButton.onclick = () => {
-                        renderRolePermissionsView(role);
-                    };
-                    li.appendChild(viewButton);
-
-
                     // Только для проектных ролей
                     if (role.idProject !== null) {
                         const editButton = document.createElement('button');
@@ -1380,7 +1370,13 @@ function renderRolesSection(container, projectId) {
                         };
                         li.appendChild(deleteButton);
                     }
-
+                    const viewButton = document.createElement('button');
+                    viewButton.className = 'role-view-button';
+                    viewButton.innerHTML = `<img src="/icons/EyeOpen.svg" alt="Просмотреть" class="icon">`;
+                    viewButton.onclick = () => {
+                        renderRolePermissionsView(role);
+                    };
+                    li.appendChild(viewButton);
 
                     list.appendChild(li);
                 });
@@ -1473,7 +1469,8 @@ function renderCreateRoleView(container, projectId, previousSection) {
         .then(() => {
             container.removeChild(createSection);
             previousSection.remove();
-            renderRolesSection(container, projectId);
+            console.log("Должно быть вызвано");
+            loadProjectInfoView(projectId);
         })
         .catch(error => {
             console.error('Ошибка при создании роли:', error);
@@ -1507,7 +1504,7 @@ function deleteRole(roleId, projectId, container) {
     )
     .then(() => {
         container.innerHTML = '';
-        renderRolesSection(container, projectId);
+        loadProjectInfoView(projectId);
     })
     .catch(error => {
         console.error('Ошибка при удалении роли:', error);
@@ -1611,7 +1608,6 @@ async function updateRole(projectId, roleId, updatedData, csrfToken) {
     }
 }
 
-
 function renderMemberItem(member, projectId, roles) {
     const listItem = document.createElement('li');
 
@@ -1627,7 +1623,7 @@ function renderMemberItem(member, projectId, roles) {
     roles.forEach(role => {
         const option = document.createElement('option');
         option.value = role.id;
-        option.textContent = role.name;
+        option.textContent = role.name + (role.idProject === null ? ' (глобальная)' : '');
         if (role.id === member.roleId) {
             option.selected = true;
         }

@@ -132,6 +132,11 @@ public class RoleApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя роли не может быть длиннее 100 символов.");
         }
 
+        boolean roleExists = rolesRepository.existsByNameAndIdProject(request.name, projectOpt.get());
+        if (roleExists) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Роль с таким именем уже существует в проекте.");
+        }
+
         boolean hasPermission = permissionService.hasPermission(user.getId(), projectOpt.get().getId(), "delete_roles");
         if (!hasPermission) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
