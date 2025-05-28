@@ -36,6 +36,7 @@ async function checkUnreadNotifications(bellButton) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  let currentlyOpenNotification = null;
   const bellButton = document.querySelector('.profile-button[href=""]');
   if (!bellButton) return;
 
@@ -132,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const notifElem = document.createElement('div');
           notifElem.className = 'notification-item';
           if (!notification.isRead) notifElem.classList.add('unread');
-
+          console.log("Дата и время уведомления: ", notification.createdAt);
           notifElem.innerHTML = `
             <div class="notification-header">
               <span class="notification-type">${notificationTypeDict[notification.type] || notification.type} </span>
@@ -147,8 +148,19 @@ document.addEventListener("DOMContentLoaded", () => {
           notifElem.addEventListener('click', async () => {
             const content = notifElem.querySelector('.notification-content');
             const isVisible = content.style.display === 'block';
+
+            // Закрыть предыдущую открытую нотификацию, если она не та же самая
+            if (currentlyOpenNotification && currentlyOpenNotification !== content) {
+              currentlyOpenNotification.style.display = 'none';
+            }
+
+            // Переключить видимость текущей
             content.style.display = isVisible ? 'none' : 'block';
 
+            // Обновить ссылку на открытую нотификацию (или сбросить, если закрыта)
+            currentlyOpenNotification = isVisible ? null : content;
+
+            // Отметить как прочитанное, если ещё не прочитано
             if (!isVisible && !notification.isRead) {
               try {
                 const csrfToken = getCsrfToken();

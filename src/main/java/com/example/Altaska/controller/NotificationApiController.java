@@ -27,9 +27,9 @@ public class NotificationApiController {
     private UsersRepository usersRepository;
 
     @Autowired
-    private TasksRepository tasksRepository;  // чтобы получить название задачи
+    private TasksRepository tasksRepository;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     @GetMapping
     public ResponseEntity<List<NotificationDto>> getNotifications(Principal principal) {
@@ -43,7 +43,6 @@ public class NotificationApiController {
                 Tasks task = tasksRepository.findById(n.getRelatedEntityId()).orElse(null);
                 if (task != null) relatedName = task.getName();
             }
-            // можно добавить else if для других relatedEntityType
 
             return new NotificationDto(
                     n.getId(),
