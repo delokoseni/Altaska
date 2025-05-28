@@ -1622,6 +1622,7 @@ async function updateRole(projectId, roleId, updatedData, csrfToken) {
 }
 
 function renderMemberItem(member, projectId, roles) {
+    sortRoles(roles);
     const listItem = document.createElement('li');
 
     // Почта участника
