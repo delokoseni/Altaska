@@ -222,6 +222,12 @@
     color: #333;
 }
 
+.task-details-sidebar .comment-date {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: gray;
+}
+
 .task-details-sidebar .comment-text {
     white-space: pre-wrap;
     word-wrap: break-word;

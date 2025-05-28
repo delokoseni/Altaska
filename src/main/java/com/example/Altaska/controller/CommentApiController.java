@@ -58,7 +58,8 @@ public class CommentApiController {
                 .map(comment -> new CommentDto(
                         comment.getId(),
                         comment.getIdUser().getEmail(),
-                        comment.getContent()
+                        comment.getContent(),
+                        comment.getCreatedAtServer().toString()
                 ))
                 .toList();
     }
@@ -246,11 +247,13 @@ public class CommentApiController {
         private Long id; // ID комментария
         private String authorName;
         private String text;
+        private String createdAt;
 
-        public CommentDto(Long id, String authorName, String text) {
+        public CommentDto(Long id, String authorName, String text, String createdAt) {
             this.id = id;
             this.authorName = authorName;
             this.text = text;
+            this.createdAt = createdAt;
         }
 
         // Геттеры
@@ -265,5 +268,7 @@ public class CommentApiController {
         public String getText() {
             return text;
         }
+
+        public  String getCreatedAt() {return  createdAt; }
     }
 }

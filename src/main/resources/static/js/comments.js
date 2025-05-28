@@ -20,7 +20,6 @@ export function initTaskCommentsSection(taskId, container, currentUserEmail) {
         container.appendChild(commentsWrapper);
     }
 
-    // После создания/проверки обертки сразу загружаем комментарии
     loadTaskComments(taskId, commentsWrapper.querySelector('.comments-list'), currentUserEmail);
 }
 
@@ -46,11 +45,16 @@ export function loadTaskComments(taskId, commentsList, currentUserEmail) {
                     author.className = 'comment-author';
                     author.textContent = comment.authorName;
 
+                    const commentDate = document.createElement('div');
+                    commentDate.className = 'comment-date';
+                    commentDate.textContent = new Date(comment.createdAt).toLocaleString();
+
                     const text = document.createElement('div');
                     text.className = 'comment-text';
                     text.textContent = comment.text;
 
                     commentBlock.appendChild(author);
+                    commentBlock.appendChild(commentDate);
                     commentBlock.appendChild(text);
 
                     // Кнопки "Редактировать" и "Удалить" для своего комментария
