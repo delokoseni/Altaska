@@ -10,6 +10,7 @@ import { loadProjectLogsView } from './projectLogs.js';
 import { showToast } from './toast.js';
 import { showTaskLogsSidebar } from './taskLogSidebar.js'
 import { renderRolePermissionsView } from './renderRolePermissionsView.js';
+import { permissionLabels } from './permissionLabels.js';
 
 window.selectProject = selectProject;
 window.loadView = loadView;
@@ -1417,46 +1418,6 @@ function renderCreateRoleView(container, projectId, previousSection) {
     createSection.appendChild(nameLabel);
     createSection.appendChild(nameInput);
 
-    const permissionLabels = {
-        "add_task_tags": "Добавление тегов к задаче",
-        "remove_task_tags": "Удаление тегов из задачи",
-        "add_task_performers": "Назначение исполнителей задачи",
-        "remove_task_performers": "Удаление исполнителей задачи",
-        "accept_tasks": "Взятие задачи в работу",
-        "reject_tasks": "Отказ от выполнения задачи",
-        "create_tasks": "Создание задач",
-        "edit_task_title": "Редактирование названия задачи",
-        "edit_task_description": "Редактирование описания задачи",
-        "edit_task_priority": "Изменение приоритета задачи",
-        "edit_task_status": "Изменение статуса задачи",
-        "edit_task_deadline": "Изменение срока выполнения",
-        "edit_task_start_date": "Изменение даты начала задачи",
-        "delete_tasks": "Удаление задач",
-        "attach_task_files": "Прикрепление файлов к задаче",
-        "download_task_files": "Загрузка файлов из задачи",
-        "delete_task_files": "Удаление прикреплённых файлов",
-        "write_task_comments": "Написание комментариев",
-        "edit_task_comments": "Редактирование комментариев",
-        "delete_task_comments": "Удаление комментариев",
-        "create_gantt_chart": "Создание диаграммы Ганта",
-        "edit_project_title_description": "Редактирование названия и описания проекта",
-        "archive_project": "Архивирование проекта",
-        "change_user_roles": "Назначение ролей участникам",
-        "invite_project_members": "Приглашение участников в проект",
-        "remove_project_members": "Удаление участников из проекта",
-        "delete_project": "Удаление проекта",
-        "create_roles": "Создание ролей",
-        "delete_roles": "Удаление ролей",
-        "edit_roles": "Редактирование ролей",
-        "create_subtasks": "Создание подзадач",
-        "edit_subtasks": "Редактирование подзадач",
-        "delete_subtasks": "Удаление подзадач",
-        "create_tags": "Создание тегов проекта",
-        "delete_tags": "Удаление тегов проекта",
-        "edit_tags": "Редактирование тегов проекта",
-        "view_project_log": "Просмотр истории проекта"
-    };
-
     const permissionsList = document.createElement('div');
     permissionsList.className = 'permissions-list';
 
@@ -1571,45 +1532,6 @@ function renderEditRoleView(container, projectId, role, previousSection) {
     editSection.appendChild(nameLabel);
     editSection.appendChild(nameInput);
 
-    const permissionLabels = {
-            "add_task_tags": "Добавление тегов к задаче",
-            "remove_task_tags": "Удаление тегов из задачи",
-            "add_task_performers": "Назначение исполнителей задачи",
-            "remove_task_performers": "Удаление исполнителей задачи",
-            "accept_tasks": "Взятие задачи в работу",
-            "reject_tasks": "Отказ от выполнения задачи",
-            "create_tasks": "Создание задач",
-            "edit_task_title": "Редактирование названия задачи",
-            "edit_task_description": "Редактирование описания задачи",
-            "edit_task_priority": "Изменение приоритета задачи",
-            "edit_task_status": "Изменение статуса задачи",
-            "edit_task_deadline": "Изменение срока выполнения",
-            "edit_task_start_date": "Изменение даты начала задачи",
-            "delete_tasks": "Удаление задач",
-            "attach_task_files": "Прикрепление файлов к задаче",
-            "download_task_files": "Загрузка файлов из задачи",
-            "delete_task_files": "Удаление прикреплённых файлов",
-            "write_task_comments": "Написание комментариев",
-            "edit_task_comments": "Редактирование комментариев",
-            "delete_task_comments": "Удаление комментариев",
-            "create_gantt_chart": "Создание диаграммы Ганта",
-            "edit_project_title_description": "Редактирование названия и описания проекта",
-            "archive_project": "Архивирование проекта",
-            "change_user_roles": "Назначение ролей участникам",
-            "invite_project_members": "Приглашение участников в проект",
-            "remove_project_members": "Удаление участников из проекта",
-            "delete_project": "Удаление проекта",
-            "create_roles": "Создание ролей",
-            "delete_roles": "Удаление ролей",
-            "edit_roles": "Редактирование ролей",
-            "create_subtasks": "Создание подзадач",
-            "edit_subtasks": "Редактирование подзадач",
-            "delete_subtasks": "Удаление подзадач",
-            "create_tags": "Создание тегов проекта",
-            "delete_tags": "Удаление тегов проекта",
-            "edit_tags": "Редактирование тегов проекта",
-            "view_project_log": "Просмотр истории проекта"
-        };
     const permissionsList = document.createElement('div');
     permissionsList.className = 'permissions-list';
 
