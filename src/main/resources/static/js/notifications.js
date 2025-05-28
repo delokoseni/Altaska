@@ -136,8 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("Дата и время уведомления: ", notification.createdAt);
           notifElem.innerHTML = `
             <div class="notification-header">
-              <span class="notification-type">${notificationTypeDict[notification.type] || notification.type} </span>
-              <span class="notification-date">${new Date(notification.createdAt).toLocaleString()}</span>
+              <div class="notification-main">
+                <span class="notification-type">${notificationTypeDict[notification.type] || notification.type}</span>
+                <span class="notification-date">${new Date(notification.createdAt).toLocaleDateString()}</span>
+                <span class="notification-time">${new Date(notification.createdAt).toLocaleTimeString()}</span>
+              </div>
               ${!notification.isRead ? '<span class="unread-dot"></span>' : ''}
             </div>
             <div class="notification-content" style="display:none;">
