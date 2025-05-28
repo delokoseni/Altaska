@@ -35,5 +35,6 @@ export const permissionLabels = {
     "create_tags": "Создание тегов проекта",
     "delete_tags": "Удаление тегов проекта",
     "edit_tags": "Редактирование тегов проекта",
-    "view_project_log": "Просмотр истории проекта"
+    "view_project_log": "Просмотр истории проекта",
+    "view_all_tasks": "Просмотр всех задач проекта"
 };

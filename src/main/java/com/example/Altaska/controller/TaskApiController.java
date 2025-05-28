@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.*;
@@ -65,8 +66,24 @@ public class TaskApiController {
     private NotificationService notificationService;
 
     @GetMapping("/project/{projectId}")
-    public List<Tasks> getTasksByProject(@PathVariable Long projectId) {
-        return tasksRepository.findByIdProject_Id(projectId);
+    public ResponseEntity<List<Tasks>> getTasksByProject(@PathVariable Long projectId, Principal principal) {
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        Projects project = projectsRepository.findById(projectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
+
+        boolean isOwner = project.getIdOwner().getId().equals(user.getId());
+        boolean canViewAll = permissionService.hasPermission(user.getId(), projectId, "view_all_tasks");
+
+        List<Tasks> tasks;
+        if (isOwner || canViewAll) {
+            tasks = tasksRepository.findByIdProject_Id(projectId);
+        } else {
+            tasks = tasksRepository.findTasksByUserOrNoPerformers(user.getId(), projectId);
+        }
+
+        return ResponseEntity.ok(tasks);
     }
 
     @PostMapping("/create/{projectId}")
@@ -816,8 +833,21 @@ public class TaskApiController {
 
 
     @GetMapping("/project/{projectId}/withperformers")
-    public List<Map<String, Object>> getTasksWithPerformersByProject(@PathVariable Long projectId) {
-        List<Tasks> tasks = tasksRepository.findByIdProject_Id(projectId);
+    public List<Map<String, Object>> getTasksWithPerformersByProject(@PathVariable Long projectId, Principal principal) {
+        Users user = usersRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        Projects projectFind = projectsRepository.findById(projectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
+
+        boolean isOwner = projectFind.getIdOwner().getId().equals(user.getId());
+        boolean canViewAll = permissionService.hasPermission(user.getId(), projectId, "view_all_tasks");
+        List<Tasks> tasks;
+        if (isOwner || canViewAll) {
+            tasks = tasksRepository.findByIdProject_Id(projectId);
+        }
+        else {
+            tasks = tasksRepository.findTasksByUserOrNoPerformers(user.getId(), projectId);
+        }
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Tasks task : tasks) {

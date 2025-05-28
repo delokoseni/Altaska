@@ -4,6 +4,7 @@ import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
+import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.RolesRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
 import com.example.Altaska.repositories.UsersRepository;
@@ -38,6 +39,9 @@ public class RoleApiController {
 
     @Autowired
     private ActivityLogService activityLogService;
+
+    @Autowired
+    private ProjectMembersRepository projectMembersRepository;
 
     private static final Map<String, String> PERMISSION_LABELS = Map.ofEntries(
             Map.entry("add_task_tags", "Добавление тегов к задаче"),
@@ -76,7 +80,8 @@ public class RoleApiController {
             Map.entry("create_tags", "Создание тегов проекта"),
             Map.entry("delete_tags", "Удаление тегов проекта"),
             Map.entry("edit_tags", "Редактирование тегов проекта"),
-            Map.entry("view_project_log", "Просмотр истории проекта")
+            Map.entry("view_project_log", "Просмотр истории проекта"),
+            Map.entry("view_all_tasks", "Просмотр всех задач проекта")
     );
 
     public record RoleDto(
@@ -177,6 +182,11 @@ public class RoleApiController {
 
         if(permissionService.checkIfProjectArchived(project))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
+        if (projectMembersRepository.existsByIdRole(role)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Эта роль используется участниками проекта и не может быть удалена.");
+        }
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));

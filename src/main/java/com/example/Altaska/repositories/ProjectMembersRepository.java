@@ -2,6 +2,7 @@ package com.example.Altaska.repositories;
 
 import com.example.Altaska.models.ProjectMembers;
 import com.example.Altaska.models.Projects;
+import com.example.Altaska.models.Roles;
 import com.example.Altaska.models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -28,5 +29,5 @@ public interface ProjectMembersRepository extends JpaRepository<ProjectMembers, 
 
     List<ProjectMembers> findByIdProjectIdAndConfirmedTrue(Long projectId);
 
-
+    boolean existsByIdRole(Roles role);
 }
