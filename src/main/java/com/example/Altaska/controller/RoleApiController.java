@@ -114,7 +114,8 @@ public class RoleApiController {
             throw new RuntimeException("Проект не найден");
         }
 
-        permissionService.checkIfProjectArchived(projectOpt.get());
+        if(permissionService.checkIfProjectArchived(projectOpt.get()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
@@ -174,7 +175,8 @@ public class RoleApiController {
         Projects project = projectsRepository.findById(role.getIdProject().getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
 
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
@@ -220,7 +222,8 @@ public class RoleApiController {
         Projects project = projectsRepository.findById(projectId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
 
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));

@@ -80,7 +80,9 @@ public class CommentApiController {
         }
 
         Projects project = task.getIdProject();
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), project.getId(), "write_task_comments")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -150,7 +152,9 @@ public class CommentApiController {
         }
         Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
         Projects project = task.getIdProject();
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_task_comments")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -192,7 +196,9 @@ public class CommentApiController {
         }
         Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
         Projects project = task.getIdProject();
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_task_comments")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }

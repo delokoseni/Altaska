@@ -65,7 +65,9 @@ public class TasksTagsApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "add_task_tags")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         TasksTags tasksTags = new TasksTags();
         tasksTags.setIdTask(task);
         tasksTags.setIdTag(tag);
@@ -95,7 +97,9 @@ public class TasksTagsApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "remove_task_tags")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         activityLogService.logActivity(
                 user,
                 task.getIdProject(),

@@ -112,7 +112,8 @@ public class AttachmentsApiController {
         if (contentType == null || !allowedMimeTypes.contains(contentType)) {
             return ResponseEntity.badRequest().body("Недопустимый тип файла: " + contentType);
         }
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
         if (!permissionService.hasPermission(user.getId(), project.getId(), "attach_task_files")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -166,7 +167,7 @@ public class AttachmentsApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при загрузке файла");
         }
     }
-
+    //TODO Проверка прав и архивации
     @GetMapping("/download/{fileId}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable Long fileId, Principal principal) {
         Attachments attachment = attachmentsRepository.findById(fileId).orElse(null);
@@ -185,7 +186,8 @@ public class AttachmentsApiController {
         if (project == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Проект архивирован и не может быть изменён");
         if (!permissionService.hasPermission(user.getId(), project.getId(), "download_task_files")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Недостаточно прав.");
         }
@@ -228,7 +230,8 @@ public class AttachmentsApiController {
         if (project == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Задача не привязана к проекту.");
         }
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
         if (!permissionService.hasPermission(currentUserId, project.getId(), "delete_task_files")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }

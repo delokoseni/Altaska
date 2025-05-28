@@ -59,7 +59,9 @@ public class TagApiController {
         tag.setIdProject(project);
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
-        permissionService.checkIfProjectArchived(tag.getIdProject());
+        if(permissionService.checkIfProjectArchived(tag.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), project.getId(), "create_tags")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -89,7 +91,9 @@ public class TagApiController {
         if (project == null) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_tags")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -117,7 +121,9 @@ public class TagApiController {
         }
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Пользователь не найден"));
-        permissionService.checkIfProjectArchived(tag.getIdProject());
+        if(permissionService.checkIfProjectArchived(tag.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), tag.getIdProject().getId(), "edit_tags")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }

@@ -55,7 +55,8 @@ public class GanttController {
         Tasks tasks = tasksRepository.findById(data.getTasks().getFirst().getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
 
-        permissionService.checkIfProjectArchived(tasks.getIdProject());
+        if(permissionService.checkIfProjectArchived(tasks.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
         if (!permissionService.hasPermission(user.getId(), tasks.getIdProject().getId(), "create_gantt_chart")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }

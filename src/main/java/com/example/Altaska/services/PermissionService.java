@@ -50,10 +50,11 @@ public class PermissionService {
         return permissions.get(action).asBoolean(false);
     }
 
-    public void checkIfProjectArchived(Projects project) {
+    public boolean checkIfProjectArchived(Projects project) {
         if (project.getIsArchived()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Проект архивирован и не может быть изменён");
+            return true;
         }
+        return false;
     }
 
 }

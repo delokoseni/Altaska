@@ -59,7 +59,8 @@ public class TaskPerformerApiController {
                                           @RequestParam Long userId,
                                           Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Users performer = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         Users currentUser = usersRepository.findByEmail(principal.getName())
@@ -107,7 +108,9 @@ public class TaskPerformerApiController {
                                              @RequestParam Long userId,
                                              Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
-        permissionService.checkIfProjectArchived(task.getIdProject());
+
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
@@ -144,7 +147,8 @@ public class TaskPerformerApiController {
     @PostMapping("/{taskId}/assign")
     public ResponseEntity<?> assignPerformer(@PathVariable Long taskId, Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));
@@ -191,7 +195,8 @@ public class TaskPerformerApiController {
     @PutMapping("/{taskId}/unassign")
     public ResponseEntity<?> unassignPerformer(@PathVariable Long taskId, Principal principal) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Задача не найдена"));
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Текущий пользователь не найден"));

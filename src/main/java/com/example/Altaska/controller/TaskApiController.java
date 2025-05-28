@@ -96,7 +96,9 @@ public class TaskApiController {
         Projects project = projectOpt.get();
         Users user = userOpt.get();
 
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), projectId, "create_tasks")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -108,7 +110,9 @@ public class TaskApiController {
                 task.setDescription(description);
             }
             task.setIdProject(projectOpt.get());
-            permissionService.checkIfProjectArchived(task.getIdProject());
+            if(permissionService.checkIfProjectArchived(task.getIdProject()))
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
             task.setIdCreator(userOpt.get());
             if (priorityId != null) {
                 Priorities priority = prioritiesRepository.findById(priorityId)
@@ -200,7 +204,9 @@ public class TaskApiController {
         }
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_title")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -258,7 +264,9 @@ public class TaskApiController {
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_description")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -321,7 +329,8 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_priority")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         String oldPriorityName = task.getIdPriority() != null ? task.getIdPriority().getName() : null;
 
@@ -391,7 +400,8 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_status")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         entityManager.createNativeQuery("SET LOCAL myapp.user_id = " + user.getId())
                 .executeUpdate();
@@ -463,7 +473,8 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_priority")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Priorities priority = prioritiesRepository.findByName(priorityName)
                 .orElseThrow(() -> new RuntimeException("Приоритет с таким названием не найден"));
@@ -530,7 +541,8 @@ public class TaskApiController {
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_status")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         entityManager.createNativeQuery("SET LOCAL myapp.user_id = " + user.getId())
                 .executeUpdate();
@@ -594,7 +606,9 @@ public class TaskApiController {
 
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_deadline")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -669,7 +683,8 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "edit_task_start_date")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
@@ -750,7 +765,9 @@ public class TaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "delete_tasks")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }

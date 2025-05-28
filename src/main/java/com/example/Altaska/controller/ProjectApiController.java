@@ -82,7 +82,9 @@ public class ProjectApiController {
         if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_project_title_description")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         List<Change> changes = new ArrayList<>();
         if (name != null && !name.equals(project.getName())) {
             changes.add(new Change("name", project.getName(), name));
@@ -216,7 +218,8 @@ public class ProjectApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         ProjectMembers member = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, userId)
                 .orElseThrow(() -> new RuntimeException("Участник не найден"));
@@ -294,7 +297,8 @@ public class ProjectApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         if (email.equalsIgnoreCase(project.getIdOwner().getEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Владелец проекта не может быть приглашён.");
@@ -419,7 +423,8 @@ public class ProjectApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         Optional<ProjectMembers> memberOpt = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, userId);
         if (memberOpt.isEmpty()) {
@@ -457,7 +462,8 @@ public class ProjectApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
 
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         List<Tasks> tasks = tasksRepository.findByIdProject_Id(id);
         for (Tasks task : tasks) {
@@ -488,7 +494,9 @@ public class ProjectApiController {
         if (Objects.equals(project.getIdOwner().getId(), currentUser.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Владелец не может покинуть проект."));
         }
-        permissionService.checkIfProjectArchived(project);
+        if(permissionService.checkIfProjectArchived(project))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
         Optional<ProjectMembers> memberOpt = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, currentUser.getId());
         if (memberOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Вы не являетесь участником этого проекта"));

@@ -51,7 +51,9 @@ public class SubTaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        permissionService.checkIfProjectArchived(task.getIdProject());
+        if(permissionService.checkIfProjectArchived(task.getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+
 
         if (!permissionService.hasPermission(user.getId(), task.getIdProject().getId(), "create_subtasks")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
@@ -118,7 +120,8 @@ public class SubTaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
+        if(permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "edit_subtasks")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
@@ -168,7 +171,8 @@ public class SubTaskApiController {
         Users user = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject());
+        if(permissionService.checkIfProjectArchived(subTask.getIdTask().getIdProject()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
 
         if (!permissionService.hasPermission(user.getId(), subTask.getIdTask().getIdProject().getId(), "delete_subtasks")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
