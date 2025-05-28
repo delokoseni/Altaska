@@ -1328,10 +1328,23 @@ function createArchiveToggleButton(project, projectId) {
     return button;
 }
 
+function sortRoles(roles) {
+    return roles.sort((a, b) => {
+        if (a.idProject === null && b.idProject !== null) {
+            return -1;
+        } else if (a.idProject !== null && b.idProject === null) {
+            return 1;
+        } else {
+            return a.name.localeCompare(b.name, 'ru', { sensitivity: 'base' });
+        }
+    });
+}
+
 function renderRolesSection(container, projectId) {
     fetch(`/api/projects/${projectId}/roles`)
         .then(response => response.json())
         .then(roles => {
+            sortRoles(roles);
             const rolesSection = document.createElement('div');
             rolesSection.className = 'roles-section';
 
