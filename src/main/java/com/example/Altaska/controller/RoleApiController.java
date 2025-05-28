@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/projects/{projectId}/roles")
@@ -41,6 +38,46 @@ public class RoleApiController {
 
     @Autowired
     private ActivityLogService activityLogService;
+
+    private static final Map<String, String> PERMISSION_LABELS = Map.ofEntries(
+            Map.entry("add_task_tags", "Добавление тегов к задаче"),
+            Map.entry("remove_task_tags", "Удаление тегов из задачи"),
+            Map.entry("add_task_performers", "Назначение исполнителей задачи"),
+            Map.entry("remove_task_performers", "Удаление исполнителей задачи"),
+            Map.entry("accept_tasks", "Взятие задачи в работу"),
+            Map.entry("reject_tasks", "Отказ от выполнения задачи"),
+            Map.entry("create_tasks", "Создание задач"),
+            Map.entry("edit_task_title", "Редактирование названия задачи"),
+            Map.entry("edit_task_description", "Редактирование описания задачи"),
+            Map.entry("edit_task_priority", "Изменение приоритета задачи"),
+            Map.entry("edit_task_status", "Изменение статуса задачи"),
+            Map.entry("edit_task_deadline", "Изменение срока выполнения"),
+            Map.entry("edit_task_start_date", "Изменение даты начала задачи"),
+            Map.entry("delete_tasks", "Удаление задач"),
+            Map.entry("attach_task_files", "Прикрепление файлов к задаче"),
+            Map.entry("download_task_files", "Загрузка файлов из задачи"),
+            Map.entry("delete_task_files", "Удаление прикреплённых файлов"),
+            Map.entry("write_task_comments", "Написание комментариев"),
+            Map.entry("edit_task_comments", "Редактирование комментариев"),
+            Map.entry("delete_task_comments", "Удаление комментариев"),
+            Map.entry("create_gantt_chart", "Создание диаграммы Ганта"),
+            Map.entry("edit_project_title_description", "Редактирование названия и описания проекта"),
+            Map.entry("archive_project", "Архивирование проекта"),
+            Map.entry("change_user_roles", "Назначение ролей участникам"),
+            Map.entry("invite_project_members", "Приглашение участников в проект"),
+            Map.entry("remove_project_members", "Удаление участников из проекта"),
+            Map.entry("delete_project", "Удаление проекта"),
+            Map.entry("create_roles", "Создание ролей"),
+            Map.entry("delete_roles", "Удаление ролей"),
+            Map.entry("edit_roles", "Редактирование ролей"),
+            Map.entry("create_subtasks", "Создание подзадач"),
+            Map.entry("edit_subtasks", "Редактирование подзадач"),
+            Map.entry("delete_subtasks", "Удаление подзадач"),
+            Map.entry("create_tags", "Создание тегов проекта"),
+            Map.entry("delete_tags", "Удаление тегов проекта"),
+            Map.entry("edit_tags", "Редактирование тегов проекта"),
+            Map.entry("view_project_log", "Просмотр истории проекта")
+    );
 
     public record RoleDto(
             Long id,
@@ -252,13 +289,11 @@ public class RoleApiController {
             return ResponseEntity.ok(List.of());
         }
 
-        List<Object> result = new ArrayList<>();
+        List<Map<String, String>> result = new ArrayList<>();
         permissions.fieldNames().forEachRemaining(key -> {
             JsonNode value = permissions.get(key);
             if (value.asBoolean(false)) {
-                result.add(new Object() {
-                    public final String name = key;
-                });
+                result.add(Map.of("name", PERMISSION_LABELS.getOrDefault(key, key)));
             }
         });
 
