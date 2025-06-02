@@ -56,7 +56,15 @@ function selectProject(buttonElement) {
     loadView('список', projectId);
 }
 
-function goToMainPage() {
+function goToMainPage(buttonElement) {
+    // Удалить выделение со всех кнопок
+    document.querySelectorAll('.project-button').forEach(btn => {
+        btn.classList.remove('active-project-button');
+    });
+
+    // Выделить текущую кнопку
+    buttonElement.classList.add('active-project-button');
+
     sessionStorage.removeItem('currentProjectId');
     sessionStorage.removeItem('currentProjectName');
     const mainContent = document.querySelector('.main-content');
