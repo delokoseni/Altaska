@@ -142,6 +142,10 @@ export function uploadFile(file, taskId, filesListContainer, csrfToken, currentU
     })
     .then(() => {
         loadFilesList(taskId, filesListContainer, csrfToken, currentUserEmail);
+        const fileInput = document.getElementById('fileInput');
+        const fileLabel = document.getElementById('fileLabel');
+        if (fileInput) fileInput.value = '';
+        if (fileLabel) fileLabel.textContent = 'Файл не выбран';
     })
     .catch(error => {
         const message = error.message || '';

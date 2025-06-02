@@ -106,11 +106,15 @@ public class AttachmentsApiController {
                 "application/pdf",
                 "text/plain",
                 "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation"
         );
 
         if (contentType == null || !allowedMimeTypes.contains(contentType)) {
-            return ResponseEntity.badRequest().body("Недопустимый тип файла: " + contentType);
+            return ResponseEntity.badRequest().body("Недопустимый тип файла.");
         }
         if(permissionService.checkIfProjectArchived(task.getIdProject()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");

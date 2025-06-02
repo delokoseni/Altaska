@@ -214,6 +214,10 @@ public class ProjectApiController {
         Users currentUser = usersRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
+        if (Objects.equals(currentUser.getId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не можете поменять свою роль.");
+        }
+
         if (!permissionService.hasPermission(currentUser.getId(), project.getId(), "change_user_roles")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
@@ -527,6 +531,21 @@ public class ProjectApiController {
         );
 
         return ResponseEntity.ok(Map.of("message", "Вы покинули проект"));
+    }
+
+    @GetMapping("/{projectId}/owner")
+    public ResponseEntity<String> getProjectOwnerEmail(@PathVariable Long projectId) {
+        Optional<Projects> projectOpt = projectsRepository.findById(projectId);
+        if (projectOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Users owner = projectOpt.get().getIdOwner();
+        if (owner == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(owner.getEmail());
     }
 
 }

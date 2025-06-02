@@ -918,8 +918,9 @@ function loadProjectInfoView(projectId) {
 
             Promise.all([
                 fetch(`/api/projects/${projectId}/members`).then(res => res.json()),
-                fetch(`/api/projects/${projectId}/roles`).then(res => res.json())
-            ]).then(([members, roles]) => {
+                fetch(`/api/projects/${projectId}/roles`).then(res => res.json()),
+                fetch(`/api/projects/${projectId}/owner`).then(res => res.text())
+            ]).then(([members, roles, ownerEmail]) => {
                 const membersSection = document.createElement('div');
                 membersSection.className = 'project-members-section';
 
@@ -927,9 +928,13 @@ function loadProjectInfoView(projectId) {
                 membersTitle.textContent = 'Участники проекта:';
                 membersSection.appendChild(membersTitle);
 
+                const ownerItem = document.createElement('p');
+                ownerItem.textContent = `Владелец проекта: ${ownerEmail}`;
+                membersSection.appendChild(ownerItem);
+
                 if (members.length === 0) {
                     const noMembers = document.createElement('p');
-                    noMembers.textContent = 'Нет участников';
+                    noMembers.textContent = 'Нет других участников';
                     membersSection.appendChild(noMembers);
                 } else {
                     const membersList = document.createElement('ul');
