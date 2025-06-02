@@ -495,7 +495,7 @@
 /* Один файл */
 .task-details-sidebar .task-files-section .file-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     padding: 6px 8px;
     margin-bottom: 8px;
@@ -504,10 +504,22 @@
     border-radius: 6px;
     font-size: 0.95em;
     gap: 10px;
+    color: #000;
 }
 
-.task-details-sidebar .task-files-section .file-item {
-    color: #000;
+.task-details-sidebar .task-files-section .file-item .file-name {
+    flex: 1;
+    word-break: break-word; /* Разрешаем перенос длинных слов */
+    white-space: normal;    /* Разрешаем перенос строк */
+    overflow-wrap: anywhere;
+}
+
+.task-details-sidebar .task-files-section .file-item .file-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    flex-shrink: 0;
 }
 
 /* Контейнер кнопок загрузки */
@@ -604,4 +616,22 @@
 .task-timer .timer-btn:focus {
     outline: 2px solid var(--hover-button-color);
     outline-offset: 2px;
+}
+
+.task-details-sidebar .task-files-section .files-list::-webkit-scrollbar-thumb {
+  background-color: var(--button-color);
+  border-radius: 4px;
+}
+
+.task-details-sidebar .task-files-section .files-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--hover-button-color);
+}
+
+.task-details-sidebar .task-files-section .files-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.task-details-sidebar .task-files-section .files-list::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
 }

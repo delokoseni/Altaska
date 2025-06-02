@@ -73,7 +73,10 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
             files.forEach(file => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
-                fileItem.textContent = `${file.fileName}`;
+                const fileName = document.createElement('div');
+                fileName.className = 'file-name';
+                fileName.textContent = file.fileName;
+                fileItem.appendChild(fileName);
 
                 const downloadIcon = document.createElement('img');
                 downloadIcon.src = '/icons/download.svg';
@@ -83,22 +86,23 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
                     window.location.href = `/api/files/download/${file.id}`;
                 });
 
-                fileItem.appendChild(downloadIcon);
-
-
+                const iconsContainer = document.createElement('div');
+                iconsContainer.className = 'file-icons';
                 if (file.uploadedByEmail === currentUserEmail) {
                     const deleteIcon = document.createElement('img');
                     deleteIcon.src = '/icons/trash.svg'; // Замените на путь к вашей SVG-иконке
                     deleteIcon.alt = 'Удалить';
                     deleteIcon.classList.add('delete-icon'); // Добавляем класс для стилизации
-
+                    iconsContainer.appendChild(deleteIcon);
                     deleteIcon.addEventListener('click', () => {
                         deleteFile(file.id, taskId, filesListContainer, csrfToken, currentUserEmail);
                     });
 
-                    fileItem.appendChild(deleteIcon);
                 }
 
+                iconsContainer.appendChild(downloadIcon);
+
+                fileItem.appendChild(iconsContainer);
                 filesListContainer.appendChild(fileItem);
             });
         })
