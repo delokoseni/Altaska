@@ -1,6 +1,9 @@
 let images = [
-    '/images/coming_soon.jpg',
-    '/images/coming_soon_1.jpg',
+    '/images/first.png',
+    '/images/second.png',
+    '/images/third.png',
+    '/images/fourth.png',
+    '/images/fivth.png'
 ];
 let currentIndex = 0;
 

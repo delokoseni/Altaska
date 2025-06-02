@@ -52,7 +52,7 @@
             </div>
         </div>
         <div class="project-entry">
-            <button class="project-button" onclick="goToMainPage(this)">Главная</button>
+            <button class="project-button" id="mainproject" onclick="goToMainPage(this)">Главная</button>
         </div>
         <#if projects?? && (projects?size > 0)>
         <#assign activeProjects = projects?filter(p -> !p.isArchived)>

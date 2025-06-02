@@ -28,7 +28,7 @@
     <div class="content-block" id="product">
         <p>
             Представляем вам уникальный бесплатный инструмент<br>
-            для управления проектами, который поможет вам организовать<br>
+            для управления задачами, который поможет вам организовать<br>
             свою работу на высшем уровне. Наша платформа предлагает<br>
             все необходимые функции: от создания задач и списков задач<br>
             до отслеживания статуса выполнения и управления<br>
@@ -42,7 +42,7 @@
             <img src="/icons/button_left_light.svg" alt="Назад" width="64" height="64">
         </button>
         <div class="image-container">
-            <img class="current-image" src="/images/coming_soon.jpg" alt="Текущее изображение">
+            <img class="current-image" src="/images/first.png" alt="Текущее изображение">
         </div>
         <button class="next-button">
             <img src="/icons/button_right_light.svg" alt="Вперед" width="64" height="64">
