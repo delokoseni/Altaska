@@ -711,6 +711,26 @@ function showTaskForm(projectId, container, from = 'список') {
             filesInput.name = 'files';
             filesInput.multiple = false;
 
+            const fileContainer = document.createElement('div');
+            fileContainer.className = 'file-upload-container';
+
+            const fileLabel = document.createElement('label');
+            fileLabel.className = 'file-upload-label';
+            fileLabel.textContent = 'Выберите файл';
+
+            const fileNameDisplay = document.createElement('div');
+            fileNameDisplay.className = 'selected-file-name';
+
+            filesInput.className = 'file-input';
+            fileLabel.appendChild(filesInput);
+            fileContainer.append(fileLabel, fileNameDisplay);
+
+            filesInput.addEventListener('change', () => {
+                fileNameDisplay.textContent = filesInput.files.length > 0
+                    ? `Выбран: ${filesInput.files[0].name}`
+                    : '';
+            });
+
             const submitBtn = document.createElement('button');
             submitBtn.type = 'submit';
             submitBtn.textContent = 'Создать';
@@ -735,7 +755,7 @@ function showTaskForm(projectId, container, from = 'список') {
                 tagSelector,
                 performerLabel,
                 subtasksSection,
-                filesInput,
+                fileContainer,
                 submitBtn
             );
 

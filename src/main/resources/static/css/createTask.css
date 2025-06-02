@@ -171,3 +171,45 @@
 .task-form-wrapper .back-button:hover {
     background-color: var(--hover-button-color);
 }
+
+/* Обёртка, чтобы изолировать стили */
+.task-form-wrapper .file-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: 'Nunito', sans-serif;
+}
+
+.task-form-wrapper .file-upload-label {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: var(--button-color);
+    color: white;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+    transition: background-color 0.3s;
+}
+
+.task-form-wrapper .file-upload-label:hover {
+    background-color: var(--hover-button-color);
+}
+
+.task-form-wrapper .file-upload-label input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.task-form-wrapper .selected-file-name {
+    font-size: 0.9rem;
+    color: black;
+    font-family: 'Nunito', sans-serif;
+}

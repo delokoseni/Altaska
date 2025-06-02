@@ -50,6 +50,7 @@
 }
 
 .task-details-sidebar .editable-field {
+    font-family: 'Nunito';
     width: 100%;
     margin-top: 5px;
     margin-bottom: 10px;
@@ -77,6 +78,7 @@
     border-radius: 4px;
     font-size: 13px;
     color: var(--text-color);
+    font-family: 'Nunito';
 }
 
 .task-details-sidebar .edit-button:hover {
@@ -121,6 +123,7 @@
 }
 
 .task-details-sidebar .add-task-tag select {
+    font-family: 'Nunito';
     flex: 1;
     padding: 5px;
     font-size: 13px;
@@ -128,9 +131,11 @@
     color: var(--text-color);
     border: 1px solid #ccc;
     border-radius: 4px;
+    margin-bottom: 15px;
 }
 
 .task-details-sidebar .add-task-tag button {
+    font-family: 'Nunito';
     padding: 5px 10px;
     font-size: 13px;
     cursor: pointer;
@@ -138,6 +143,7 @@
     color: var(--text-color);
     border: none;
     border-radius: 4px;
+    margin-bottom: 15px;
 }
 
 .task-details-sidebar .add-task-tag button:hover {
@@ -155,6 +161,7 @@
     background-color: var(--button-color);
     color: white;
     margin-bottom: 30px;
+    font-family: 'Nunito';
 }
 
 .task-details-sidebar .comment-submit-button {
@@ -272,6 +279,7 @@
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-family: 'Nunito';
 }
 
 .task-details-sidebar .comment-send-button:hover {
@@ -350,6 +358,7 @@
     border-radius: 4px;
     border: 1px solid #ccc;
     font-size: 0.9rem;
+    font-family: 'Nunito';
 }
 
 .task-details-sidebar .performers-section button.assign-button {
@@ -362,11 +371,11 @@
     cursor: pointer;
     font-size: 0.95rem;
     transition: background-color 0.2s;
+    font-family: 'Nunito';
 }
 
 .task-details-sidebar .performers-section p {
-    font-style: italic;
-    color: var(--second-text-color);
+    color: white;
 }
 
 /* Стили для раздела с подзадачами внутри task-details-sidebar */
@@ -393,6 +402,7 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-family: 'Nunito';
 }
 
 .task-details-sidebar .task-subtasks-section button:hover {
@@ -417,6 +427,7 @@
 
 .task-details-sidebar .subtask-item input,
 .task-details-sidebar .subtask-item textarea {
+    font-family: 'Nunito';
     box-sizing: border-box;
     width: 100%;
     margin-bottom: 8px;
@@ -538,7 +549,7 @@
     padding: 5px;
     border-radius: 6px;
     background-color: #fff;
-    font-size: 0.95em;
+    font-size: 0.9em;
     width: 100%; /* Убедимся, что инпут не выходит за пределы */
     box-sizing: border-box; /* Чтобы padding и border не выходили за пределы */
 }
@@ -569,6 +580,7 @@
 }
 
 .task-details-sidebar .task-files-section .upload-controls button {
+    font-family: 'Nunito';
     color: white;
     border: none;
     border-radius: 6px;

@@ -121,7 +121,7 @@
 .no-projects-message {
     text-align: center;
     margin-top: 20px;
-    color: var(--second-text-color);
+    color: white;
 }
 
 .project-menu {
