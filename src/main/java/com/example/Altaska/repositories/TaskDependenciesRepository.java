@@ -8,12 +8,8 @@ import java.util.List;
 
 @Repository
 public interface TaskDependenciesRepository extends JpaRepository<TasksDependencies, Long> {
-
-    void deleteByIdFromTask_Id(Long taskId);// Удаляем по idFromTask
-
+    void deleteByIdFromTask_Id(Long taskId);
     void deleteByIdToTask_Id(Long taskId);
-
     List<TasksDependencies> findByIdFromTask_IdProject_Id(Long projectId);
-
     List<TasksDependencies> findByIdToTask_IdProject_Id(Long projectId);
 }

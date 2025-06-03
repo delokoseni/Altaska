@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    // === Форма смены email ===
     const changeEmailFormWrapper = document.createElement("div");
     changeEmailFormWrapper.classList.add("change-email-form");
     changeEmailFormWrapper.style.display = "none";
@@ -69,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // === Форма смены пароля ===
     const changePasswordFormWrapper = document.createElement("div");
     changePasswordFormWrapper.classList.add("change-password-form");
     changePasswordFormWrapper.style.display = "none";

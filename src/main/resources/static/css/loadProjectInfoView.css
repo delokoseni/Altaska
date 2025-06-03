@@ -132,15 +132,15 @@
 }
 
 .project-info-view .tag-list .tag-item {
-    background-color: #f5f5f5; /* Новый фон */
+    background-color: #f5f5f5;
     color: #000;
     padding: 8px 12px;
-    border-radius: 6px; /* Закругление */
+    border-radius: 6px;
     font-size: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #aaa; /* Новый цвет границы */
+    border: 1px solid #aaa;
 }
 
 .project-info-view .tag-list .tag-item span {
@@ -151,7 +151,7 @@
     margin-left: 10px;
     background-color: transparent;
     color: #888;
-    font-size: 16px; /* Увеличен размер */
+    font-size: 16px;
     border: none;
     cursor: pointer;
     transition: color 0.2s;
@@ -209,7 +209,7 @@
     width: 16px;
     height: 16px;
     vertical-align: middle;
-    filter: grayscale(100%); /* можно стилизовать под цвет темы */
+    filter: grayscale(100%);
     transition: filter 0.2s;
 }
 
@@ -245,7 +245,7 @@
 }
 
 input.add-tag {
-    flex: 1; /* чтобы занимал всю доступную ширину */
+    flex: 1;
     padding: 10px;
     font-size: 1rem;
     font-family: 'Nunito', sans-serif;

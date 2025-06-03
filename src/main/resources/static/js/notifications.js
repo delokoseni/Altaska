@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const bellButton = document.querySelector('.profile-button[href=""]');
   if (!bellButton) return;
 
-  // Если точка для уведомлений не создана, создаём её
   if (!bellButton.querySelector('.notification-dot')) {
     const dot = document.createElement('span');
     dot.className = 'notification-dot';
@@ -152,18 +151,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const content = notifElem.querySelector('.notification-content');
             const isVisible = content.style.display === 'block';
 
-            // Закрыть предыдущую открытую нотификацию, если она не та же самая
             if (currentlyOpenNotification && currentlyOpenNotification !== content) {
               currentlyOpenNotification.style.display = 'none';
             }
 
-            // Переключить видимость текущей
             content.style.display = isVisible ? 'none' : 'block';
 
-            // Обновить ссылку на открытую нотификацию (или сбросить, если закрыта)
             currentlyOpenNotification = isVisible ? null : content;
 
-            // Отметить как прочитанное, если ещё не прочитано
             if (!isVisible && !notification.isRead) {
               try {
                 const csrfToken = getCsrfToken();
@@ -180,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
                   if (dot) dot.remove();
                   notification.isRead = true;
 
-                  // Обновляем точку уведомлений — скрываем, если непрочитанных нет
                   const anyUnread = [...contentContainer.querySelectorAll('.notification-item.unread')].length > 0;
                   const notificationDot = bellButton.querySelector('.notification-dot');
                   notificationDot.style.display = anyUnread ? 'block' : 'none';
@@ -229,7 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (notificationsPanel.style.display === 'block') positionPanel();
   });
 
-  // Периодическая проверка новых уведомлений каждые 30 секунд
   async function pollNotifications() {
     try {
       const response = await fetch('/api/notifications');
@@ -243,9 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
         notificationDot.style.display = 'none';
       }
 
-      // Если панель открыта, обновим список уведомлений
       if (notificationsPanel.style.display === 'block') {
-        // Можно вызвать loadNotifications() или обновить contentContainer напрямую
         await loadNotifications();
       }
     } catch (e) {

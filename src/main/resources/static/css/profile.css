@@ -119,21 +119,18 @@ form input[type="email"] {
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-/* Эффект при фокусе */
 form input:focus {
     outline: none;
     border-color: var(--hover-button-color);
     box-shadow: 0 0 5px var(--hover-button-color);
 }
 
-/* Контейнер с паролями (глаз) */
 .password-container {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-/* Глазик */
 .toggle-password {
     position: absolute;
     right: 12px;
@@ -143,7 +140,6 @@ form input:focus {
     height: 100%;
 }
 
-/* Иконка */
 .eye-icon {
     width: 20px;
     height: 20px;

@@ -1,6 +1,5 @@
 import { showToast } from './toast.js';
 
-// Функция для отображения блока с файлами
 export function initTaskFilesSection(taskId, container, csrfToken, currentUserEmail) {
     let filesWrapper = container.querySelector('.task-files-section');
 
@@ -14,12 +13,10 @@ export function initTaskFilesSection(taskId, container, csrfToken, currentUserEm
         title.style.textAlign = 'center';
         filesWrapper.appendChild(title);
 
-        // Контейнер для списка файлов
         const filesList = document.createElement('div');
         filesList.className = 'files-list';
         filesWrapper.appendChild(filesList);
 
-        // Контейнер для кнопок
         const uploadControls = document.createElement('div');
         uploadControls.className = 'upload-controls';
         uploadControls.style.marginTop = '10px';
@@ -53,7 +50,6 @@ export function initTaskFilesSection(taskId, container, csrfToken, currentUserEm
 
 }
 
-// Функция для загрузки списка файлов
 export function loadFilesList(taskId, filesListContainer, csrfToken, currentUserEmail) {
     filesListContainer.innerHTML = '';
 
@@ -90,9 +86,9 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
                 iconsContainer.className = 'file-icons';
                 if (file.uploadedByEmail === currentUserEmail) {
                     const deleteIcon = document.createElement('img');
-                    deleteIcon.src = '/icons/trash.svg'; // Замените на путь к вашей SVG-иконке
+                    deleteIcon.src = '/icons/trash.svg';
                     deleteIcon.alt = 'Удалить';
-                    deleteIcon.classList.add('delete-icon'); // Добавляем класс для стилизации
+                    deleteIcon.classList.add('delete-icon');
                     iconsContainer.appendChild(deleteIcon);
                     deleteIcon.addEventListener('click', () => {
                         deleteFile(file.id, taskId, filesListContainer, csrfToken, currentUserEmail);
@@ -114,7 +110,6 @@ export function loadFilesList(taskId, filesListContainer, csrfToken, currentUser
         });
 }
 
-// Функция для отправки файла на сервер
 export function uploadFile(file, taskId, filesListContainer, csrfToken, currentUserEmail) {
     const formData = new FormData();
     formData.append('file', file);

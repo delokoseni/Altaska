@@ -310,7 +310,7 @@ public class TaskApiController {
         List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskId(taskId);
         Set<Users> recipients = performers.stream()
                 .map(TaskPerformers::getIdUser)
-                .filter(u -> !u.getId().equals(user.getId())) // исключаем текущего
+                .filter(u -> !u.getId().equals(user.getId()))
                 .collect(Collectors.toSet());
 
         Users creator = task.getIdCreator();
@@ -545,7 +545,7 @@ public class TaskApiController {
     @PutMapping("/{taskId}/statusByName")
     @Transactional
     public ResponseEntity<?> updateTaskStatusByName(@PathVariable Long taskId,
-                                        @RequestBody Map<String, String> requestBody,  // Принимаем данные из тела запроса
+                                        @RequestBody Map<String, String> requestBody,
                                         Principal principal) {
         String statusName = requestBody.get("statusName");
 
@@ -947,11 +947,11 @@ public class TaskApiController {
         private Long id;
         private String name;
         private String description;
-        private String status; // status.name
-        private String priority; // priority.name
+        private String status;
+        private String priority;
         private List<PerformerDto> performers;
         private List<String> tags;
-        private ProjectDto idProject; // Используем ProjectDto
+        private ProjectDto idProject;
 
         public TaskDto(Tasks task, List<PerformerDto> performers, List<String> tags) {
             this.id = task.getId();
@@ -961,31 +961,27 @@ public class TaskApiController {
             this.priority = task.getIdPriority() != null ? task.getIdPriority().getName() : "Без приоритета";
             this.performers = performers;
             this.tags = tags;
-            this.idProject = new ProjectDto(task.getIdProject().getId()); // Передаем ProjectDto с id
+            this.idProject = new ProjectDto(task.getIdProject().getId());
         }
 
-        // Геттеры
         public Long getId() { return id; }
         public String getName() { return name; }
         public String getDescription() { return description; }
         public String getStatus() { return status; }
         public String getPriority() { return priority; }
         public List<PerformerDto> getPerformers() { return performers; }
-        public ProjectDto getIdProject() { return idProject; } // Возвращаем объект ProjectDto
+        public ProjectDto getIdProject() { return idProject; }
     }
 
     @GetMapping("/project/{projectId}/performers-map")
     public ResponseEntity<Map<Long, List<String>>> getPerformersMap(@PathVariable Long projectId) {
-        // Получаем все задачи проекта
         List<Tasks> projectTasks = tasksRepository.findByIdProject_Id(projectId);
         List<Long> taskIds = projectTasks.stream()
                 .map(Tasks::getId)
                 .toList();
 
-        // Получаем исполнителей по задачам
         List<TaskPerformers> performers = taskPerformersRepository.findByIdTaskIdIn(taskIds);
 
-        // Группируем по taskId
         Map<Long, List<String>> result = performers.stream()
                 .collect(Collectors.groupingBy(
                         tp -> tp.getIdTask().getId(),

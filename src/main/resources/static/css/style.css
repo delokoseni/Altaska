@@ -4,7 +4,6 @@
     src: url('../fonts/Nunito-Bold.ttf') format('truetype');
 }
 
-/* Общие настройки */
 body {
     font-family: 'Nunito', sans-serif;
     margin: 0;
@@ -14,33 +13,29 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Светлая тема */
 :root {
-    --header-color: #5680E9; /* Цвет заголовков */
-    --background-color: #C1C8E4; /* Цвет фона */
-    --button-color: #8860D0; /* Цвет кнопок */
-    --text-color: #FFFFFF; /* Цвет текста */
-    --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --header-color: #5680E9;
+    --background-color: #C1C8E4;
+    --button-color: #8860D0;
+    --text-color: #FFFFFF;
+    --second-text-color: #ACB3CE;
     --hover-button-color: #7449C6;
 }
 
-/* Темная тема */
 .dark-mode {
-    --header-color: #FFFFFF; /* Цвет заголовков в темной теме */
-    --background-color: #1F1F1F; /* Цвет фона в темной теме */
-    --button-color: #5A5A5A; /* Цвет кнопков в темной теме */
-    --text-color: #FFFFFF; /* Цвет текста в темной теме */
-    --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --header-color: #FFFFFF;
+    --background-color: #1F1F1F;
+    --button-color: #5A5A5A;
+    --text-color: #FFFFFF;
+    --second-text-color: #ACB3CE;
     --hover-button-color: #7A7A7A;
 }
 
-/* Стили для заголовков */
 h1, h2, h3 {
     color: var(--header-color);
-    font-weight: 700; /* Устанавливаем жирный шрифт для заголовков */
+    font-weight: 700;
 }
 
-/* Стили для кнопок */
 a.menu-button,
 a.login-button,
 a.register-button {
@@ -51,8 +46,8 @@ a.register-button {
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
-    text-decoration: none; /* чтобы убрать подчёркивание у ссылок */
-    display: inline-block; /* чтобы вести себя как кнопки */
+    text-decoration: none;
+    display: inline-block;
 }
 
 a.menu-button:not(.prev-button):not(.next-button):hover,

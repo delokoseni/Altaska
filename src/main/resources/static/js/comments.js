@@ -57,7 +57,6 @@ export function loadTaskComments(taskId, commentsList, currentUserEmail) {
                     commentBlock.appendChild(commentDate);
                     commentBlock.appendChild(text);
 
-                    // Кнопки "Редактировать" и "Удалить" для своего комментария
                     if (comment.authorName === currentUserEmail) {
                         const editButton = document.createElement('button');
                         editButton.className = 'edit-comment-button';
@@ -105,9 +104,9 @@ export function initCommentInputSection(taskId, container, onCommentAdded, csrfT
 
         sendComment(taskId, text, csrfToken)
             .then(() => {
-                textarea.value = ''; // очистить поле
+                textarea.value = '';
                 if (onCommentAdded) {
-                    onCommentAdded(); // обновить список комментариев
+                    onCommentAdded();
                 }
             })
             .catch(error => {
@@ -121,7 +120,6 @@ export function initCommentInputSection(taskId, container, onCommentAdded, csrfT
     container.appendChild(inputWrapper);
 }
 
-// Функция отправки комментария на сервер
 export function sendComment(taskId, text, csrfToken) {
     return fetch('/api/comments/add-comment', {
         method: 'POST',

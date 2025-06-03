@@ -35,16 +35,13 @@ public class ActivityLogService {
     ) {
         ObjectNode details = objectMapper.createObjectNode();
 
-        // Action
         details.put("action", action);
 
-        // Entity
         ObjectNode entityNode = objectMapper.createObjectNode();
         entityNode.put("type", entityType);
         entityNode.put("id", entityId);
         details.set("entity", entityNode);
 
-        // Changes
         if (changes != null && !changes.isEmpty()) {
             ArrayNode changesArray = objectMapper.createArrayNode();
             for (Change change : changes) {
@@ -57,14 +54,12 @@ public class ActivityLogService {
             details.set("changes", changesArray);
         }
 
-        // Message
         details.put("message", message);
 
-        // Создание записи лога
         ActivityLog log = new ActivityLog();
         log.setDetails(details);
-        log.setActivityDate(OffsetDateTime.now());              // клиентская дата
-        log.setActivityDateServer(OffsetDateTime.now());        // серверная дата
+        log.setActivityDate(OffsetDateTime.now());
+        log.setActivityDateServer(OffsetDateTime.now());
         log.setIdUser(user);
         log.setIdProject(project);
 

@@ -1,4 +1,3 @@
-/* Стили для шапки */
 header {
     display: flex;
     justify-content: space-between;
@@ -6,88 +5,81 @@ header {
     padding: 16px;
 }
 
-/* Стили для названия */
 .site-title {
     font-size: 24px;
-    color: var(--header-color); /* Цвет надписи */
+    color: var(--header-color);
 }
 
-/* Контейнер для меню */
 .menu-container {
     display: flex;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    flex-grow: 1; /* Позволяем контейнеру занимать оставшееся пространство */
+    flex-grow: 1;
 }
 
 .theme-icon-container {
     display: flex;
     align-items: center;
-    margin-right: 8px; /* Отступ между иконкой и меню */
+    margin-right: 8px;
 }
 
 .theme-toggle {
-    width: 32px; /* Размер иконки */
-    height: 32px; /* Размер иконки */
-    cursor: pointer; /* Указатель курсора */
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
 }
 
-/* Стили для меню */
 .menu {
     display: flex;
-    background-color: var(--text-color); /* Цвет фона элемента меню */
-    border: 3px solid var(--button-color); /* Цвет границы элемента */
-    border-radius: 15px; /* Радиус закругления углов */
-    padding: 8px; /* Отступы внутри контейнера */
+    background-color: var(--text-color);
+    border: 3px solid var(--button-color);
+    border-radius: 15px;
+    padding: 8px;
 }
 
 .language-container {
     display: flex;
     align-items: center;
-    margin-left: 8px; /* Отступ между иконкой и меню */
+    margin-left: 8px;
 }
 
 .language-toggle {
-    width: 32px; /* Размер иконки */
-    height: 32px; /* Размер иконки */
-    cursor: pointer; /* Указатель курсора */
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
 }
 
-/* Стили для кнопок в меню */
 .menu-button {
-    background-color: transparent; /* Прозрачный фон для кнопок */
-    color: var(--second-text-color); /* Цвет текста */
-    border: none; /* Убираем стандартную обводку */
-    border-radius: 8px; /* Радиус закругления углов */
-    padding: 16px; /* Отступы внутри кнопок */
-    margin: 0 8px; /* Отступ между кнопками */
-    cursor: pointer; /* Указатель курсора */
-    font-size: 16px; /* Размер шрифта кнопки */
+    background-color: transparent;
+    color: var(--second-text-color);
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0 8px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
-/* Стили для кнопок */
 .login-button, .register-button {
-    padding: 24px 48px; /* Отступы по кнопкам */
-    border-radius: 15px; /* Радиус обводки */
-    cursor: pointer; /* Указатель курсора */
-    border: none; /* Убираем стандартную обводку */
-    font-size: 16px; /* Размер шрифта кнопок */
-    margin-left: 8px; /* Менять */
+    padding: 24px 48px;
+    border-radius: 15px;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+    margin-left: 8px;
 }
 
-/* Стили для кнопки "Войти" */
 .login-button {
-    background-color: var(--background-color); /* Цвет фона кнопки "Войти" */
-    border: 3px solid var(--button-color); /* Обводка */
-    color: var(--text-color); /* Цвет текста */
+    background-color: var(--background-color);
+    border: 3px solid var(--button-color);
+    color: var(--text-color);
 }
 
-/* Стили для кнопки "Зарегистрироваться" */
 .register-button {
-    background-color: var(--button-color); /* Цвет фона кнопки "Зарегистрироваться" */
-    color: var(--text-color); /* Цвет текста */
-    padding: 24px; /* Отступы */
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 24px;
 }
 
 main h1 {
@@ -96,13 +88,13 @@ main h1 {
 }
 
 .content-block {
-    background-color: var(--second-text-color); /* Цвет фона блока */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, [1)](1)); /* Увеличенная тень */
-    border-radius: 32px; /* Радиус углов */
-    padding: 16px 16px 16px; /* Верхний отступ уменьшен до 16px */
-    max-width: fit-content; /* Чтобы ширина подстраивалась под текст */
-    margin-left: 40px; /* Отступ слева */
-    margin-bottom: 16px; /* Межблочный отступ снизу */
+    background-color: var(--second-text-color);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, [1)](1));
+    border-radius: 32px;
+    padding: 16px 16px 16px;
+    max-width: fit-content;
+    margin-left: 40px;
+    margin-bottom: 16px;
 }
 
 .content-block p {
@@ -116,22 +108,22 @@ main h1 {
 }
 
 .image-container {
-    width: 60vw; /* Ширина 60% страницы */
-    aspect-ratio: 16/9; /* Соотношение сторон 720:1280 */
-    border-radius: 32px; /* Радиус углов */
+    width: 60vw;
+    aspect-ratio: 16/9;
+    border-radius: 32px;
     overflow: hidden;
-    background-color: #f0f0f0; /* Фоновый цвет */
+    background-color: #f0f0f0;
     margin-bottom: 20px;
 }
 
 .current-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Масштабирование изображения */
+    object-fit: cover;
 }
 
 .prev-button, .next-button {
-    margin: 0 16px; /* Отступы между кнопками и контейнером */
+    margin: 0 16px;
     padding: 0;
     border: none;
     background: none;
@@ -144,8 +136,8 @@ h2 {
 
 .center-button {
     display: flex;
-    flex-direction: column; /* Для вертикального выравнивания */
-    align-items: center; /* Центрирование по горизонтали */
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 40px;
 }
 
@@ -163,7 +155,6 @@ footer {
     src: url('../fonts/Nunito-Bold.ttf') format('truetype');
 }
 
-/* Общие настройки */
 body {
     font-family: 'Nunito', sans-serif;
     margin: 0;
@@ -173,33 +164,29 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Светлая тема */
 :root {
-    --header-color: #5680E9; /* Цвет заголовков */
-    --background-color: #C1C8E4; /* Цвет фона */
-    --button-color: #8860D0; /* Цвет кнопок */
-    --text-color: #FFFFFF; /* Цвет текста */
-    --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --header-color: #5680E9;
+    --background-color: #C1C8E4;
+    --button-color: #8860D0;
+    --text-color: #FFFFFF;
+    --second-text-color: #ACB3CE;
     --hover-button-color: #7449C6;
 }
 
-/* Темная тема */
 .dark-mode {
-    --header-color: #FFFFFF; /* Цвет заголовков в темной теме */
-    --background-color: #1F1F1F; /* Цвет фона в темной теме */
-    --button-color: #5A5A5A; /* Цвет кнопков в темной теме */
-    --text-color: #FFFFFF; /* Цвет текста в темной теме */
-    --second-text-color: #ACB3CE; /* Второй цвет текста */
+    --header-color: #FFFFFF;
+    --background-color: #1F1F1F;
+    --button-color: #5A5A5A;
+    --text-color: #FFFFFF;
+    --second-text-color: #ACB3CE;
     --hover-button-color: #7A7A7A;
 }
 
-/* Стили для заголовков */
 h1, h2, h3 {
     color: var(--header-color);
-    font-weight: 700; /* Устанавливаем жирный шрифт для заголовков */
+    font-weight: 700;
 }
 
-/* Стили для кнопок */
 a.menu-button,
 a.login-button,
 a.register-button,
@@ -211,8 +198,8 @@ a.register-button,
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
-    text-decoration: none; /* чтобы убрать подчёркивание у ссылок */
-    display: inline-block; /* чтобы вести себя как кнопки */
+    text-decoration: none;
+    display: inline-block;
 }
 
 .gantt-save-button {
@@ -256,8 +243,8 @@ main {
 }
 
 .project-button.active-project-button {
-    background-color: var(--selected-bg-color, #d0ebff); /* Светло-синий фон */
-    color: var(--selected-text-color, #004085);           /* Тёмно-синий текст */
+    background-color: var(--selected-bg-color, #d0ebff);
+    color: var(--selected-text-color, #004085);
     font-weight: bold;
     border-left: 4px solid var(--primary-color, #007bff);
 }

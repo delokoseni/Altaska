@@ -67,7 +67,6 @@ public class TagApiController {
         }
         Tags savedTag = tagsRepository.save(tag);
 
-        // Логируем создание тега
         activityLogService.logActivity(
                 user,
                 project,

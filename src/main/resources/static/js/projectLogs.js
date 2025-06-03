@@ -66,7 +66,7 @@ function formatPermissions(jsonValue) {
     }
 
     const lines = Object.entries(permissions)
-        .filter(([key]) => permissionLabels[key]) // игнорировать неизвестные
+        .filter(([key]) => permissionLabels[key])
         .map(([key, value]) => `- ${permissionLabels[key]}: ${value === true ? 'Да' : 'Нет'}`);
 
     return lines.length > 0 ? lines.join('\n') : 'Нет данных';
@@ -82,20 +82,17 @@ export function loadProjectLogsView(projectId) {
     fetch(`/api/logs/project/${projectId}`)
         .then(async response => {
             if (!response.ok) {
-                // Ошибка, получаем текст и показываем тост
                 const errorText = await response.text();
                 showToast(errorText || 'Ошибка при загрузке истории.', 'error');
-                // Можно отобразить сообщение в wrapper, если надо
                 const errorMsg = document.createElement('p');
                 errorMsg.textContent = errorText || 'Ошибка при загрузке истории.';
                 wrapper.appendChild(errorMsg);
-                // Прекращаем дальнейшую обработку
                 return null;
             }
             return response.json();
         })
         .then(logs => {
-            if (!logs) return; // Если была ошибка, выходим
+            if (!logs) return;
 
             if (logs.length === 0) {
                 const noLogs = document.createElement('p');

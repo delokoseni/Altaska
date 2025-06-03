@@ -19,10 +19,8 @@ export function showToast(message, type = "success") {
     toast.appendChild(closeBtn);
     document.body.appendChild(toast);
 
-    // Показ с анимацией
     setTimeout(() => toast.classList.add("toast-show"), 100);
 
-    // Автоматическое скрытие
     setTimeout(() => {
         toast.classList.remove("toast-show");
         toast.classList.add("toast-hide");

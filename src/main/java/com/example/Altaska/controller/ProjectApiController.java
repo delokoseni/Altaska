@@ -308,7 +308,6 @@ public class ProjectApiController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Владелец проекта не может быть приглашён.");
         }
 
-        // Проверка: не является ли пользователь уже участником проекта
         boolean alreadyMember = projectMembersRepository.existsByIdProjectAndInviteeEmail(project, email);
         if (alreadyMember) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь уже является участником проекта.");
@@ -324,10 +323,8 @@ public class ProjectApiController {
         Roles role = rolesRepository.findById(roleId)
                 .orElseThrow(() -> new RuntimeException("Роль не найдена"));
 
-        // Генерация токена
         String token = UUID.randomUUID().toString();
 
-        // Создание участника проекта
         ProjectMembers member = new ProjectMembers();
         member.setIdProject(project);
         member.setIdUser(invitee);
@@ -340,7 +337,6 @@ public class ProjectApiController {
         member.setInviteeEmail(email);
         projectMembersRepository.save(member);
 
-        // Формирование и отправка письма
         String link = "http://localhost:8080/confirm-invite?token=" + token;
         String subject = "Приглашение в проект";
         String body = "Вас пригласили в проект \"" + project.getName() + "\". Подтвердите участие, перейдя по ссылке:\n" + link;
@@ -362,57 +358,6 @@ public class ProjectApiController {
         return ResponseEntity.ok(Map.of("message", "Приглашение отправлено"));
     }
 
-    /*
-    @GetMapping("/confirm-invite")
-    public String confirmInvite(@RequestParam String token, Model model) {
-        System.out.println("Получаем участника по токену: " + token);
-        Optional<ProjectMembers> memberOpt = projectMembersRepository.findByConfirmationToken(token);
-
-        if (memberOpt.isEmpty()) {
-            model.addAttribute("statusTitle", "Ошибка");
-            model.addAttribute("statusMessage", "Недействительный или просроченный токен.");
-            return "confirmInvite";
-        }
-        System.out.println("Участник найден, подтверждаем участие");
-        ProjectMembers member = memberOpt.get();
-        member.setConfirmed(true);
-        member.setConfirmationToken(null);
-        projectMembersRepository.save(member);
-
-        System.out.println("member: " + member);
-        System.out.println("idUser: " + member.getIdUser());
-        System.out.println("idProject: " + member.getIdProject());
-
-
-        try {
-            System.out.println("ЛОГИРУЕМ");
-            activityLogService.logActivity(
-                    member.getIdUser(),
-                    member.getIdProject(),
-                    "update",
-                    "project_member",
-                    member.getIdUser().getId(),
-                    List.of(new Change(
-                            "confirmed",
-                            false,
-                            true
-                    )),
-                    "Пользователь присоединился к проекту"
-            );
-            System.out.println("ЗАЛОГИРОВАЛИ");
-        } catch (Exception e) {
-            System.err.println("Ошибка при логировании: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-
-        model.addAttribute("statusTitle", "Приглашение подтверждено");
-        model.addAttribute("statusMessage", "Вы успешно присоединились к проекту \"" + member.getIdProject().getName() + "\"!");
-        model.addAttribute("goToLogin", true);
-
-        return "confirmInvite";
-    }
-    */
     @DeleteMapping("/{projectId}/members/{userId}")
     public ResponseEntity<?> removeMember(@PathVariable Long projectId,
                                           @PathVariable Long userId,

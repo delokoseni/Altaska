@@ -125,14 +125,14 @@ public class GanttController {
 
     @GetMapping("/project/{projectId}/dependencies")
     public List<Map<String, Object>> getDependenciesByProject(@PathVariable Long projectId) {
-        List<TasksDependencies> dependencies = taskDependenciesRepository.findByIdToTask_IdProject_Id(projectId); // toTask — зависимая задача
+        List<TasksDependencies> dependencies = taskDependenciesRepository.findByIdToTask_IdProject_Id(projectId);
 
         return dependencies.stream()
                 .map(dep -> {
                     Map<String, Object> map = new HashMap<>();
 
-                    String from = dep.getIdFromTask().getId().toString(); // та, от которой зависит (предшественник)
-                    String to = dep.getIdToTask().getId().toString();     // та, которая зависит (последователь)
+                    String from = dep.getIdFromTask().getId().toString();
+                    String to = dep.getIdToTask().getId().toString();
                     String type = dep.getType();
 
                     Double lag = dep.getLag();
@@ -143,7 +143,7 @@ public class GanttController {
 
                     map.put("from", from);
                     map.put("to", to);
-                    map.put("type", type + lagStr); // например: FS+2d
+                    map.put("type", type + lagStr);
 
                     return map;
                 })
@@ -169,7 +169,7 @@ public class GanttController {
         private String name;
         private LocalDateTime startTime;
         private LocalDateTime deadline;
-        private String dependencies; // строка вида "1FS,3SS"
+        private String dependencies;
 
         public Long getId() {
             return id;

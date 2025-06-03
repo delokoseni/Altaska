@@ -80,7 +80,6 @@ public class ProfileController {
             return ResponseEntity.badRequest().body("Новый email совпадает с текущим");
         }
 
-        // Генерация токенов
         String oldToken = java.util.UUID.randomUUID().toString();
         String newToken = java.util.UUID.randomUUID().toString();
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(1);
@@ -215,14 +214,13 @@ public class ProfileController {
             return ResponseEntity.badRequest().body(validationError);
         }
 
-        // Сохраняем закодированный новый пароль временно
         String encodedNewPassword = encoder.encode(newPassword);
         String confirmToken = UUID.randomUUID().toString();
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(1);
 
         user.setPasswordResetToken(confirmToken);
         user.setPasswordResetTokenExpiresAt(expiresAt);
-        user.setNewPassword(encodedNewPassword); // временно используем confirmationToken для хранения
+        user.setNewPassword(encodedNewPassword);
 
         usersRepository.save(user);
 

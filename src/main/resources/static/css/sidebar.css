@@ -13,7 +13,7 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* Включаем прокрутку, если контента слишком много */
+    overflow-y: auto;
     min-height: 100%;
     overflow-x: hidden;
     overflow: visible;
@@ -186,30 +186,25 @@
 .project-button {
     width: 100%;
     box-sizing: border-box;
-    padding: 10px 16px; /* внутренние отступы */
-    margin: 4px 0; /* вертикальные отступы между кнопками */
-    background-color: var(--second-text-color); /* фон кнопки */
-    color: white; /* цвет текста */
+    padding: 10px 16px;
+    margin: 4px 0;
+    background-color: var(--second-text-color);
+    color: white;
     border: none;
     border-radius: 8px;
-    font-family: 'Nunito', sans-serif; /* как в других элементах */
+    font-family: 'Nunito', sans-serif;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    text-align: left; /* чтобы текст не был по центру */
+    text-align: left;
 }
-
-/*.project-button.active {
-    background-color: var(--button-color);
-    color: white;
-}*/
 
 .top-right-buttons {
     position: absolute;
     top: 10px;
     right: 10px;
     display: flex;
-    gap: 10px; /* Расстояние между кнопками */
+    gap: 10px;
     z-index: 1000;
 }
 
@@ -243,25 +238,21 @@
     font-family: 'Nunito', sans-serif;
 }
 
-/* Стиль полосы прокрутки */
 .sidebar::-webkit-scrollbar {
-    width: 8px; /* Ширина полосы прокрутки */
+    width: 8px;
 }
 
-/* Стиль самой полосы прокрутки */
 .sidebar::-webkit-scrollbar-thumb {
-    background-color: var(--button-color); /* Цвет фона для ползунка */
-    border-radius: 10px; /* Радиус скругления ползунка */
-    border: 2px solid var(--background-color); /* Цвет обводки */
+    background-color: var(--button-color);
+    border-radius: 10px;
+    border: 2px solid var(--background-color);
 }
 
-/* Стиль дорожки полосы прокрутки */
 .sidebar::-webkit-scrollbar-track {
-    background: var(--second-text-color); /* Цвет фона дорожки */
-    border-radius: 10px; /* Радиус скругления дорожки */
+    background: var(--second-text-color);
+    border-radius: 10px;
 }
 
-/* Стиль при наведении на ползунок */
 .sidebar::-webkit-scrollbar-thumb:hover {
-    background-color: var(--hover-button-color); /* Цвет фона при наведении */
+    background-color: var(--hover-button-color);
 }

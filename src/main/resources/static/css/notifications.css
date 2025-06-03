@@ -12,8 +12,8 @@
 #notifications-panel .panel-header {
   display: flex;
   justify-content: space-between;
-  background-color: var(--button-color); /* фиолетовая шапка */
-  color: var(--text-color); /* белый текст в шапке */
+  background-color: var(--button-color);
+  color: var(--text-color);
   padding: 12px 16px;
   font-weight: 700;
   font-size: 1.1em;
@@ -24,8 +24,8 @@
 }
 
 #notifications-panel .notifications-content {
-  background-color: white; /* светлый фон */
-  color: var(--text-color); /* белый текст */
+  background-color: white;
+  color: var(--text-color);
   padding: 10px;
   overflow-y: auto;
   max-height: 360px;
@@ -107,7 +107,6 @@
   z-index: 10;
 }
 
-/* Стилизация полосы прокрутки внутри уведомлений */
 #notifications-panel .notifications-content::-webkit-scrollbar {
   width: 8px;
 }
@@ -118,12 +117,11 @@
 }
 
 #notifications-panel .notifications-content::-webkit-scrollbar-thumb {
-  background-color: var(--button-color); /* Используем фирменный фиолетовый */
+  background-color: var(--button-color);
   border-radius: 4px;
-  border: 2px solid white; /* Отступ внутри скроллбара */
+  border: 2px solid white;
 }
 
-/* Поддержка Firefox */
 #notifications-panel .notifications-content {
   scrollbar-width: thin;
   scrollbar-color: var(--button-color) #f0f0f0;

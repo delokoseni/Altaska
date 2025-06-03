@@ -71,7 +71,7 @@ public class SubTaskApiController {
             }
             subTask.setName(dto.getName());
             subTask.setDescription(dto.getDescription());
-            subTask.setCreatedAt(LocalDate.now()); //TODO заменить на время пользователя
+            subTask.setCreatedAt(LocalDate.now());
             subTask.setCreatedAtServer(LocalDate.now());
             SubTasks savedSubTask = subTasksRepository.save(subTask);
             saved.add(savedSubTask);
@@ -138,7 +138,6 @@ public class SubTaskApiController {
         subTask.setDescription(dto.getDescription());
         SubTasks updatedSubTask = subTasksRepository.save(subTask);
 
-        // Формируем список изменений
         List<Change> changes = new ArrayList<>();
         if (!oldName.equals(dto.getName())) {
             changes.add(new Change("name", oldName, dto.getName()));
@@ -147,7 +146,6 @@ public class SubTaskApiController {
             changes.add(new Change("description", oldDescription, dto.getDescription()));
         }
 
-        // Логируем активность, если есть изменения
         if (!changes.isEmpty()) {
             activityLogService.logActivity(
                     user,

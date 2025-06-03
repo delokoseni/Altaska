@@ -1,7 +1,6 @@
 import { showToast } from './toast.js';
 import { deleteTask } from './deleteTask.js';
 
-// Функция для получения всех задач проекта
 function getAllTasksForProject(projectId) {
     return fetch(`/api/tasks/project/${projectId}/withperformers`)
         .then(response => {
@@ -17,28 +16,24 @@ function getAllTasksForProject(projectId) {
         .catch(error => console.error('Ошибка загрузки задач:', error));
 }
 
-// Функция для получения всех приоритетов
 function getAllPriorities() {
     return fetch('/api/priorities')
         .then(response => response.json())
         .catch(error => console.error('Ошибка загрузки приоритетов:', error));
 }
 
-// Функция для получения всех статусов
 function getAllStatuses() {
     return fetch('/api/statuses')
         .then(response => response.json())
         .catch(error => console.error('Ошибка загрузки статусов:', error));
 }
 
-// Функция для получения всех подтвержденных участников проекта
 function getConfirmedMembers(projectId) {
     return fetch(`/api/projects/${projectId}/confirmed-members`)
         .then(response => response.json())
         .catch(error => console.error('Ошибка загрузки участников:', error));
 }
 
-// Функция для создания фильтра (select)
 function createFilter(label, options, filterType) {
     const filterContainer = document.createElement('div');
     filterContainer.className = 'kanban-filter-container';
@@ -81,7 +76,6 @@ function createFilter(label, options, filterType) {
     return filterContainer;
 }
 
-// Селектор группировки
 function createGroupBySelector() {
     const container = document.createElement('div');
     container.className = 'kanban-filter-container';
@@ -110,7 +104,6 @@ function createGroupBySelector() {
     return container;
 }
 
-// Основная функция отображения фильтров и канбан-доски
 export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
     Promise.all([
         getAllTasksForProject(projectId),
@@ -154,7 +147,6 @@ export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
         kanbanBoard.className = 'kanban-board';
         viewContent.appendChild(kanbanBoard);
 
-        // Функция обновления доски
         function updateBoard() {
             const filters = {
                 memberId: memberSelect.value
@@ -163,7 +155,6 @@ export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
             renderKanbanBoard(kanbanBoard, groupBySelect.value, filteredTasks, statuses, priorities, updateBoard, deleteTaskAndRefresh);
         }
 
-        // Функция удаления задачи с обновлением массива и доски
         function deleteTaskAndRefresh(taskId) {
             deleteTask(taskId, csrfToken, () => {
                 const index = tasks.findIndex(t => t.id === taskId);
@@ -182,7 +173,6 @@ export function renderKanbanFiltersAndBoard(projectId, showTaskForm) {
     .catch(error => console.error('Ошибка при загрузке данных для канбан-доски:', error));
 }
 
-// Фильтрация задач
 function filterTasks(tasks, filters) {
     return tasks.filter(task => {
         if (filters.memberId) {
@@ -229,7 +219,6 @@ function groupTasksByFilter(tasks, groupBy, statuses, priorities) {
     return groups;
 }
 
-// Отображение канбан-доски с поддержкой перетаскивания
 export function renderKanbanBoard(container, groupBy, tasks, statuses, priorities, updateBoard, deleteTaskCallback) {
     container.innerHTML = '';
     const groupedTasks = groupTasksByFilter(tasks, groupBy, statuses, priorities);
@@ -317,7 +306,6 @@ export function renderKanbanBoard(container, groupBy, tasks, statuses, prioritie
     }
 }
 
-// Универсальный обработчик fetch с showToast
 function handleFetchWithToast(url, options, successMessage, errorPrefix = "Ошибка") {
     return fetch(url, options)
         .then(async response => {
@@ -352,11 +340,10 @@ function handleFetchWithToast(url, options, successMessage, errorPrefix = "Ош�
                 showToast(`${errorPrefix}: ${message}`, "error");
             }
             console.error(`${errorPrefix}:`, error);
-            throw error; // если нужно пробросить ошибку дальше
+            throw error;
         });
 }
 
-// Функция для обновления статуса задачи на сервере
 function updateTaskStatus(taskId, newStatus) {
     const csrfToken = getCsrfToken();
     return handleFetchWithToast(
@@ -376,7 +363,6 @@ function updateTaskStatus(taskId, newStatus) {
     });
 }
 
-// Функция для обновления приоритета задачи на сервере
 function updateTaskPriority(taskId, newPriority) {
     const csrfToken = getCsrfToken();
     return handleFetchWithToast(

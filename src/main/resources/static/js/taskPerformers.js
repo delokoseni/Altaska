@@ -3,7 +3,6 @@ import { showToast } from './toast.js';
 export async function createPerformersSection(taskId, projectId, containerElement, csrfToken) {
     containerElement.innerHTML = "";
 
-    // Создаём обёртку
     const wrapper = document.createElement("div");
     wrapper.className = "performers-section";
     containerElement.appendChild(wrapper);
@@ -18,26 +17,22 @@ export async function createPerformersSection(taskId, projectId, containerElemen
     renderAddButton(select, taskId, projectId, wrapper, csrfToken);
 }
 
-// Заголовок
 function renderTitle(containerElement) {
     const title = document.createElement("h3");
     title.textContent = "Исполнители";
     containerElement.appendChild(title);
 }
 
-// Получение исполнителей
 async function fetchPerformers(taskId) {
     const response = await fetch(`/api/task-performers/${taskId}`);
     return await response.json();
 }
 
-// Получение подтверждённых участников проекта
 async function fetchMembers(projectId) {
     const response = await fetch(`/api/projects/${projectId}/confirmed-members`);
     return await response.json();
 }
 
-// Отображение списка исполнителей
 function renderPerformersList(performers, taskId, projectId, containerElement, csrfToken) {
     if (performers.length === 0) {
         const empty = document.createElement("p");
@@ -95,7 +90,6 @@ function renderPerformersList(performers, taskId, projectId, containerElement, c
     }
 }
 
-// Отображение выпадающего списка участников
 function renderMemberSelect(members, containerElement) {
     const select = document.createElement("select");
     members.forEach(m => {
@@ -108,7 +102,6 @@ function renderMemberSelect(members, containerElement) {
     return select;
 }
 
-// Кнопка назначения исполнителя
 function renderAddButton(select, taskId, projectId, containerElement, csrfToken) {
     const addBtn = document.createElement("button");
     addBtn.textContent = "Назначить исполнителем";
@@ -171,7 +164,6 @@ export async function addPerformer(taskId, userId, csrfToken) {
     }
 }
 
-// Функция для взятия задачи
 export async function assignTask(taskId, formData, csrfToken) {
     try {
         const response = await fetch(`/api/task-performers/${taskId}/assign`, {
@@ -215,7 +207,6 @@ export async function assignTask(taskId, formData, csrfToken) {
     }
 }
 
-// Функция для отказа от задачи
 export async function unassignTask(taskId, formData, csrfToken) {
     try {
         const response = await fetch(`/api/task-performers/${taskId}/unassign`, {

@@ -90,7 +90,7 @@ public class AttachmentsApiController {
         }
         String fileName = file.getOriginalFilename();
         String contentType = file.getContentType();
-        long maxFileSize = 25L * 1024 * 1024; // 25MB
+        long maxFileSize = 25L * 1024 * 1024;
 
         if (fileName == null || fileName.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя файла не может быть пустым");
@@ -250,7 +250,6 @@ public class AttachmentsApiController {
         return ResponseEntity.ok("Файл удален.");
     }
 
-    // DTO для ответа на запрос о файлах
     public static class FileDto {
         private Long id;
         private String fileName;
@@ -266,7 +265,6 @@ public class AttachmentsApiController {
             this.uploadedByEmail = uploadedByEmail;
         }
 
-        // Геттеры
         public Long getId() {
             return id;
         }

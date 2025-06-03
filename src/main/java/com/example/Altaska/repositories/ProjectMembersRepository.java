@@ -12,22 +12,11 @@ import java.util.List;
 
 @Repository
 public interface ProjectMembersRepository extends JpaRepository<ProjectMembers, Long> {
-
-    List<ProjectMembers> findByIdUser(Users user);
-
     List<ProjectMembers> findByIdProjectId(Long projectId);
-
     Optional<ProjectMembers> findByIdProjectIdAndIdUserId(Long projectId, Long userId);
-
     Optional<ProjectMembers> findByConfirmationToken(String confirmationToken);
-
-    boolean existsByIdProjectAndIdUser(Projects project, Users user);
-
     boolean existsByIdProjectAndInviteeEmail(Projects project, String inviteeEmail);
-
     List<ProjectMembers> findByIdUserAndConfirmedTrue(Users user);
-
     List<ProjectMembers> findByIdProjectIdAndConfirmedTrue(Long projectId);
-
     boolean existsByIdRole(Roles role);
 }

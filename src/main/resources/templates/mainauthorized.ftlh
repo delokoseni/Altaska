@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="/css/taskStatusesLog.css">
     <link rel="stylesheet" href="/css/modal.css">
     <script src="/js/sidebar.js" defer></script>
-    <script src="/js/mainAuthorized.js" defer></script>
+    <script type = "module" src="/js/mainAuthorized.js" defer></script>
     <script type = "module" src="/js/projectSelection.js"></script>
     <script type = "module" src="/js/taskDetails.js"></script>
     <script type = "module" src="/js/notifications.js" defer></script>

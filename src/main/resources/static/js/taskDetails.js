@@ -17,9 +17,9 @@ const targetLabels = {
 function toLocalDateTimeInputString(utcDateString) {
     if (!utcDateString) return '';
     const date = new Date(utcDateString);
-    const offset = date.getTimezoneOffset(); // в минутах
+    const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - offset * 60 * 1000);
-    return localDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+    return localDate.toISOString().slice(0, 16);
 }
 
 function showTaskDetails(task, view = 'список') {
@@ -156,8 +156,6 @@ function showTaskDetails(task, view = 'список') {
             timerDiv.querySelector('[data-action="pause"]').onclick = () => pauseTimer(task.id);
             timerDiv.querySelector('[data-action="reset"]').onclick = () => resetTimer(task.id);
 
-
-            // Проверка, является ли текущий пользователь исполнителем задачи
             fetch(`/api/task-performers/${task.id}/is-assigned`)
                 .then(response => response.json())
                 .then(isAssigned => {
@@ -174,21 +172,21 @@ function showTaskDetails(task, view = 'список') {
                         const formData = new URLSearchParams();
 
                         if (isAssigned) {
-                            // Отказаться от задачи
+
                             unassignTask(task.id, formData, csrfToken)
                                 .then(() => {
                                     takeTaskButton.textContent = 'Взять задачу';
-                                    showTaskDetails(task);  // Обновить детали задачи
+                                    showTaskDetails(task);
                                 })
                                 .catch(err => {
                                     alert('Ошибка при отказе от задачи: ' + err.message);
                                 });
                         } else {
-                            // Взять задачу
+
                             assignTask(task.id, formData, csrfToken)
                                 .then(() => {
                                     takeTaskButton.textContent = 'Отказаться от задачи';
-                                    showTaskDetails(task);  // Обновить детали задачи
+                                    showTaskDetails(task);
                                 })
                                 .catch(err => {
                                     alert('Ошибка при принятии задачи: ' + err.message);
@@ -281,19 +279,15 @@ function showTaskDetails(task, view = 'список') {
                 window.addEventListener('click', outsideClickListener);
             }, 0);
 
-            // Выполняем запрос к серверу, чтобы получить email текущего пользователя
             fetch('/current-user-email')
-                .then(response => response.text())  // Получаем email как строку
+                .then(response => response.text())
                 .then(email => {
-                    // Если email получен, используем его
-                    console.log(email);  // Можно заменить на логику, где используется email
-
-                    // Теперь можно передавать email в функцию, как ранее
+                    console.log(email);
                     initTaskCommentsSection(task.id, content, email);
                     initCommentInputSection(task.id, content, () => initTaskCommentsSection(task.id, content, email), csrfToken);
                     initTaskFilesSection(task.id, content, csrfToken, email);
                 })
-                .catch(error => console.error('Error:', error));  // Обрабатываем возможные ошибки
+                .catch(error => console.error('Error:', error));
 
             function outsideClickListener(e) {
                 if (!sidebar.contains(e.target)) {

@@ -9,31 +9,25 @@ export async function renderRolePermissionsView(role) {
 
         const permissions = await response.json();
 
-        // overlay
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
 
-        // modal wrapper
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-wrapper';
 
-        // modal
         const modal = document.createElement('div');
         modal.className = 'modal';
 
-        // header
         const header = document.createElement('div');
         header.className = 'modal-header';
         header.textContent = `Права роли: ${roleName}`;
 
-        // Кнопка-крестик
         const closeIcon = document.createElement('span');
         closeIcon.className = 'modal-close-icon';
         closeIcon.innerHTML = '&times;';
         closeIcon.onclick = () => document.body.removeChild(overlay);
         header.appendChild(closeIcon);
 
-        // content
         const content = document.createElement('div');
         content.className = 'modal-content';
 
@@ -51,11 +45,9 @@ export async function renderRolePermissionsView(role) {
             content.appendChild(permissionsList);
         }
 
-        // footer (оставим на случай будущего использования, но не добавляем кнопку)
         const footer = document.createElement('div');
         footer.className = 'modal-footer';
 
-        // Сборка
         modal.appendChild(header);
         modal.appendChild(content);
         modal.appendChild(footer);

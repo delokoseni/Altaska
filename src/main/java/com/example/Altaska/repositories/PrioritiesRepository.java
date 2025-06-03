@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface PrioritiesRepository extends JpaRepository<Priorities, Long> {
-    List<Priorities> findByLevel(Long level);
     Optional<Priorities> findByName(String name);
 }

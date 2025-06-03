@@ -8,8 +8,6 @@ import java.util.List;
 
 @Repository
 public interface StatusesLogRepository extends JpaRepository<StatusesLog, Long> {
-
     void deleteByIdTask_Id(Long taskId);
-
     List<StatusesLog> findByIdTask_IdOrderByChangeAtDesc(Long taskId);
 }

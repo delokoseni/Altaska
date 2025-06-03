@@ -21,7 +21,6 @@ public class NotificationService {
         OffsetDateTime now = OffsetDateTime.now();
 
         for (Users user : recipients) {
-            // Не уведомляем инициатора
             if (user.getId().equals(initiator.getId())) {
                 continue;
             }

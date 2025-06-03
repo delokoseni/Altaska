@@ -29,7 +29,7 @@ export function resumeTimer(taskId, data) {
 }
 
 export function startTimer(taskId) {
-    if (taskTimers.has(taskId)) return; // уже запущен
+    if (taskTimers.has(taskId)) return;
 
     const data = JSON.parse(localStorage.getItem(`timer_${taskId}`)) || {};
     const startTimestamp = Date.now();
@@ -90,7 +90,6 @@ export function sendToServer(taskId, timeSpent) {
     });
 }
 
-// Сохранение при закрытии/перезагрузке страницы
 window.addEventListener("beforeunload", () => {
     taskTimers.forEach((timer, taskId) => {
         const elapsed = Math.floor((Date.now() - timer.startTimestamp) / 1000);

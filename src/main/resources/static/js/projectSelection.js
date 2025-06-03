@@ -18,15 +18,12 @@ window.loadView = loadView;
 function selectProject(buttonElement) {
     const projectId = buttonElement.dataset.projectId;
 
-    // Удалить выделение со всех кнопок
     document.querySelectorAll('.project-button').forEach(btn => {
         btn.classList.remove('active-project-button');
     });
 
-    // Выделить текущую кнопку
     buttonElement.classList.add('active-project-button');
 
-    // Сохранить выбор
     sessionStorage.setItem('currentProjectId', projectId);
 
     const projectName = buttonElement.textContent.trim();
@@ -57,12 +54,10 @@ function selectProject(buttonElement) {
 }
 
 function goToMainPage() {
-    // Удалить выделение со всех кнопок
     document.querySelectorAll('.project-button').forEach(btn => {
         btn.classList.remove('active-project-button');
     });
 
-    // Выделить текущую кнопку
     const buttonElement = document.getElementById('mainproject');
     buttonElement.classList.add('active-project-button');
 
@@ -120,7 +115,6 @@ function getAssignedTasks() {
         });
 }
 
-// Основная функция для отображения канбана с назначенными задачами
 export function renderKanbanForAssignedTasks(container) {
     Promise.all([
         getAssignedTasks(),
@@ -130,7 +124,6 @@ export function renderKanbanForAssignedTasks(container) {
     .then(([tasks, priorities, statuses]) => {
         container.innerHTML = '';
 
-        // Контейнер для фильтров (только группировка)
         const filterContainer = document.createElement('div');
         filterContainer.className = 'kanban-filters';
         container.appendChild(filterContainer);
@@ -142,7 +135,6 @@ export function renderKanbanForAssignedTasks(container) {
         header.appendChild(title);
         container.appendChild(header);
 
-        // Селектор группировки: по статусу или приоритету
         const groupBySelectorContainer = document.createElement('div');
         groupBySelectorContainer.className = 'kanban-filter';
 
@@ -166,7 +158,6 @@ export function renderKanbanForAssignedTasks(container) {
         groupBySelectorContainer.appendChild(groupBySelect);
         filterContainer.appendChild(groupBySelectorContainer);
 
-        // Канбан-доска
         const kanbanBoard = document.createElement('div');
         kanbanBoard.className = 'kanban-board';
         container.appendChild(kanbanBoard);
@@ -276,7 +267,7 @@ function renderMainAssignedTasks(viewContent) {
             statusSelect.addEventListener('change', applyFilters);
             prioritySelect.addEventListener('change', applyFilters);
 
-            applyFilters(); // Инициализация
+            applyFilters();
         })
         .catch(err => {
             console.error('Ошибка при загрузке задач:', err);
@@ -493,7 +484,6 @@ function renderTaskListView(projectId, viewContent) {
             updateTaskCountInfo(filtered, tasks);
         };
 
-        // Добавим taskCountInfo через замыкание
         const renderTaskFiltersResult = renderTaskFilters(tasks, tagsWithTasks, performersMap, taskListContainer, renderFilteredTasks);
         taskCountInfo = renderTaskFiltersResult.taskCountInfo;
 
@@ -771,8 +761,7 @@ function showTaskForm(projectId, container, from = 'список') {
             form.onsubmit = function (e) {
                 e.preventDefault();
 
-                // Проверка файлов
-                const maxFileSize = 25 * 1024 * 1024; // 25MB
+                const maxFileSize = 25 * 1024 * 1024;
                 for (let file of filesInput.files) {
                     if (file.size > maxFileSize) {
                         alert(`Файл "${file.name}" превышает 25 МБ`);
@@ -1049,7 +1038,6 @@ export async function handleFetchWithToast(url, options, successMessage, errorMe
         const responseText = await response.text();
 
         if (!response.ok) {
-            // Пробрасываем ошибку, но не показываем Toast тут — это сделает catch
             throw new Error(responseText || 'Неизвестная ошибка');
         }
 
@@ -1177,7 +1165,6 @@ function createTagElement(tag, projectId) {
 }
 
 function showAddTagForm(container, projectId) {
-    // Не добавлять форму повторно
     if (container.querySelector('.add-tag-form-wrapper')) return;
 
     const formWrapper = document.createElement('div');
@@ -1272,7 +1259,6 @@ function createTagSelector(projectId, selectedTags) {
     const tagsList = document.createElement('div');
     tagsList.className = 'selected-tags';
 
-    // Храним id выбранных тегов, чтобы не дублировались
     const selectedTagIds = new Set();
 
     fetch(`/api/tags/project/${projectId}`)
@@ -1297,7 +1283,7 @@ function createTagSelector(projectId, selectedTags) {
 
         if (selectedId && !selectedTagIds.has(selectedId)) {
             selectedTagIds.add(selectedId);
-            selectedTags.push(selectedId); // Добавляем в общий массив
+            selectedTags.push(selectedId);
 
             const tagItem = document.createElement('span');
             tagItem.className = 'tag-item';
@@ -1399,7 +1385,6 @@ function renderRolesSection(container, projectId) {
                     text.textContent = role.name + (role.idProject === null ? ' (глобальная)' : '');
                     li.appendChild(text);
 
-                    // Только для проектных ролей
                     if (role.idProject !== null) {
                         const editButton = document.createElement('button');
                         editButton.className = 'role-edit-button';
@@ -1659,13 +1644,11 @@ function renderMemberItem(member, projectId, roles) {
     sortRoles(roles);
     const listItem = document.createElement('li');
 
-    // Почта участника
     const emailSpan = document.createElement('span');
     emailSpan.textContent = member.email + (member.confirmed ? ' ' : ' (Приглашение отправлено) ');
     emailSpan.style.color = member.confirmed ? '' : '#888';
     listItem.appendChild(emailSpan);
 
-    // Выпадающий список ролей
     const roleSelect = document.createElement('select');
 
     roles.forEach(role => {

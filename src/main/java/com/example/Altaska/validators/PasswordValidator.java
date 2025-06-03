@@ -30,6 +30,6 @@ public class PasswordValidator {
             return "Пароль может содержать только латинские буквы, цифры и специальные символы.";
         }
 
-        return null; // Нет ошибок
+        return null;
     }
 }

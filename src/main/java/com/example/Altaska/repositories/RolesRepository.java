@@ -8,7 +8,5 @@ import java.util.List;
 
 public interface RolesRepository extends JpaRepository<Roles, Long> {
     List<Roles> findByIdProject_IdOrIdProjectIsNull(Long projectId);
-
     boolean existsByNameAndIdProject(String name, Projects project);
-
 }

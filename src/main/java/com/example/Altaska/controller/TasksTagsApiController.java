@@ -105,7 +105,7 @@ public class TasksTagsApiController {
                 task.getIdProject(),
                 "delete",
                 "task_tag",
-                null, //Возможно тут нужен id
+                null,
                 null,
                 "Из задачи \"" + task.getName() + "\" удалён тег \"" + tag.getName() + "\""
         );

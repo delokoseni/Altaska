@@ -4,8 +4,8 @@
     padding: 20px;
     border-radius: 10px;
     width: 100%;
-    max-width: 1000px; /* было 600px */
-    margin: 0 auto 40px auto; /* добавлен отступ снизу */
+    max-width: 1000px;
+    margin: 0 auto 40px auto;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -172,7 +172,6 @@
     background-color: var(--hover-button-color);
 }
 
-/* Обёртка, чтобы изолировать стили */
 .task-form-wrapper .file-upload-container {
     display: flex;
     flex-direction: column;

@@ -8,7 +8,7 @@ export function addSubtask(taskId, subtaskData, csrfToken, callback) {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken,
         },
-        body: JSON.stringify([subtaskData]) // Заворачиваем в массив!
+        body: JSON.stringify([subtaskData])
     })
     .then(async response => {
         if (!response.ok) {
@@ -26,7 +26,7 @@ export function addSubtask(taskId, subtaskData, csrfToken, callback) {
     .then(subtasks => {
         if (Array.isArray(subtasks) && subtasks.length > 0) {
             showToast("Подзадача успешно добавлена");
-            callback(subtasks[0]); // возвращаем первую добавленную подзадачу
+            callback(subtasks[0]);
         } else {
             showToast("Не удалось добавить подзадачу: пустой ответ от сервера", "error");
             throw new Error('Подзадача не добавлена');
@@ -232,7 +232,6 @@ function createSubtaskItem(subtask, taskId, csrfToken) {
             };
 
             updateSubtask(taskId, subtask.id, updatedData, csrfToken, (updatedSubtask) => {
-                // можно обновить UI, если нужно
                 nameInput.disabled = true;
                 descInput.disabled = true;
                 editButton.textContent = 'Изменить';

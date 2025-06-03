@@ -33,13 +33,13 @@ public class Users {
     private String passwordResetToken;
 
     @Column(name = "password_reset_token_expires_at")
-    private LocalDateTime passwordResetTokenExpiresAt;      //В БД тип данных Timestamp with time zone
+    private LocalDateTime passwordResetTokenExpiresAt;
 
     @Column(name = "old_email_change_token")
     private String oldEmailChangeToken;
 
     @Column(name = "old_email_change_token_expires_at")
-    private LocalDateTime oldEmailChangeTokenExpiresAt;     //В БД тип данных Timestamp with time zone
+    private LocalDateTime oldEmailChangeTokenExpiresAt;
 
     @Column(name = "new_email")
     private String newEmail;
@@ -48,7 +48,7 @@ public class Users {
     private String newEmailChangeToken;
 
     @Column(name = "new_email_change_token_expires_at")
-    private LocalDateTime newEmailChangeTokenExpiresAt;     //В БД тип данных Timestamp with time zone
+    private LocalDateTime newEmailChangeTokenExpiresAt;
 
     @Column(name = "email_change_status")
     private Boolean emailChangeStatus;

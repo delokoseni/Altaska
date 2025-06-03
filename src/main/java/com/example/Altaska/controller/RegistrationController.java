@@ -39,7 +39,6 @@ public class RegistrationController {
             @RequestParam("repeatpassword") String repeatpassword,
             Model model) {
 
-        // Проверка обязательных полей на наличие значений
         if (email == null || email.trim().isEmpty() ||
                 password == null || password.trim().isEmpty() ||
                 repeatpassword == null || repeatpassword.trim().isEmpty()) {
@@ -47,20 +46,17 @@ public class RegistrationController {
             return "registration";
         }
 
-        // Проверка существования email в базе данных
         if (usersRepository.findByEmail(email).isPresent()) {
             model.addAttribute("error", "Пользователь с таким email уже существует!");
             return "registration";
         }
 
-        // Проверяем длину email
         if (!EmailValidator.isValidLength(email)) {
             model.addAttribute("error", "Email не должен превышать "
                     + EmailValidator.getMaxEmailLength() + " символов!");
             return "registration";
         }
 
-        // Проверяем формат email
         if (!EmailValidator.isValidFormat(email)) {
             model.addAttribute("error", "Введите корректный адрес электронной почты!");
             return "registration";
@@ -74,7 +70,7 @@ public class RegistrationController {
 
         if (!password.equals(repeatpassword)) {
             model.addAttribute("error", "Пароли не совпадают!");
-            return "registration"; // Вернуть на страницу регистрации с ошибкой
+            return "registration";
         }
 
         String hashedPassword = passwordEncoder.encode(password);

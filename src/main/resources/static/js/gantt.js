@@ -43,7 +43,6 @@ export async function renderGanttChart(projectId) {
     viewContent.innerHTML = '<div id="Gantt" style="min-height: 400px;"></div>';
 
     try {
-        // Параллельно получаем задачи и зависимости
         const [tasksResponse, dependenciesResponse] = await Promise.all([
             fetch(`/api/gantt/project/${projectId}`),
             fetch(`/api/gantt/project/${projectId}/dependencies`)
@@ -59,7 +58,6 @@ export async function renderGanttChart(projectId) {
             return;
         }
 
-        // Преобразование зависимостей: создаём карту taskId -> зависимости
         const dependencyMap = {};
         dependencies.forEach(dep => {
             const to = dep.to;
@@ -157,7 +155,7 @@ function createSaveButton() {
             startTime: task.StartDate,
             deadline: task.EndDate,
             progress: task.Progress,
-            dependencies: task.Predecessor // строка типа "1FS,2SS"
+            dependencies: task.Predecessor
         }));
 
         console.log('Связи между задачами (dependencies):');

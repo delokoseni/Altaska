@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
             backButton.type = 'button';
             backButton.className = 'back-button';
             backButton.onclick = () => {
-                mainContent.innerHTML = previousContent;
+                goToMainPage();
+                //mainContent.innerHTML = previousContent;
             };
 
             formWrapper.appendChild(backButton);

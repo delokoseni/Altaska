@@ -54,7 +54,7 @@ public class CommentApiController {
     public List<CommentDto> getCommentsByTask(@PathVariable Long taskId) {
         List<Comments> comments = commentsRepository.findByIdTask_Id(taskId);
         return comments.stream()
-                .sorted(Comparator.comparing(Comments::getCreatedAtServer))  // Сортировка по возрастанию
+                .sorted(Comparator.comparing(Comments::getCreatedAtServer))
                 .map(comment -> new CommentDto(
                         comment.getId(),
                         comment.getIdUser().getEmail(),
@@ -90,7 +90,7 @@ public class CommentApiController {
 
         Comments comment = new Comments();
         comment.setContent(commentRequest.getContent());
-        comment.setCreatedAt(OffsetDateTime.now()); //TODO Изменить
+        comment.setCreatedAt(OffsetDateTime.now());
         comment.setCreatedAtServer(OffsetDateTime.now());
         comment.setIdTask(task);
         comment.setIdUser(user);
@@ -149,7 +149,7 @@ public class CommentApiController {
 
         Comments comment = commentsRepository.findById(commentId).orElse(null);
         if (comment == null || !comment.getIdUser().equals(user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Можно редактировать только свои комментарии
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
         Projects project = task.getIdProject();
@@ -193,7 +193,7 @@ public class CommentApiController {
 
         Comments comment = commentsRepository.findById(commentId).orElse(null);
         if (comment == null || !comment.getIdUser().equals(user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Можно удалять только свои комментарии
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
         Projects project = task.getIdProject();
@@ -221,7 +221,6 @@ public class CommentApiController {
         return ResponseEntity.ok().build();
     }
 
-    // DTO для запроса
     public static class CommentRequest {
         private Long taskId;
         private String content;
@@ -244,7 +243,7 @@ public class CommentApiController {
     }
 
     public static class CommentDto {
-        private Long id; // ID комментария
+        private Long id;
         private String authorName;
         private String text;
         private String createdAt;
@@ -256,7 +255,6 @@ public class CommentApiController {
             this.createdAt = createdAt;
         }
 
-        // Геттеры
         public Long getId() {
             return id;
         }
