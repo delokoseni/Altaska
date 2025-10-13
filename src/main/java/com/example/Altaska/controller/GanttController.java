@@ -52,7 +52,7 @@ public class GanttController {
         if(user  == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден.");
         }
-        Tasks tasks = tasksRepository.findById(data.getTasks().getFirst().getId())
+        Tasks tasks = tasksRepository.findById(data.getTasks().get(0).getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
 
         if(permissionService.checkIfProjectArchived(tasks.getIdProject()))
