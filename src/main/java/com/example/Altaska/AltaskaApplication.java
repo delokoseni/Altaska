@@ -12,4 +12,5 @@ public class AltaskaApplication {
 		SpringApplication.run(AltaskaApplication.class, args);
 	}
 
+
 }
