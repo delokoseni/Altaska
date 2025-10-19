@@ -149,7 +149,7 @@ footer {
     padding: 16px;
 }
 
-@media (max-width: 1025px) {
+@media (max-width: 1024px) {
     .menu-container {
         display: none;
     }
