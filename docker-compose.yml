@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:16
@@ -12,6 +14,8 @@ services:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - altaska_net
 
   app:
     build: .
@@ -22,3 +26,35 @@ services:
     env_file: .env
     ports:
       - "8080:8080"
+    networks:
+      - altaska_net
+
+  nginx:
+    image: nginx:latest
+    container_name: altaska_nginx
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - altaska_net
+
+  certbot:
+    image: certbot/certbot
+    container_name: altaska_certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew; done"
+    networks:
+      - altaska_net
+
+networks:
+  altaska_net:
+    driver: bridge
