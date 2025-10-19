@@ -9,7 +9,7 @@ body {
     margin: 0;
     padding: 0;
     color: var(--text-color);
-    background-color: var(--background-color);
+    background-color: black;
     transition: background-color 0.3s, color 0.3s;
 }
 
