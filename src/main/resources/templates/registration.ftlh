@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/toast.css">
     <script src="/js/passwordToggle.js"></script>
     <title>Регистрация</title>
+    <meta name="robots" content="index, follow">
 </head>
 <body>
 <header>

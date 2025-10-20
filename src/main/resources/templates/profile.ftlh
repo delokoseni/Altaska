@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="/css/profile.css">
         <script type="module" src="/js/profile.js"></script>
         <title>Профиль</title>
+        <meta name="robots" content="index, follow">
     </head>
     <body>
         <header class="back-button-container">

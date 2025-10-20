@@ -28,6 +28,7 @@
     <script type = "module" src="/js/taskDetails.js"></script>
     <script type = "module" src="/js/notifications.js" defer></script>
     <title>Главная</title>
+    <meta name="robots" content="index, follow">
 </head>
 <body>
 <div class="layout">

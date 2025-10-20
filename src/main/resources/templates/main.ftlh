@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/gallery.js" defer></script>
     <title>altaska</title>
+    <meta name="robots" content="index, follow">
 </head>
 <body>
 <header>

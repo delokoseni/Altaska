@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /confirmInvite/
+Allow: /
+
+Sitemap: https://altaska.ru/sitemap.xml
