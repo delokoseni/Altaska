@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/", "/login", "/registration", "/confirm", "/error", "/confirm-invite",
                                 "/confirm-old", "/confirm-new", "/css/**", "/js/**", "/icons/**", "/images/**", "/fonts/**",
-                                "/robots.txt", "/sitemap.xml")
+                                "/robots.txt", "/sitemap.xml", "/yandex_7894ecb874a405e5.html")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
