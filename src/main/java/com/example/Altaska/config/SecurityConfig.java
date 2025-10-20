@@ -36,7 +36,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/", "/login", "/registration", "/confirm", "/error", "/confirm-invite",
-                                "/confirm-old", "/confirm-new", "/css/**", "/js/**", "/icons/**", "/images/**", "/fonts/**")
+                                "/confirm-old", "/confirm-new", "/css/**", "/js/**", "/icons/**", "/images/**", "/fonts/**",
+                                "/robots.txt", "/sitemap.xml")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
