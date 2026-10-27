@@ -15,11 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,7 +90,6 @@ public class AttachmentsApiController {
         }
         String fileName = file.getOriginalFilename();
         String contentType = file.getContentType();
-        long maxFileSize = 25L * 1024 * 1024;
 
         if (fileName == null || fileName.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Имя файла не может быть пустым");
@@ -122,9 +121,10 @@ public class AttachmentsApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
         }
         try {
+            OffsetDateTime offsetDateTime = OffsetDateTime.now(ZoneId.systemDefault());
             Attachments attachment = new Attachments();
-            attachment.setUploadedAt(OffsetDateTime.now());
-            attachment.setUploadedAtServer(OffsetDateTime.now());
+            attachment.setUploadedAt(offsetDateTime);
+            attachment.setUploadedAtServer(offsetDateTime);
             attachment.setFileName(file.getOriginalFilename());
             attachment.setFileType(file.getContentType());
             attachment.setUploadedFile(file.getBytes());
@@ -250,39 +250,13 @@ public class AttachmentsApiController {
         return ResponseEntity.ok("Файл удален.");
     }
 
-    public static class FileDto {
-        private Long id;
-        private String fileName;
-        private String fileType;
-        private String uploadedAt;
-        private String uploadedByEmail;
+    public record FileDto(
+            Long id,
+            String fileName,
+            String fileType,
+            String uploadedAt,
+            String uploadedByEmail)
+    {
 
-        public FileDto(Long id, String fileName, String fileType, String uploadedAt, String uploadedByEmail) {
-            this.id = id;
-            this.fileName = fileName;
-            this.fileType = fileType;
-            this.uploadedAt = uploadedAt;
-            this.uploadedByEmail = uploadedByEmail;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public String getFileType() {
-            return fileType;
-        }
-
-        public String getUploadedAt() {
-            return uploadedAt;
-        }
-
-        public  String getUploadedByEmail() {
-            return uploadedByEmail;
-        }
     }
 }

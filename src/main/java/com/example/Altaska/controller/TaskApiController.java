@@ -10,6 +10,8 @@ import com.example.Altaska.services.TaskCleanupService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -137,8 +139,8 @@ public class TaskApiController {
                 task.setIdPriority(priority);
             }
 
-            LocalDate nowDate = LocalDate.now();
-            LocalDateTime nowDateTime = LocalDateTime.now();
+            LocalDate nowDate = LocalDate.now(ZoneId.systemDefault());
+            LocalDateTime nowDateTime = LocalDateTime.now(ZoneId.systemDefault());
             LocalDate createdAtDate = LocalDate.parse(createdAt);
             OffsetDateTime updatedAtOffset = OffsetDateTime.parse(updatedAt);
             task.setCreatedAt(createdAtDate);
@@ -180,7 +182,8 @@ public class TaskApiController {
                     TasksTags tasksTags = new TasksTags();
                     tasksTags.setIdTask(savedTask);
                     tasksTags.setIdTag(tag);
-                    tasksTags.setAddedAtServer(LocalDateTime.now());
+                    LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+                    tasksTags.setAddedAtServer(localDateTime);
                     tasksTagsRepository.save(tasksTags);
                 }
             }
@@ -230,8 +233,10 @@ public class TaskApiController {
         String oldName = task.getName();
         task.setName(name);
         task.setUpdatedBy(principal.getName());
-        task.setUpdatedAtServer(LocalDateTime.now());
-        task.setUpdatedAt(OffsetDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+        task.setUpdatedAtServer(localDateTime);
+        OffsetDateTime offsetDateTime = localDateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime();
+        task.setUpdatedAt(offsetDateTime);
         Tasks updatedTask = tasksRepository.save(task);
 
         if (!oldName.equals(name)) {
@@ -290,8 +295,10 @@ public class TaskApiController {
         String oldDescription = task.getDescription();
         task.setDescription(description);
         task.setUpdatedBy(principal.getName());
-        task.setUpdatedAtServer(LocalDateTime.now());
-        task.setUpdatedAt(OffsetDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+        task.setUpdatedAtServer(localDateTime);
+        OffsetDateTime offsetDateTime =  localDateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime();
+        task.setUpdatedAt(offsetDateTime);
 
         Tasks updatedTask = tasksRepository.save(task);
 
@@ -360,8 +367,10 @@ public class TaskApiController {
         }
 
         task.setUpdatedBy(principal.getName());
-        task.setUpdatedAtServer(LocalDateTime.now());
-        task.setUpdatedAt(OffsetDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+        task.setUpdatedAtServer(localDateTime);
+        OffsetDateTime offsetDateTime =  localDateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime();
+        task.setUpdatedAt(offsetDateTime);
 
         Tasks updatedTask = tasksRepository.save(task);
 
@@ -499,8 +508,10 @@ public class TaskApiController {
         task.setIdPriority(priority);
 
         task.setUpdatedBy(principal.getName());
-        task.setUpdatedAtServer(LocalDateTime.now());
-        task.setUpdatedAt(OffsetDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+        task.setUpdatedAtServer(localDateTime);
+        OffsetDateTime offsetDateTime = OffsetDateTime.now(ZoneId.systemDefault());
+        task.setUpdatedAt(offsetDateTime);
         Tasks updatedTask = tasksRepository.save(task);
 
         String newPriorityName = updatedTask.getIdPriority() != null ? updatedTask.getIdPriority().getName() : null;
@@ -568,10 +579,12 @@ public class TaskApiController {
                 .orElseThrow(() -> new RuntimeException("Статус с таким названием не найден"));
 
         task.setIdStatus(status);
-        task.setStatusChangeAtServer(LocalDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+        task.setStatusChangeAtServer(localDateTime);
         task.setUpdatedBy(principal.getName());
-        task.setUpdatedAtServer(LocalDateTime.now());
-        task.setUpdatedAt(OffsetDateTime.now());
+        task.setUpdatedAtServer(localDateTime);
+        OffsetDateTime offsetDateTime = OffsetDateTime.now(ZoneId.systemDefault());
+        task.setUpdatedAt(offsetDateTime);
 
         Tasks updatedTask = tasksRepository.save(task);
 
@@ -919,7 +932,9 @@ public class TaskApiController {
         }).collect(Collectors.toList());
     }
 
-    public class PerformerDto {
+    @Setter
+    @Getter
+    public static class PerformerDto {
         private Long userId;
         private String email;
 
@@ -928,30 +943,31 @@ public class TaskApiController {
             this.email = email;
         }
 
-        public Long getUserId() { return userId; }
-        public String getEmail() { return email; }
-        public void setUserId(Long userId) { this.userId = userId; }
-        public void setEmail(String email) { this.email = email; }
     }
 
-    public class ProjectDto {
-        private Long id;
+    @Getter
+    public static class ProjectDto {
+        private final Long id;
         public ProjectDto(Long id) {
             this.id = id;
         }
 
-        public Long getId() { return id; }
     }
 
-    public class TaskDto {
-        private Long id;
-        private String name;
-        private String description;
-        private String status;
-        private String priority;
-        private List<PerformerDto> performers;
+    public static class TaskDto {
+        @Getter
+        private final Long id;
+        @Getter
+        private final String name;
+        @Getter
+        private final String description;
+        @Getter
+        private final String status;
+        private final String priority;
+        private final List<PerformerDto> performers;
         private List<String> tags;
-        private ProjectDto idProject;
+        @Getter
+        private final ProjectDto idProject;
 
         public TaskDto(Tasks task, List<PerformerDto> performers, List<String> tags) {
             this.id = task.getId();
@@ -964,13 +980,8 @@ public class TaskApiController {
             this.idProject = new ProjectDto(task.getIdProject().getId());
         }
 
-        public Long getId() { return id; }
-        public String getName() { return name; }
-        public String getDescription() { return description; }
-        public String getStatus() { return status; }
         public String getPriority() { return priority; }
         public List<PerformerDto> getPerformers() { return performers; }
-        public ProjectDto getIdProject() { return idProject; }
     }
 
     @GetMapping("/project/{projectId}/performers-map")

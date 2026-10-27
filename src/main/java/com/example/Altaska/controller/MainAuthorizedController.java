@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -35,7 +34,7 @@ public class MainAuthorizedController {
 
 
     @GetMapping("/mainauthorized")
-    public String ShowLogin(Model model, Principal principal) {
+    public String showLogin(Model model, Principal principal) {
         if (principal != null) {
             String email = principal.getName();
             Optional<Users> currentUserOpt = userRepository.findByEmail(email);

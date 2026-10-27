@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -332,7 +333,8 @@ public class ProjectApiController {
         member.setConfirmed(false);
         member.setConfirmationToken(token);
         member.setAddedAt(LocalDate.parse(clientDate));
-        member.setAddedAtServer(LocalDate.now());
+        LocalDate localDate = LocalDate.now(ZoneId.systemDefault());
+        member.setAddedAtServer(localDate);
         member.setInvitedBy(inviter.getEmail());
         member.setInviteeEmail(email);
         projectMembersRepository.save(member);

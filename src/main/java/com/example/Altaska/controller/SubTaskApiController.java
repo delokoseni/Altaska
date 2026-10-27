@@ -2,6 +2,7 @@ package com.example.Altaska.controller;
 
 import com.example.Altaska.dto.Change;
 import com.example.Altaska.services.ActivityLogService;
+import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import com.example.Altaska.models.Users;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,8 +73,9 @@ public class SubTaskApiController {
             }
             subTask.setName(dto.getName());
             subTask.setDescription(dto.getDescription());
-            subTask.setCreatedAt(LocalDate.now());
-            subTask.setCreatedAtServer(LocalDate.now());
+            LocalDate localDate = LocalDate.now(ZoneId.systemDefault());
+            subTask.setCreatedAt(localDate);
+            subTask.setCreatedAtServer(localDate);
             SubTasks savedSubTask = subTasksRepository.save(subTask);
             saved.add(savedSubTask);
             activityLogService.logActivity(
@@ -94,20 +97,13 @@ public class SubTaskApiController {
 
     @GetMapping
     public List<SubTasks> getSubtasks(@PathVariable Long taskId, Principal principal) {
-        Tasks task = tasksRepository.findById(taskId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
-
-        Users user = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
         return subTasksRepository.findByIdTask_Id(taskId);
     }
 
+    @Getter
     public static class SubTaskDTO {
         private String name;
         private String description;
-
-        public String getName() { return name; }
-        public String getDescription() { return description; }
     }
 
     @PutMapping("/{subtaskId}")

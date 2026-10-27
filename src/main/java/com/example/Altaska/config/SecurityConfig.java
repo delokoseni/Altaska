@@ -29,6 +29,7 @@ public class SecurityConfig {
 
 
     public SecurityConfig() {
+        // TODO document why this constructor is empty
     }
 
     @Bean

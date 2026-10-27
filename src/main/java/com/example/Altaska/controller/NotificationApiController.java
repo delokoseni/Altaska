@@ -29,7 +29,7 @@ public class NotificationApiController {
     @Autowired
     private TasksRepository tasksRepository;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     @GetMapping
     public ResponseEntity<List<NotificationDto>> getNotifications(Principal principal) {

@@ -9,11 +9,12 @@ import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.NotificationService;
 import com.example.Altaska.services.PermissionService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.OffsetDateTime;
@@ -221,52 +222,16 @@ public class CommentApiController {
         return ResponseEntity.ok().build();
     }
 
+    @Setter
+    @Getter
     public static class CommentRequest {
         private Long taskId;
         private String content;
-
-        public Long getTaskId() {
-            return taskId;
-        }
-
-        public void setTaskId(Long taskId) {
-            this.taskId = taskId;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
     }
 
-    public static class CommentDto {
-        private Long id;
-        private String authorName;
-        private String text;
-        private String createdAt;
-
-        public CommentDto(Long id, String authorName, String text, String createdAt) {
-            this.id = id;
-            this.authorName = authorName;
-            this.text = text;
-            this.createdAt = createdAt;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getAuthorName() {
-            return authorName;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public  String getCreatedAt() {return  createdAt; }
-    }
+    public record CommentDto(
+            Long id,
+            String authorName,
+            String text,
+            String createdAt) { }
 }

@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -100,7 +101,8 @@ public class GanttController {
 
                         taskDependenciesRepository.save(dependency);
                     } else {
-                        System.out.println("Неверный формат зависимости: " + dep);
+                        Logger logger = Logger.getLogger(getClass().getName());
+                        logger.info("Неверный формат зависимости: " + dep);
                     }
                 }
             }
@@ -153,14 +155,6 @@ public class GanttController {
     @Data
     public static class GanttDataDTO {
         private List<TaskDTO> tasks;
-
-        public List<TaskDTO> getTasks() {
-            return tasks;
-        }
-
-        public void setTasks(List<TaskDTO> tasks) {
-            this.tasks = tasks;
-        }
     }
 
     @Data
@@ -170,46 +164,6 @@ public class GanttController {
         private LocalDateTime startTime;
         private LocalDateTime deadline;
         private String dependencies;
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public LocalDateTime getStartTime() {
-            return startTime;
-        }
-
-        public void setStartTime(LocalDateTime startTime) {
-            this.startTime = startTime;
-        }
-
-        public LocalDateTime getDeadline() {
-            return deadline;
-        }
-
-        public void setDeadline(LocalDateTime deadline) {
-            this.deadline = deadline;
-        }
-
-        public String getDependencies() {
-            return dependencies;
-        }
-
-        public void setDependencies(String dependencies) {
-            this.dependencies = dependencies;
-        }
     }
 
 }

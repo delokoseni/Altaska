@@ -16,7 +16,7 @@ public class LoginController {
     public  LoginController() { }
 
     @GetMapping({"/login"})
-    public String ShowLogin(HttpServletRequest request, Model model) {
+    public String showLogin(HttpServletRequest request, Model model) {
         model.addAttribute("request", request);
         return "login";
     }
