@@ -1,14 +1,20 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "task_performers")
 public class TaskPerformers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne
@@ -21,32 +27,4 @@ public class TaskPerformers {
 
     @Column(name = "added_at_server", nullable = false)
     private OffsetDateTime addedAtServer;
-
-    public Long getId() {
-        return id;
-    }
-
-    public Tasks getIdTask() {
-        return idTask;
-    }
-
-    public Users getIdUser() {
-        return idUser;
-    }
-
-    public OffsetDateTime getAddedAtServer() {
-        return addedAtServer;
-    }
-
-    public void setIdTask(Tasks idTask) {
-        this.idTask = idTask;
-    }
-
-    public void setIdUser(Users idUser) {
-        this.idUser = idUser;
-    }
-
-    public void setAddedAtServer(OffsetDateTime addedAtServer) {
-        this.addedAtServer = addedAtServer;
-    }
 }

@@ -47,7 +47,7 @@ public class ActivityLogService {
             for (Change change : changes) {
                 ObjectNode changeNode = objectMapper.createObjectNode();
                 changeNode.put("field", change.getField());
-                changeNode.putPOJO("old", change.getOld());
+                changeNode.putPOJO("old", change.getOldValue());
                 changeNode.putPOJO("new", change.getNewValue());
                 changesArray.add(changeNode);
             }

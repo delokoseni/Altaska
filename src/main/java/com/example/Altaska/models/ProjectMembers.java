@@ -1,13 +1,20 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "project_members")
 public class ProjectMembers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne
@@ -39,76 +46,4 @@ public class ProjectMembers {
 
     @Column(name = "inviteeEmail", length = 254, nullable = false)
     private String inviteeEmail;
-
-    public Long getId() {
-        return id;
-    }
-
-    public Users getIdUser() {
-        return idUser;
-    }
-
-    public Projects getIdProject() {
-        return idProject;
-    }
-
-    public LocalDate getAddedAt() {
-        return addedAt;
-    }
-
-    public Roles getIdRole() {
-        return idRole;
-    }
-
-    public boolean getConfirmed() {
-        return confirmed;
-    }
-
-    public String getConfirmationToken() {
-        return confirmationToken;
-    }
-
-    public LocalDate getAddedAtServer() {
-        return addedAtServer;
-    }
-
-    public String getInvitedBy() {
-        return invitedBy;
-    }
-
-    public String getInviteeEmail() {return inviteeEmail; }
-
-    public void setIdUser(Users idUser) {
-        this.idUser = idUser;
-    }
-
-    public void setIdProject(Projects idProject) {
-        this.idProject = idProject;
-    }
-
-    public void setAddedAt(LocalDate addedAt) {
-        this.addedAt = addedAt;
-    }
-
-    public void setIdRole(Roles idRole) {
-        this.idRole = idRole;
-    }
-
-    public void setConfirmed(boolean confirmed) {
-        this.confirmed = confirmed;
-    }
-
-    public void setConfirmationToken(String confirmationToken) {
-        this.confirmationToken = confirmationToken;
-    }
-
-    public void setAddedAtServer(LocalDate addedAtServer) {
-        this.addedAtServer = addedAtServer;
-    }
-
-    public void setInvitedBy(String invitedBy) {
-        this.invitedBy = invitedBy;
-    }
-
-    public void setInviteeEmail(String inviteeEmail) { this.inviteeEmail = inviteeEmail;}
 }

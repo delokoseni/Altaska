@@ -36,7 +36,7 @@ public class PermissionService {
             return false;
         }
         ProjectMembers member = memberOpt.get();
-        if (!member.getConfirmed()) {
+        if (!member.isConfirmed()) {
             return false;
         }
         Roles role = member.getIdRole();
@@ -51,7 +51,7 @@ public class PermissionService {
     }
 
     public boolean checkIfProjectArchived(Projects project) {
-        if (project.getIsArchived()) {
+        if (project.isArchived()) {
             return true;
         }
         return false;

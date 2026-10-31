@@ -103,7 +103,7 @@ public class RoleApiController {
                 .map(role -> new RoleDto(
                         role.getId(),
                         role.getName(),
-                        role.getIsCustom(),
+                        role.isCustom(),
                         role.getPermissions(),
                         role.getIdProject() != null ? role.getIdProject().getId() : null
                 ))
@@ -144,7 +144,7 @@ public class RoleApiController {
         Roles newRole = new Roles();
         newRole.setName(request.name);
         newRole.setPermissions(request.permissions);
-        newRole.setIsCustom(true);
+        newRole.setCustom(true);
         newRole.setIdProject(projectOpt.get());
 
         Roles savedRole = rolesRepository.save(newRole);
@@ -162,7 +162,7 @@ public class RoleApiController {
         return ResponseEntity.ok(new RoleDto(
                 savedRole.getId(),
                 savedRole.getName(),
-                savedRole.getIsCustom(),
+                savedRole.isCustom(),
                 savedRole.getPermissions(),
                 savedRole.getIdProject() != null ? savedRole.getIdProject().getId() : null
         ));
@@ -280,7 +280,7 @@ public class RoleApiController {
         return ResponseEntity.ok(new RoleDto(
                 updatedRole.getId(),
                 updatedRole.getName(),
-                updatedRole.getIsCustom(),
+                updatedRole.isCustom(),
                 updatedRole.getPermissions(),
                 updatedRole.getIdProject() != null ? updatedRole.getIdProject().getId() : null
         ));

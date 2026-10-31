@@ -1,16 +1,22 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tasks")
 public class Tasks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "name", length = 50, nullable = false)
@@ -61,128 +67,4 @@ public class Tasks {
 
     @Column(name = "start_time_server")
     private LocalDateTime startTimeServer;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public Statuses getIdStatus() {
-        return idStatus;
-    }
-
-    public Priorities getIdPriority() {
-        return idPriority;
-    }
-
-    public Users getIdCreator() {
-        return idCreator;
-    }
-
-    public Long getTimeSpent() {
-        return timeSpent;
-    }
-
-    public Projects getIdProject() {
-        return idProject;
-    }
-
-    public LocalDate getCreatedAtServer() {
-        return createdAtServer;
-    }
-
-    public LocalDateTime getUpdatedAtServer() {
-        return updatedAtServer;
-    }
-
-    public LocalDateTime getDeadlineServer() {
-        return deadlineServer;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public LocalDateTime getStatusChangeAtServer() {
-        return statusChangeAtServer;
-    }
-
-    public LocalDateTime getStartTimeServer() {
-        return startTimeServer;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setIdStatus(Statuses idStatus) {
-        this.idStatus = idStatus;
-    }
-
-    public void setIdPriority(Priorities idPriority) {
-        this.idPriority = idPriority;
-    }
-
-    public void setIdCreator(Users idCreator) {
-        this.idCreator = idCreator;
-    }
-
-    public void setTimeSpent(Long timeSpent) {
-        this.timeSpent = timeSpent;
-    }
-
-    public void setIdProject(Projects idProject) {
-        this.idProject = idProject;
-    }
-
-    public void setCreatedAtServer(LocalDate createdAtServer) {
-        this.createdAtServer = createdAtServer;
-    }
-
-    public void setUpdatedAtServer(LocalDateTime updatedAtServer) {
-        this.updatedAtServer = updatedAtServer;
-    }
-
-    public void setDeadlineServer(LocalDateTime deadlineServer) {
-        this.deadlineServer = deadlineServer;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public void setStatusChangeAtServer(LocalDateTime statusChangeAtServer) {
-        this.statusChangeAtServer = statusChangeAtServer;
-    }
-
-    public void setStartTimeServer(LocalDateTime startTimeServer) {
-        this.startTimeServer = startTimeServer;
-    }
 }

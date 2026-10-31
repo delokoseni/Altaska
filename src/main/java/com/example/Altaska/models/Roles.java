@@ -3,13 +3,19 @@ package com.example.Altaska.models;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "roles")
 public class Roles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "is_custom", nullable = false)
@@ -25,41 +31,4 @@ public class Roles {
     @ManyToOne
     @JoinColumn(name = "id_project", referencedColumnName = "id")
     private Projects idProject;
-
-    public Long getId() {
-        return id;
-    }
-
-    public boolean getIsCustom() {
-        return isCustom;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public JsonNode getPermissions() {
-        return permissions;
-    }
-
-
-    public Projects getIdProject() {
-        return idProject;
-    }
-
-    public void setIsCustom(boolean isCustom) {
-        this.isCustom = isCustom;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPermissions(JsonNode permissions) {
-        this.permissions = permissions;
-    }
-
-    public void setIdProject(Projects idProject) {
-        this.idProject = idProject;
-    }
 }

@@ -1,12 +1,18 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tasks_dependencies")
 public class TasksDependencies {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "type", length = 50, nullable = false)
@@ -22,40 +28,4 @@ public class TasksDependencies {
 
     @Column(name = "lag")
     private Double lag;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public Tasks getIdFromTask() {
-        return idFromTask;
-    }
-
-    public Tasks getIdToTask() {
-        return idToTask;
-    }
-
-    public Double getLag() {
-        return lag;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setIdFromTask(Tasks idFromTask) {
-        this.idFromTask = idFromTask;
-    }
-
-    public void setIdToTask(Tasks idToTask) {
-        this.idToTask = idToTask;
-    }
-
-    public void setLag(Double lag) {
-        this.lag = lag;
-    }
 }

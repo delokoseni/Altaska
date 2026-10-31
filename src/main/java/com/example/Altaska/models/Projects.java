@@ -1,15 +1,22 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "projects")
 public class Projects {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "name", length = 128, nullable = false)
@@ -39,80 +46,4 @@ public class Projects {
     @ManyToOne
     @JoinColumn(name = "id_owner", referencedColumnName = "id")
     private Users idOwner;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public boolean getIsArchived() {
-        return isArchived;
-    }
-
-    public LocalDate getCreatedAtServer() {
-        return createdAtServer;
-    }
-
-    public OffsetTime getUpdatedAtServer() {
-        return updatedAtServer;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public Users getIdOwner() {
-        return idOwner;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setIsArchived(boolean isArchived) {
-        this.isArchived = isArchived;
-    }
-
-    public void setCreatedAtServer(LocalDate createdAtServer) {
-        this.createdAtServer = createdAtServer;
-    }
-
-    public void setUpdatedAtServer(OffsetTime updatedAtServer) {
-        this.updatedAtServer = updatedAtServer;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public void setIdOwner(Users idOwner) {
-        this.idOwner = idOwner;
-    }
 }

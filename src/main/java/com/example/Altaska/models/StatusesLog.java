@@ -1,14 +1,20 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "statuses_log")
 public class StatusesLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "change_at", nullable = false)
@@ -24,38 +30,4 @@ public class StatusesLog {
 
     @Column(name = "new_status", nullable = false)
     private String newStatus;
-
-    public Long getId() {
-        return id;
-    }
-
-    public OffsetDateTime getChangeAt() {
-        return changeAt;
-    }
-
-    public Users getIdUser() {
-        return idUser;
-    }
-
-    public Tasks getIdTask() {
-        return idTask;
-    }
-
-    public String getNewStatus() {
-        return newStatus;
-    }
-
-    public void setChangeAt(OffsetDateTime changeAt) {
-        this.changeAt = changeAt;
-    }
-
-    public void setIdUser(Users idUser) {
-        this.idUser = idUser;
-    }
-
-    public void setIdTask(Tasks idTask) {
-        this.idTask = idTask;
-    }
-
-    public void  setNewStatus(String newStatus) { this.newStatus = newStatus; }
 }

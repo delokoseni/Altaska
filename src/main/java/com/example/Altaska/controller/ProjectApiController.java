@@ -127,7 +127,7 @@ public class ProjectApiController {
             Map<String, Object> map = new HashMap<>();
             map.put("userId", member.getIdUser().getId());
             map.put("email", member.getIdUser().getEmail());
-            map.put("confirmed", member.getConfirmed());
+            map.put("confirmed", member.isConfirmed());
 
             Roles role = member.getIdRole();
             if (role != null) {
@@ -181,11 +181,11 @@ public class ProjectApiController {
         }
 
         boolean newStatus = payload.getOrDefault("archived", false);
-        boolean oldStatus = project.getIsArchived();
+        boolean oldStatus = project.isArchived();
 
         if (newStatus != oldStatus) {
             List<Change> changes = List.of(new Change("archived", oldStatus, newStatus));
-            project.setIsArchived(newStatus);
+            project.setArchived(newStatus);
             projectsRepository.save(project);
 
             activityLogService.logActivity(

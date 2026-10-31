@@ -1,12 +1,18 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tags")
 public class Tags {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "name", length = 20, nullable = false)
@@ -15,24 +21,4 @@ public class Tags {
     @ManyToOne
     @JoinColumn(name = "id_project", referencedColumnName = "id")
     private Projects idProject;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Projects getIdProject() {
-        return idProject;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setIdProject(Projects idProject) {
-        this.idProject = idProject;
-    }
 }

@@ -1,16 +1,20 @@
 package com.example.Altaska.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
-@Table(
-        name = "users"
-)
+@Table(name = "users")
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "email", unique = true, nullable = false)
@@ -55,79 +59,5 @@ public class Users {
 
     @Column(name = "new_password")
     private String newPassword;
-
-    public Long getId() { return id; }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public boolean getConfirmed() { return confirmed; }
-
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public String getConfirmationToken() { return confirmationToken; }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
-    public void setConfirmed(boolean confirmed) { this.confirmed = confirmed; }
-
-    public void setConfirmationToken(String confirmationToken) { this.confirmationToken = confirmationToken; }
-
-    public String getPasswordResetToken() { return passwordResetToken; }
-
-    public void setPasswordResetToken(String passwordResetToken) { this.passwordResetToken = passwordResetToken; }
-
-    public LocalDateTime getPasswordResetTokenExpiresAt() { return passwordResetTokenExpiresAt; }
-
-    public void setPasswordResetTokenExpiresAt(LocalDateTime passwordResetTokenExpiresAt) { this.passwordResetTokenExpiresAt = passwordResetTokenExpiresAt; }
-
-    public String getOldEmailChangeToken() { return oldEmailChangeToken; }
-
-    public void setOldEmailChangeToken(String oldEmailChangeToken) { this.oldEmailChangeToken = oldEmailChangeToken; }
-
-    public LocalDateTime getOldEmailChangeTokenExpiresAt() { return oldEmailChangeTokenExpiresAt; }
-
-    public void setOldEmailChangeTokenExpiresAt(LocalDateTime oldEmailChangeTokenExpiresAt) { this.oldEmailChangeTokenExpiresAt = oldEmailChangeTokenExpiresAt; }
-
-    public String getNewEmail() { return newEmail; }
-
-    public void setNewEmail(String newEmail) { this.newEmail = newEmail; }
-
-    public String getNewEmailChangeToken() { return newEmailChangeToken; }
-
-    public void setNewEmailChangeToken(String newEmailChangeToken) { this.newEmailChangeToken = newEmailChangeToken; }
-
-    public LocalDateTime getNewEmailChangeTokenExpiresAt() { return newEmailChangeTokenExpiresAt; }
-
-    public void setNewEmailChangeTokenExpiresAt(LocalDateTime newEmailChangeTokenExpiresAt) { this.newEmailChangeTokenExpiresAt = newEmailChangeTokenExpiresAt; }
-
-    public Boolean getEmailChangeStatus() { return emailChangeStatus; }
-
-    public void setEmailChangeStatus(Boolean emailChangeStatus) { this.emailChangeStatus = emailChangeStatus; }
 
 }
