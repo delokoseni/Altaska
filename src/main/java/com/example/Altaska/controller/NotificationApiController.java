@@ -7,7 +7,7 @@ import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.NotificationsRepository;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,16 +18,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/notifications")
+@RequiredArgsConstructor
 public class NotificationApiController {
 
-    @Autowired
-    private NotificationsRepository notificationsRepository;
+    private final NotificationsRepository notificationsRepository;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 

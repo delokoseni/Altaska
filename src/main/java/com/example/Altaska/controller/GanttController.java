@@ -11,7 +11,7 @@ import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,22 +29,18 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/gantt")
+@RequiredArgsConstructor
 public class GanttController {
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private TaskDependenciesRepository taskDependenciesRepository;
+    private final TaskDependenciesRepository taskDependenciesRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
     @Transactional
     @PostMapping("/save")

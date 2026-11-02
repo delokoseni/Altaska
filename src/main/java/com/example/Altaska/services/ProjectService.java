@@ -5,7 +5,7 @@ import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,12 +14,12 @@ import java.time.OffsetTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectService {
-    @Autowired
-    private ProjectsRepository projectsRepo;
 
-    @Autowired
-    private ProjectMembersRepository membersRepo;
+    private final ProjectsRepository projectsRepo;
+
+    private final ProjectMembersRepository membersRepo;
 
     public List<Projects> getAllUserProjects(Users user) {
         Set<Projects> allProjects = new LinkedHashSet<>();

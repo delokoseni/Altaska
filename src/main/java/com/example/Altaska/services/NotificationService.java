@@ -4,7 +4,6 @@ import com.example.Altaska.models.Notifications;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.NotificationsRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -14,8 +13,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    @Autowired
-    private NotificationsRepository notificationsRepository;
+    private final NotificationsRepository notificationsRepository;
 
     public void notifyUsers(Set<Users> recipients, String type, String relatedEntityType, Long relatedEntityId, Users initiator, String content) {
         OffsetDateTime now = OffsetDateTime.now();

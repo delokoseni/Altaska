@@ -4,7 +4,7 @@ import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.ProjectMembers;
 import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.services.ActivityLogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,13 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class InviteController {
 
-    @Autowired
-    private ProjectMembersRepository projectMembersRepository;
+    private final ProjectMembersRepository projectMembersRepository;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
     @GetMapping("/confirm-invite")
     public String confirmInvite(@RequestParam String token, Model model) {

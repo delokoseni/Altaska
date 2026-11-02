@@ -9,7 +9,7 @@ import com.example.Altaska.security.CustomUserDetails;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.NotificationService;
 import com.example.Altaska.services.PermissionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -28,28 +28,22 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/files")
+@RequiredArgsConstructor
 public class AttachmentsApiController {
 
-    @Autowired
-    private AttachmentsRepository attachmentsRepository;
+    private final AttachmentsRepository attachmentsRepository;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
-    @Autowired
-    private TaskPerformersRepository taskPerformersRepository;
+    private final TaskPerformersRepository taskPerformersRepository;
 
     @GetMapping("/task/{taskId}")
     public ResponseEntity<?> getFilesByTask(@PathVariable Long taskId) {
@@ -217,7 +211,7 @@ public class AttachmentsApiController {
         if (!(principal instanceof CustomUserDetails userDetails)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не аутентифицирован.");
         }
-        Long currentUserId = userDetails.GetUserId();
+        Long currentUserId = userDetails.getId();
         if (!file.getIdUser().getId().equals(currentUserId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не можете удалить этот файл.");
         }

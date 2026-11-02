@@ -6,22 +6,19 @@ import com.example.Altaska.models.Roles;
 import com.example.Altaska.repositories.ProjectMembersRepository;
 import com.example.Altaska.repositories.ProjectsRepository;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PermissionService {
 
-    @Autowired
-    private ProjectMembersRepository projectMembersRepository;
+    private final ProjectMembersRepository projectMembersRepository;
 
-    @Autowired
-    private ProjectsRepository projectsRepository;
+    private final ProjectsRepository projectsRepository;
 
     public boolean hasPermission(Long userId, Long projectId, String action) {
         Optional<Projects> project = projectsRepository.findById(projectId);
@@ -51,10 +48,7 @@ public class PermissionService {
     }
 
     public boolean checkIfProjectArchived(Projects project) {
-        if (project.isArchived()) {
-            return true;
-        }
-        return false;
+        return project.isArchived();
     }
 
 }

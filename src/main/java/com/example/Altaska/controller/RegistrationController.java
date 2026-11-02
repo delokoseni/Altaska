@@ -6,7 +6,7 @@ import com.example.Altaska.repositories.UserTypeRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.validators.EmailValidator;
 import com.example.Altaska.validators.PasswordValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,17 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class RegistrationController {
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private UserTypeRepository userTypeRepository;
+    private final UserTypeRepository userTypeRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    public RegistrationController() { }
 
     @GetMapping({"/registration"})
     public String showRegistration() { return "registration"; }
@@ -51,13 +48,13 @@ public class RegistrationController {
             return "registration";
         }
 
-        if (!EmailValidator.isValidLength(email)) {
+        if (EmailValidator.isValidLength(email)) {
             model.addAttribute("error", "Email не должен превышать "
                     + EmailValidator.getMaxEmailLength() + " символов!");
             return "registration";
         }
 
-        if (!EmailValidator.isValidFormat(email)) {
+        if (EmailValidator.isValidFormat(email)) {
             model.addAttribute("error", "Введите корректный адрес электронной почты!");
             return "registration";
         }

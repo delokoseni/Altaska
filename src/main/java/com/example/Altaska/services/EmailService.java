@@ -3,6 +3,8 @@ package com.example.Altaska.services;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
+import java.util.logging.Logger;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +22,7 @@ public class EmailService {
 
         Session session = Session.getInstance(props,
                 new jakarta.mail.Authenticator() {
+                    @Override
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(username, password);
                     }
@@ -32,7 +35,8 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(body);
             Transport.send(message);
-            System.out.println("Email sent successfully");
+            Logger logger = Logger.getLogger(EmailService.class.getName());
+            logger.info("Email sent successfully");
         } catch (MessagingException e) {
             e.printStackTrace();
         }

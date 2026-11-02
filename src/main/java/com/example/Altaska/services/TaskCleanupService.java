@@ -1,33 +1,27 @@
 package com.example.Altaska.services;
 
 import com.example.Altaska.repositories.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class TaskCleanupService {
 
-    @Autowired
-    private CommentsRepository commentsRepository;
+    private final CommentsRepository commentsRepository;
 
-    @Autowired
-    private SubTasksRepository subtasksRepository;
+    private final SubTasksRepository subtasksRepository;
 
-    @Autowired
-    private TasksTagsRepository tasksTagsRepository;
+    private final TasksTagsRepository tasksTagsRepository;
 
-    @Autowired
-    private TaskPerformersRepository taskPerformersRepository;
+    private final TaskPerformersRepository taskPerformersRepository;
 
-    @Autowired
-    private StatusesLogRepository statusesLogRepository;
+    private final StatusesLogRepository statusesLogRepository;
 
-    @Autowired
-    private AttachmentsRepository attachmentsRepository;
+    private final AttachmentsRepository attachmentsRepository;
 
-    @Autowired
-    private TaskDependenciesRepository taskDependenciesRepository;
+    private final TaskDependenciesRepository taskDependenciesRepository;
 
     @Transactional
     public void deleteTaskDependencies(Long taskId) {

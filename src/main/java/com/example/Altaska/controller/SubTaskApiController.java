@@ -3,13 +3,13 @@ package com.example.Altaska.controller;
 import com.example.Altaska.dto.Change;
 import com.example.Altaska.services.ActivityLogService;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.example.Altaska.repositories.TasksRepository;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.repositories.SubTasksRepository;
@@ -26,22 +26,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks/{taskId}/subtasks")
+@RequiredArgsConstructor
 public class SubTaskApiController {
 
-    @Autowired
-    private SubTasksRepository subTasksRepository;
+    private final SubTasksRepository subTasksRepository;
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
     @PostMapping
     public ResponseEntity<?> createSubtasks(@PathVariable Long taskId,

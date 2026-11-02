@@ -12,7 +12,7 @@ import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,25 +23,20 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/projects/{projectId}/roles")
+@RequiredArgsConstructor
 public class RoleApiController {
 
-    @Autowired
-    private RolesRepository rolesRepository;
+    private final RolesRepository rolesRepository;
 
-    @Autowired
-    private ProjectsRepository projectsRepository;
+    private final ProjectsRepository projectsRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
-    @Autowired
-    private ProjectMembersRepository projectMembersRepository;
+    private final ProjectMembersRepository projectMembersRepository;
 
     private static final Map<String, String> PERMISSION_LABELS = Map.ofEntries(
             Map.entry("add_task_tags", "Добавление тегов к задаче"),

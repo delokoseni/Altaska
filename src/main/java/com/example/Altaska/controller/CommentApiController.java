@@ -10,8 +10,8 @@ import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.NotificationService;
 import com.example.Altaska.services.PermissionService;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,33 +23,22 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/comments")
+@RequiredArgsConstructor
 public class CommentApiController {
 
-    @Autowired
     private final CommentsRepository commentsRepository;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
-    @Autowired
-    private TaskPerformersRepository taskPerformersRepository;
-
-    @Autowired
-    public CommentApiController(CommentsRepository commentsRepository) {
-        this.commentsRepository = commentsRepository;
-    }
+    private final TaskPerformersRepository taskPerformersRepository;
 
     @GetMapping("/task/{taskId}")
     public List<CommentDto> getCommentsByTask(@PathVariable Long taskId) {

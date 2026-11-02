@@ -1,19 +1,18 @@
 package com.example.Altaska.controller;
 
-import com.example.Altaska.models.StatusesLog;
 import com.example.Altaska.repositories.StatusesLogRepository;
 import com.example.Altaska.dto.StatusLogDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/statuses-log")
+@RequiredArgsConstructor
 public class StatusesLogApiController {
 
-    @Autowired
-    private StatusesLogRepository statusesLogRepository;
+    private final StatusesLogRepository statusesLogRepository;
 
     @GetMapping("/task/{taskId}")
     public List<StatusLogDto> getStatusLogsByTask(@PathVariable Long taskId) {

@@ -5,24 +5,22 @@ import com.example.Altaska.models.ActivityLog;
 import com.example.Altaska.models.Projects;
 import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.ActivityLogRepository;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ActivityLogService {
 
-    @Autowired
-    private ActivityLogRepository activityLogRepository;
+    private final ActivityLogRepository activityLogRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public void logActivity(
             Users user,

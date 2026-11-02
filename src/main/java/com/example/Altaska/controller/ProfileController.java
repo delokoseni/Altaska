@@ -6,8 +6,8 @@ import com.example.Altaska.security.CustomUserDetails;
 import com.example.Altaska.services.EmailService;
 import com.example.Altaska.validators.EmailValidator;
 import com.example.Altaska.validators.PasswordValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +30,12 @@ import java.util.UUID;
 
 
 @Controller
+@RequiredArgsConstructor
 public class ProfileController {
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
     @GetMapping("/profile")
     public String getProfile(Model model, Principal principal) {
@@ -56,7 +55,7 @@ public class ProfileController {
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        Long userId = userDetails.GetUserId();
+        Long userId = userDetails.getId();
         Users user = usersRepository.findById(userId).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователь не найден");
@@ -68,11 +67,11 @@ public class ProfileController {
 
         newEmail = newEmail.trim();
 
-        if (!EmailValidator.isValidLength(newEmail)) {
+        if (EmailValidator.isValidLength(newEmail)) {
             return ResponseEntity.badRequest().body("Email слишком длинный");
         }
 
-        if (!EmailValidator.isValidFormat(newEmail)) {
+        if (EmailValidator.isValidFormat(newEmail)) {
             return ResponseEntity.badRequest().body("Неверный формат email");
         }
 
@@ -189,7 +188,7 @@ public class ProfileController {
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        Long userId = userDetails.GetUserId();
+        Long userId = userDetails.getId();
         Users user = usersRepository.findById(userId).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователь не найден");

@@ -11,7 +11,7 @@ import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,25 +22,20 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tags")
+@RequiredArgsConstructor
 public class TagApiController {
 
-    @Autowired
-    private TagsRepository tagsRepository;
+    private final TagsRepository tagsRepository;
 
-    @Autowired
-    private ProjectsRepository projectsRepository;
+    private final ProjectsRepository projectsRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
-    @Autowired
-    private TasksTagsRepository tasksTagsRepository;
+    private final TasksTagsRepository tasksTagsRepository;
 
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<Tags>> getTagsByProject(@PathVariable Long projectId) {

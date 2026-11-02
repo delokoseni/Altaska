@@ -10,7 +10,7 @@ import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.*;
 import com.example.Altaska.validators.EmailValidator;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,46 +24,37 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/projects")
+@RequiredArgsConstructor
 public class ProjectApiController {
 
-    @Autowired
-    private ProjectsRepository projectsRepository;
+    private final ProjectsRepository projectsRepository;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private ProjectMembersRepository projectMembersRepository;
+    private final ProjectMembersRepository projectMembersRepository;
 
-    @Autowired
-    private RolesRepository rolesRepository;
+    private final RolesRepository rolesRepository;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private TasksTagsRepository tasksTagsRepository;
+    private final TagsRepository tagsRepository;
 
-    @Autowired
-    private TagsRepository tagsRepository;
+    private final TaskCleanupService taskCleanupService;
 
-    @Autowired
-    private TaskCleanupService taskCleanupService;
+    private final ActivityLogService activityLogService;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogRepository activityLogRepository;
 
-    @Autowired
-    private ActivityLogRepository activityLogRepository;
+    private final NotificationService notificationService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private static final String USER_NOT_FOUND = "Пользователь не найден";
+    private static final String ACCESS_DENIED = "Недостаточно прав";
+    private static final String PROJECT_NOT_FOUND = "Проект не найден";
+    private static final String PROJECT_ARCHIVED = "Проект архивирован и не может быть изменён";
 
     @GetMapping("/{id}")
     public ResponseEntity<Projects> getProjectById(@PathVariable Long id) {
@@ -77,14 +68,14 @@ public class ProjectApiController {
                                            @RequestParam(required = false) String name,
                                            @RequestParam(required = false) String description,
                                            Principal principal) {
-        Projects project = projectsRepository.findById(id).orElseThrow(() -> new RuntimeException("Проект не найден"));
+        Projects project = projectsRepository.findById(id).orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
         Users user = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
         if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_project_title_description")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED);
         }
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(PROJECT_ARCHIVED);
 
         List<Change> changes = new ArrayList<>();
         if (name != null && !name.equals(project.getName())) {
@@ -147,7 +138,7 @@ public class ProjectApiController {
     @GetMapping("/{id}/confirmed-members")
     public ResponseEntity<?> getConfirmedMembersWithOwner(@PathVariable Long id) {
         Projects project = projectsRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Проект не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, PROJECT_NOT_FOUND));
 
         List<ProjectMembers> members = projectMembersRepository.findByIdProjectIdAndConfirmedTrue(id);
 
@@ -156,12 +147,11 @@ public class ProjectApiController {
                 .collect(Collectors.toSet());
         users.add(project.getIdOwner());
 
-        List<Map<String, Object>> result = users.stream().map(user -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("userId", user.getId());
-            map.put("email", user.getEmail());
-            return map;
-        }).collect(Collectors.toList());
+        List<Map<String, Object>> result = users.stream()
+                .map(user -> Map.<String, Object>of(
+                        "userId", user.getId(),
+                        "email", user.getEmail()))
+                .toList();
 
         return ResponseEntity.ok(result);
     }
@@ -171,13 +161,13 @@ public class ProjectApiController {
                                                  @RequestBody Map<String, Boolean> payload,
                                                  Principal principal) {
         Projects project = projectsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+                .orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 
         Users user = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         if (!permissionService.hasPermission(user.getId(), project.getId(), "archive_project")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED);
         }
 
         boolean newStatus = payload.getOrDefault("archived", false);
@@ -210,21 +200,21 @@ public class ProjectApiController {
         Long newRoleId = body.get("roleId");
 
         Projects project = projectsRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+                .orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 
         Users currentUser = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         if (Objects.equals(currentUser.getId(), userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не можете поменять свою роль.");
         }
 
         if (!permissionService.hasPermission(currentUser.getId(), project.getId(), "change_user_roles")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED);
         }
 
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(PROJECT_ARCHIVED);
 
         ProjectMembers member = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, userId)
                 .orElseThrow(() -> new RuntimeException("Участник не найден"));
@@ -282,28 +272,28 @@ public class ProjectApiController {
                                           @RequestParam String clientDate,
                                           Principal principal) {
 
-        if (!EmailValidator.isValidLength(email)) {
+        if (EmailValidator.isValidLength(email)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Превышена максимальная длина электронной почты: " + EmailValidator.getMaxEmailLength());
         }
 
-        if (!EmailValidator.isValidFormat(email)) {
+        if (EmailValidator.isValidFormat(email)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Неверный формат электронной почты.");
         }
 
         Projects project = projectsRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+                .orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 
         Users inviter = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         if (!permissionService.hasPermission(inviter.getId(), projectId, "invite_project_members")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED);
         }
 
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(PROJECT_ARCHIVED);
 
         if (email.equalsIgnoreCase(project.getIdOwner().getEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Владелец проекта не может быть приглашён.");
@@ -316,7 +306,7 @@ public class ProjectApiController {
 
         Optional<Users> optionalInvitee = usersRepository.findByEmail(email);
         if (optionalInvitee.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Приглашаемый пользователь не найден");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(USER_NOT_FOUND);
         }
         Users invitee = optionalInvitee.get();
 
@@ -365,17 +355,17 @@ public class ProjectApiController {
                                           @PathVariable Long userId,
                                           Principal principal) {
         Projects project = projectsRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+                .orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 
         Users currentUser = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         if (!permissionService.hasPermission(currentUser.getId(), projectId, "remove_project_members")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED);
         }
 
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(PROJECT_ARCHIVED);
 
         Optional<ProjectMembers> memberOpt = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, userId);
         if (memberOpt.isEmpty()) {
@@ -404,17 +394,17 @@ public class ProjectApiController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProject(@PathVariable Long id, Principal principal) {
         Projects project = projectsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+                .orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 
         Users user = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_project")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED);
         }
 
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(PROJECT_ARCHIVED);
 
         List<Tasks> tasks = tasksRepository.findByIdProject_Id(id);
         for (Tasks task : tasks) {
@@ -439,14 +429,14 @@ public class ProjectApiController {
     @DeleteMapping("/{projectId}/members/leave")
     public ResponseEntity<?> leaveProject(@PathVariable Long projectId, Principal principal) {
         Projects project = projectsRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Проект не найден"));
+                .orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
         Users currentUser = usersRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
         if (Objects.equals(project.getIdOwner().getId(), currentUser.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Владелец не может покинуть проект."));
         }
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(PROJECT_ARCHIVED);
 
         Optional<ProjectMembers> memberOpt = projectMembersRepository.findByIdProjectIdAndIdUserId(projectId, currentUser.getId());
         if (memberOpt.isEmpty()) {

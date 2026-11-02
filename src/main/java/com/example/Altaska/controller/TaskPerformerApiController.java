@@ -1,43 +1,39 @@
 package com.example.Altaska.controller;
 
-import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.*;
 import com.example.Altaska.repositories.*;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.NotificationService;
 import com.example.Altaska.services.PermissionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task-performers")
+@RequiredArgsConstructor
 public class TaskPerformerApiController {
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private TaskPerformersRepository taskPerformersRepository;
+    private final TaskPerformersRepository taskPerformersRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     @GetMapping("/{taskId}")
     public ResponseEntity<?> getTaskPerformers(@PathVariable Long taskId) {

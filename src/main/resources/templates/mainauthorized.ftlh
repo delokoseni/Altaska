@@ -56,7 +56,7 @@
             <button class="project-button" id="mainproject" onclick="goToMainPage(this)">Главная</button>
         </div>
         <#if projects?? && (projects?size > 0)>
-        <#assign activeProjects = projects?filter(p -> !p.isArchived)>
+        <#assign activeProjects = projects?filter(p -> !p.archived)>
         <#if activeProjects?has_content>
         <div class="project-section">
             <#list activeProjects as project>
@@ -70,7 +70,7 @@
         </#list>
 </div>
 </#if>
-<#assign archivedProjects = projects?filter(p -> p.isArchived)>
+<#assign archivedProjects = projects?filter(p -> p.archived)>
 <#if archivedProjects?has_content>
 <div class="project-section">
     <div class="project-section-title collapsible" style="cursor: pointer;" onclick="toggleArchived()">Архивированные проекты ▼</div>

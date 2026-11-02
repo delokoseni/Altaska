@@ -1,6 +1,5 @@
 package com.example.Altaska.controller;
 
-import com.example.Altaska.dto.Change;
 import com.example.Altaska.models.Tasks;
 import com.example.Altaska.models.Tags;
 import com.example.Altaska.models.TasksTags;
@@ -12,11 +11,13 @@ import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.PermissionService;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -27,25 +28,20 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/taskstags")
+@RequiredArgsConstructor
 public class TasksTagsApiController {
 
-    @Autowired
-    private TasksTagsRepository tasksTagsRepository;
+    private final TasksTagsRepository tasksTagsRepository;
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private TagsRepository tagsRepository;
+    private final TagsRepository tagsRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
     @GetMapping("/task/{taskId}")
     public List<Tags> getTagsByTask(@PathVariable Long taskId) {
@@ -137,22 +133,12 @@ public class TasksTagsApiController {
         return new ArrayList<>(tagMap.values());
     }
 
-    public class TagWithTasksDto {
+    @Setter
+    @Getter
+    public static class TagWithTasksDto {
         private Long tagId;
         private String tagName;
         private List<Long> taskIds;
-
-        public Long getTagId() { return tagId; }
-
-        public String getTagName() {return tagName; }
-
-        public List<Long> getTaskIds() {return taskIds; }
-
-        public void setTagId(Long tagId) { this.tagId = tagId; }
-
-        public void setTagName(String tagName) {this.tagName = tagName; }
-
-        public void setTaskIds(List<Long> taskIds) {this.taskIds = taskIds; }
     }
 
 

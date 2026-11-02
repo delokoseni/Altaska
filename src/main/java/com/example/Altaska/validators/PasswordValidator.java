@@ -1,6 +1,10 @@
 package com.example.Altaska.validators;
 
 public class PasswordValidator {
+    private PasswordValidator() {
+        /* This utility class should not be instantiated */
+    }
+
 
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 20;

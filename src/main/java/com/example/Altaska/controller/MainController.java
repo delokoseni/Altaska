@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class MainController {
-    public MainController(){ }
 
     @GetMapping({"/"})
     public String showMain() { return "main"; }

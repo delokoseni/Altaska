@@ -5,7 +5,7 @@ import com.example.Altaska.models.Users;
 import com.example.Altaska.repositories.UsersRepository;
 import com.example.Altaska.services.ActivityLogService;
 import com.example.Altaska.services.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,16 +21,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class MainAuthorizedController {
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    private UsersRepository userRepository;
+    private final UsersRepository userRepository;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
 
     @GetMapping("/mainauthorized")

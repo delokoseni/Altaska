@@ -11,8 +11,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,46 +26,35 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tasks")
+@RequiredArgsConstructor
 public class TaskApiController {
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    @Autowired
-    private ProjectsRepository projectsRepository;
+    private final ProjectsRepository projectsRepository;
 
-    @Autowired
-    private StatusesRepository statusesRepository;
+    private final StatusesRepository statusesRepository;
 
-    @Autowired
-    private PrioritiesRepository prioritiesRepository;
+    private final PrioritiesRepository prioritiesRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private  TasksTagsRepository tasksTagsRepository;
+    private final TasksTagsRepository tasksTagsRepository;
 
-    @Autowired
-    private TagsRepository tagsRepository;
+    private final TagsRepository tagsRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private TaskCleanupService taskCleanupService;
+    private final TaskCleanupService taskCleanupService;
 
-    @Autowired
-    private TaskPerformersRepository taskPerformersRepository;
+    private final TaskPerformersRepository taskPerformersRepository;
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<Tasks>> getTasksByProject(@PathVariable Long projectId, Principal principal) {
