@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,20 @@ public class CommentApiController {
     private final NotificationService notificationService;
 
     private final TaskPerformersRepository taskPerformersRepository;
+
+    private static final String TASK_COMMENT = "task_comment";
+    private static final String TASKS = "tasks";
+
+    private static final String ACTION_ADD = "add";
+    private static final String ACTION_EDIT = "edit";
+    private static final String ACTION_DELETE = "delete";
+
+    private static final String CONTENT_FIELD = "content";
+
+    private static final String ERROR_INSUFFICIENT_PERMISSIONS = "Недостаточно прав.";
+    private static final String ERROR_PROJECT_ARCHIVED = "Проект архивирован и не может быть изменён.";
+    private static final String ERROR_TASK_NOT_FOUND = "Задача не найдена.";
+    private static final String ERROR_TASK_MISSING = "Задача отсутствует.";
 
     @GetMapping("/task/{taskId}")
     public List<CommentDto> getCommentsByTask(@PathVariable Long taskId) {
@@ -67,34 +82,35 @@ public class CommentApiController {
 
         Tasks task = tasksRepository.findById(commentRequest.getTaskId()).orElse(null);
         if (task == null) {
-            return ResponseEntity.badRequest().body("Задача не найдена");
+            return ResponseEntity.badRequest().body(ERROR_TASK_NOT_FOUND);
         }
 
         Projects project = task.getIdProject();
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_PROJECT_ARCHIVED);
 
         if (!permissionService.hasPermission(user.getId(), project.getId(), "write_task_comments")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_INSUFFICIENT_PERMISSIONS);
         }
 
         Comments comment = new Comments();
         comment.setContent(commentRequest.getContent());
-        comment.setCreatedAt(OffsetDateTime.now());
-        comment.setCreatedAtServer(OffsetDateTime.now());
+        OffsetDateTime odt = OffsetDateTime.now(ZoneId.systemDefault());
+        comment.setCreatedAt(odt);
+        comment.setCreatedAtServer(odt);
         comment.setIdTask(task);
         comment.setIdUser(user);
 
         commentsRepository.save(comment);
         List<Change> changes = List.of(
-                new Change("content", null, comment.getContent())
+                new Change(CONTENT_FIELD, null, comment.getContent())
         );
 
         activityLogService.logActivity(
                 user,
                 project,
-                "add",
-                "task_comment",
+                ACTION_ADD,
+                TASK_COMMENT,
                 comment.getId(),
                 changes,
                 "Добавлен комментарий к задаче: \"" + task.getName() + "\""
@@ -116,8 +132,8 @@ public class CommentApiController {
 
             notificationService.notifyUsers(
                     recipients,
-                    "task_comment",
-                    "tasks",
+                    TASK_COMMENT,
+                    TASKS,
                     task.getId(),
                     user,
                     message
@@ -142,12 +158,15 @@ public class CommentApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_TASK_MISSING);
+        }
         Projects project = task.getIdProject();
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_PROJECT_ARCHIVED);
 
         if (!permissionService.hasPermission(user.getId(), project.getId(), "edit_task_comments")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_INSUFFICIENT_PERMISSIONS);
         }
         if (content.startsWith("\"") && content.endsWith("\"")) {
             content = content.substring(1, content.length() - 1);
@@ -155,16 +174,14 @@ public class CommentApiController {
         String oldContent = comment.getContent();
         comment.setContent(content);
         commentsRepository.save(comment);
-        Map<String, Object> before = new LinkedHashMap<>();
-        before.put("content", oldContent);
 
         activityLogService.logActivity(
                 user,
                 project,
-                "edit",
-                "task_comment",
+                ACTION_EDIT,
+                TASK_COMMENT,
                 comment.getId(),
-                List.of(new Change("content", oldContent, content)),
+                List.of(new Change(CONTENT_FIELD, oldContent, content)),
                 "Комментарий к задаче \"" + task.getName() + "\" изменён"
         );
         return ResponseEntity.ok().build();
@@ -186,24 +203,27 @@ public class CommentApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Tasks task = tasksRepository.findById(comment.getIdTask().getId()).orElse(null);
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_TASK_MISSING);
+        }
         Projects project = task.getIdProject();
         if(permissionService.checkIfProjectArchived(project))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Проект архивирован и не может быть изменён");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_PROJECT_ARCHIVED);
 
         if (!permissionService.hasPermission(user.getId(), project.getId(), "delete_task_comments")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Недостаточно прав.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ERROR_INSUFFICIENT_PERMISSIONS);
         }
         String oldContent = comment.getContent();
         commentsRepository.delete(comment);
         List<Change> changes = List.of(
-                new Change("content", oldContent, null)
+                new Change(CONTENT_FIELD, oldContent, null)
         );
 
         activityLogService.logActivity(
                 user,
                 project,
-                "delete",
-                "task_comment",
+                ACTION_DELETE,
+                TASK_COMMENT,
                 comment.getId(),
                 changes,
                 "Комментарий удалён из задачи: \"" + task.getName() + "\""
